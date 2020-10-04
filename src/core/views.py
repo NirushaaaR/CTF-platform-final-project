@@ -9,19 +9,31 @@ from django.utils.http import is_safe_url
 from django.db.models import Q
 from django.contrib.auth.views import redirect_to_login
 
+from django.utils import timezone
+
 from django.conf import settings
 
-from .models import Room, Task, UserParcitipation
+from .models import Room, Task, UserAnsweredTask, UserParcitipation
 
 def user_pass_prerequisites(user, room_id):
     user_finished_room = UserParcitipation.objects.filter(
         Q(user=user), ~Q(finished_at=None)
     ).values_list("room_id", flat=True)
 
-    return not Room.objects.filter(
+    have_unfinished_room = Room.objects.filter(
         Q(next_rooms=room_id), ~Q(id__in=user_finished_room)
-    ).exists()    
+    ).exists()
 
+    return not have_unfinished_room
+
+
+def user_clear_all_tasks(user, room_id):
+    answered_tasks = UserAnsweredTask.objects.filter(user=user)
+    exists_unfinished_tasks = Task.objects.filter(Q(room=room_id), ~Q(id__in=answered_tasks)).exists()
+    return not exists_unfinished_tasks
+
+def user_is_participated(user, room_id):
+    return UserParcitipation.objects.filter(user=user, room=room_id).exists()
 
 
 def index(request):
@@ -119,17 +131,23 @@ def secret_route(request):
 @login_required
 @require_POST
 def enter_flag(request, room_id):
-    task_id = request.POST.get("task_id")
-    flag = request.POST.get("flag")
-
-    print(task_id)
-    print(flag)
-
-    is_correct = Task.objects.filter(pk=task_id, flag=flag).exists()
-    if is_correct:
-        print("user get the right flag")
-        request.user.cleared_tasks.add(task_id)
+    if not user_is_participated(request.user, room_id):
+        print("Error user not participated can't enter flag")
     else:
-        print("user get wrong tasks")
+        task_id = request.POST.get("task_id")
+        flag = request.POST.get("flag")
+
+        is_correct = Task.objects.filter(pk=task_id, flag=flag).exists()
+        if is_correct:
+            print("user get the right flag")
+            request.user.cleared_tasks.add(task_id) 
+            if user_clear_all_tasks(request.user, room_id):
+                UserParcitipation.objects.filter(user=request.user, room=room_id).update(
+                    finished_at=timezone.now()
+                )
+                print("user cleared room")
+        else:
+            print("user get wrong tasks")
     
+    # return render(request, "core/debug.html")
     return redirect("room", pk=room_id)
