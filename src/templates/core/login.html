@@ -1,5 +1,13 @@
-{% extends 'base.html' %}
-
-{% block content %}
+{% extends 'base.html' %} {% block content %}
 <h1>Login Page</h1>
+
+<form
+  action="{% url 'login' %}{% if next %}?next={{next}}{% endif %}"
+  method="post"
+>
+  {% csrf_token %}
+  <input type="text" name="username" id="username" placeholder="username" />
+  <input type="password" name="password" id="password" placeholder="password" />
+  <button>login</button>
+</form>
 {% endblock content %}
