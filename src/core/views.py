@@ -128,7 +128,10 @@ def login(request):
 
 def register(request):
     if request.method == "POST":
-        pass
+        username = request.POST.get("username")
+        email = request.POST.get("email")
+        password = request.POST.get("email")
+
     else:
         return render(request, "core/register.html")
 

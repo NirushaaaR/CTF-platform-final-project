@@ -1,6 +1,48 @@
 from django.db import models
+from django.contrib.auth.models import (
+    AbstractBaseUser,
+    BaseUserManager,
+    PermissionsMixin,
+)
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
+
+
+class UserManager(BaseUserManager):
+    def create_user(self, username, email, password=None, **kwargs):
+        """ create and save user with email and password """
+        if not email:
+            raise ValueError("User must have an email address")
+        user = self.model(
+            email=self.normalize_email(email), username=username, **kwargs
+        )
+        user.set_password(password)
+        user.save(using=self._db)  # supporting many database ?
+
+        return user
+
+    def create_superuser(self, username, email, password):
+        """ create and save a superuser """
+        user = self.create_user(username, email, password)
+        user.is_staff = True
+        user.is_superuser = True
+        user.save(using=self._db)
+
+        return user
+
+
+class User(AbstractBaseUser, PermissionsMixin):
+    """ Custom user model that use email as username field """
+
+    email = models.EmailField(max_length=255, unique=True)
+    username = models.CharField(max_length=255, unique=True)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    score = models.PositiveIntegerField(default=0)
+
+    objects = UserManager()
+
+    USERNAME_FIELD = "username"
 
 
 class Room(models.Model):
@@ -15,7 +57,10 @@ class Room(models.Model):
         "self", symmetrical=False, blank=True, related_name="next_rooms"
     )
     participants = models.ManyToManyField(
-        get_user_model(), through="UserParcitipation", blank=True, related_name="participated_rooms"
+        get_user_model(),
+        through="UserParcitipation",
+        blank=True,
+        related_name="participated_rooms",
     )
 
     def __str__(self):
@@ -40,7 +85,10 @@ class Task(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="tasks")
 
     answered_users = models.ManyToManyField(
-        get_user_model(), through="UserAnsweredTask", blank=True, related_name="cleared_tasks"
+        get_user_model(),
+        through="UserAnsweredTask",
+        blank=True,
+        related_name="cleared_tasks",
     )
 
     def __str__(self):
