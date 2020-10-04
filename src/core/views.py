@@ -2,6 +2,7 @@ from django.http import request
 from django.http.response import Http404, HttpResponse, HttpResponseNotFound
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import auth
+from django.urls.base import reverse
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.utils.http import is_safe_url
@@ -10,14 +11,14 @@ from django.contrib.auth.views import redirect_to_login
 
 from django.conf import settings
 
-from .models import Room, UserParcitipation
+from .models import Room, Task, UserParcitipation
 
 def user_pass_prerequisites(user, room_id):
     user_finished_room = UserParcitipation.objects.filter(
         Q(user=user), ~Q(finished_at=None)
     ).values_list("room_id", flat=True)
 
-    return Room.objects.filter(
+    return not Room.objects.filter(
         Q(next_rooms=room_id), ~Q(id__in=user_finished_room)
     ).exists()    
 
@@ -37,9 +38,10 @@ def room(request, pk):
             return redirect_to_login(request.path)
 
         if user_pass_prerequisites(request.user, pk):
-            print("need to do prerequire room first")
-        else:
             request.user.participated_rooms.add(pk)
+        else:
+            print("need to do prerequire room first")
+            
 
         return render(request, "core/debug.html")
     else:
@@ -113,3 +115,21 @@ def logout(request):
 def secret_route(request):
     print("Enter secret route")
     return redirect("index")
+
+@login_required
+@require_POST
+def enter_flag(request, room_id):
+    task_id = request.POST.get("task_id")
+    flag = request.POST.get("flag")
+
+    print(task_id)
+    print(flag)
+
+    is_correct = Task.objects.filter(pk=task_id, flag=flag).exists()
+    if is_correct:
+        print("user get the right flag")
+        request.user.cleared_tasks.add(task_id)
+    else:
+        print("user get wrong tasks")
+    
+    return redirect("room", pk=room_id)

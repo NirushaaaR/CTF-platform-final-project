@@ -2,8 +2,15 @@
 <p>{{room}}</p>
 <p>{{tasks}}</p>
 <p>{{hints}}</p>
-<form action="{% url 'room' room.pk %}" method="post">
+<form action="{% url 'room' room.id %}" method="post">
   {% csrf_token %}
   <button>Participate</button>
 </form>
-{% endblock content %}
+{% for task in tasks %}
+<form action="{% url 'enter_flag' room.id %}" method="post">
+  {% csrf_token %}
+  <input type="text" name="flag" placeholder="flag here..." />
+  <input type="hidden" name="task_id" value="{{task.id}}" />
+  <button>Submit</button>
+</form>
+{% endfor %} {% endblock content %}

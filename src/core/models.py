@@ -40,7 +40,7 @@ class Task(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="tasks")
 
     answered_users = models.ManyToManyField(
-        get_user_model(), through="UserAnsweredTask", blank=True
+        get_user_model(), through="UserAnsweredTask", blank=True, related_name="cleared_tasks"
     )
 
     def __str__(self):
