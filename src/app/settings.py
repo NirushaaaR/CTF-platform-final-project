@@ -1,20 +1,12 @@
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "rg2q4l$l%eweb&7w!g)ma$ilg865_e4#f%3w+wjg=f7-u+#$k$"
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -27,6 +19,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # 3rd party
     "nested_inline",
+    "debug_toolbar",
     # local app
     "core.apps.CoreConfig",
 ]
@@ -39,6 +32,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # 3rd party
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 ROOT_URLCONF = "app.urls"
@@ -110,3 +105,8 @@ STATIC_URL = "/static/"
 # LOGIN
 LOGIN_URL = "/login"
 LOGIN_REDIRECT_URL = "/"
+
+# for debug toolbar
+INTERNAL_IPS = [
+    "127.0.0.1",
+]

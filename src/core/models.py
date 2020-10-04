@@ -15,7 +15,7 @@ class Room(models.Model):
         "self", symmetrical=False, blank=True, related_name="next_rooms"
     )
     participants = models.ManyToManyField(
-        get_user_model(), through="UserParcitipation", blank=True
+        get_user_model(), through="UserParcitipation", blank=True, related_name="participated_rooms"
     )
 
     def __str__(self):

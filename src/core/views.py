@@ -1,5 +1,5 @@
 from django.http import request
-from django.http.response import HttpResponse
+from django.http.response import Http404, HttpResponse, HttpResponseNotFound
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import auth
 from django.views.decorators.http import require_POST
@@ -12,6 +12,16 @@ from django.conf import settings
 
 from .models import Room, UserParcitipation
 
+def user_pass_prerequisites(user, room_id):
+    user_finished_room = UserParcitipation.objects.filter(
+        Q(user=user), ~Q(finished_at=None)
+    ).values_list("room_id", flat=True)
+
+    return Room.objects.filter(
+        Q(next_rooms=room_id), ~Q(id__in=user_finished_room)
+    ).exists()    
+
+
 
 def index(request):
     """ The Fist page. Will Get Rooms and shows a paginated result """
@@ -21,45 +31,36 @@ def index(request):
 
 
 def room(request, pk):
-    """when click to see a room shows room information tasks and hints
-    if user still not participate room let user participate but check the prerequsuite first
-    if room is done show conclusion"""
     if request.method == "POST":
 
         if not request.user.is_authenticated:
             return redirect_to_login(request.path)
 
-        user_finished_room = UserParcitipation.objects.filter(
-            Q(user=request.user), ~Q(finished_at=None)
-        ).values_list("room_id", flat=True)
-
-        not_finish_prerequisites = Room.objects.filter(
-            Q(next_rooms=pk), ~Q(id__in=user_finished_room)
-        )
-
-        print(not_finish_prerequisites)
-        if len(not_finish_prerequisites) > 0:
-            print("need to do room")
-            print(not_finish_prerequisites)
+        if user_pass_prerequisites(request.user, pk):
+            print("need to do prerequire room first")
         else:
-            print("all finish can begin works now")
-        return HttpResponse("ONGoing")
+            request.user.participated_rooms.add(pk)
+
+        return render(request, "core/debug.html")
     else:
-        # get all tasks in room
-        room = get_object_or_404(Room, pk=pk)
-        tasks = room.tasks.all().order_by("task_number")
-        hints = {}
-        for task in tasks:
-            hints[task.task_number] = task.hints.all()
+        try:
+            room = Room.objects.prefetch_related("tasks", "tasks__hints").get(pk=pk)
+            tasks = room.tasks.all()
+            hints = {}
+            for t in tasks:
+                hints[t.task_number] = t.hints.all()
 
-        context = {
-            "room": room,
-            "tasks": tasks,
-            "hints": hints,
-        }
+            context = {
+                "room": room,
+                "tasks": tasks,
+                "hints": hints,
+            }
 
-        print(hints)
-        return render(request, "core/room.html", context)
+            return render(request, "core/room.html", context)
+        except Room.DoesNotExist:
+            raise Http404
+
+        
 
 
 def redirect_after_login(request):
