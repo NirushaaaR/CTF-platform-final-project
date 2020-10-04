@@ -1,3 +1,9 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import Room, UserParcitipation, Task, UserAnsweredTask, TaskHint
+
+admin.site.register(Room)
+admin.site.register(UserParcitipation)
+admin.site.register(Task)
+admin.site.register(UserAnsweredTask)
+admin.site.register(TaskHint)
