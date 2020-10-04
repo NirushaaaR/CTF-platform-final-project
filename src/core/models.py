@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
-from django.core.exceptions import ValidationError
 
 class Room(models.Model):
     title = models.CharField(max_length=255)
@@ -11,7 +10,7 @@ class Room(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    prerequisites = models.ManyToManyField("self", symmetrical=False, blank=True)
+    prerequisites = models.ManyToManyField("self", symmetrical=False, blank=True, related_name="next_rooms")
     participants = models.ManyToManyField(get_user_model(), through="UserParcitipation", blank=True)
 
     def __str__(self):
@@ -33,7 +32,7 @@ class Task(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     flag = models.CharField(max_length=255)
-    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="tasks")
 
     answered_users = models.ManyToManyField(
         get_user_model(), through="UserAnsweredTask", blank=True
@@ -54,7 +53,7 @@ class UserAnsweredTask(models.Model):
 
 class TaskHint(models.Model):
     hint = models.CharField(max_length=255)
-    task = models.ForeignKey(Task, on_delete=models.CASCADE)
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="hints")
 
     def __str__(self):
         return self.hint
