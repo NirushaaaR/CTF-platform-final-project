@@ -15,6 +15,7 @@ from django.conf import settings
 
 from .models import Room, Task, UserAnsweredTask, UserParcitipation
 
+
 def user_pass_prerequisites(user, room_id):
     user_finished_room = UserParcitipation.objects.filter(
         Q(user=user), ~Q(finished_at=None)
@@ -29,32 +30,51 @@ def user_pass_prerequisites(user, room_id):
 
 def user_clear_all_tasks(user, room_id):
     answered_tasks = UserAnsweredTask.objects.filter(user=user)
-    exists_unfinished_tasks = Task.objects.filter(Q(room=room_id), ~Q(id__in=answered_tasks)).exists()
+    exists_unfinished_tasks = Task.objects.filter(
+        Q(room=room_id), ~Q(id__in=answered_tasks)
+    ).exists()
     return not exists_unfinished_tasks
+
 
 def user_is_participated(user, room_id):
     return UserParcitipation.objects.filter(user=user, room=room_id).exists()
+
+
+def add_participation_info(user, rooms):
+    participated_room = rooms.filter(participants=user).values_list(
+        "id", "userparcitipation__finished_at"
+    )
+    index = 0
+    for r in rooms:
+        if r.id == participated_room[index][0]:
+            print("same match", r, participated_room[index])
+            r.is_participating = True
+            r.finished_at = participated_room[index][1]
+            index += 1
 
 
 def index(request):
     """ The Fist page. Will Get Rooms and shows a paginated result """
     rooms = Room.objects.all().order_by("created_at")
     context = {"rooms": rooms}
+
+    if request.user.is_authenticated:
+        participated_room = rooms.filter(participants=request.user).values_list(
+            "id", "userparcitipation__finished_at"
+        )
+        context["user_participated"] = {k: v for k, v in participated_room}
+
     return render(request, "core/index.html", context)
 
 
 def room(request, pk):
     if request.method == "POST":
-
         if not request.user.is_authenticated:
             return redirect_to_login(request.path)
-
         if user_pass_prerequisites(request.user, pk):
             request.user.participated_rooms.add(pk)
         else:
             print("need to do prerequire room first")
-            
-
         return render(request, "core/debug.html")
     else:
         try:
@@ -63,18 +83,14 @@ def room(request, pk):
             hints = {}
             for t in tasks:
                 hints[t.task_number] = t.hints.all()
-
             context = {
                 "room": room,
                 "tasks": tasks,
                 "hints": hints,
             }
-
             return render(request, "core/room.html", context)
         except Room.DoesNotExist:
             raise Http404
-
-        
 
 
 def redirect_after_login(request):
@@ -128,6 +144,7 @@ def secret_route(request):
     print("Enter secret route")
     return redirect("index")
 
+
 @login_required
 @require_POST
 def enter_flag(request, room_id):
@@ -140,14 +157,14 @@ def enter_flag(request, room_id):
         is_correct = Task.objects.filter(pk=task_id, flag=flag).exists()
         if is_correct:
             print("user get the right flag")
-            request.user.cleared_tasks.add(task_id) 
+            request.user.cleared_tasks.add(task_id)
             if user_clear_all_tasks(request.user, room_id):
-                UserParcitipation.objects.filter(user=request.user, room=room_id).update(
-                    finished_at=timezone.now()
-                )
+                UserParcitipation.objects.filter(
+                    user=request.user, room=room_id
+                ).update(finished_at=timezone.now())
                 print("user cleared room")
         else:
             print("user get wrong tasks")
-    
+
     # return render(request, "core/debug.html")
     return redirect("room", pk=room_id)

@@ -1,10 +1,15 @@
-{% extends 'base.html' %} {% block content %}
+{% extends 'base.html' %} {% load custom_filters %} {% block content %}
 <h1>Show Index Page Here</h1>
 {% for room in rooms %}
 <div>
   <h3>{{room.title}}</h3>
   <p>{{room.description}}</p>
   <a href="{% url 'room' room.pk %}">enter room</a>
+  {% if room.id in user_participated %}
+  <p>participating</p>
+  {% if user_participated|get_dict_value:room.id %}
+  <p>Done</p>
+  {% endif %} {% endif %}
   <hr />
 </div>
 {% endfor %} {% endblock content %}
