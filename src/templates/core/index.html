@@ -1,4 +1,9 @@
-{% extends 'base.html' %}
-{% block content %}
+{% extends 'base.html' %} {% block content %}
 <h1>Show Index Page Here</h1>
-{% endblock content %}
+{% for room in rooms %}
+<div>
+  <h3>{{room.title}}</h3>
+  <p>{{room.description}}</p>
+  <hr />
+</div>
+{% endfor %} {% endblock content %}
