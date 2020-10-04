@@ -1,15 +1,8 @@
 from os import name
 from django.urls import path
 
-from .views import (
-    index,
-    room,
-    login,
-    register,
-    secret_route,
-    logout,
-    enter_flag,
-)
+from core.views.room import index, room, enter_flag
+from core.views.auth import login, logout, register
 
 urlpatterns = [
     path("", index, name="index"),
@@ -18,5 +11,4 @@ urlpatterns = [
     path("login", login, name="login"),
     path("register", register, name="register"),
     path("logout", logout, name="logout"),
-    path("secret", secret_route, name="secret"),
 ]
