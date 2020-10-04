@@ -3,9 +3,11 @@ from nested_inline.admin import NestedStackedInline, NestedModelAdmin
 
 from .models import Room, UserParcitipation, Task, UserAnsweredTask, TaskHint
 
+
 class TaskHintInline(NestedStackedInline):
     model = TaskHint
     extra = 1
+
 
 class TaskInline(NestedStackedInline):
     model = Task

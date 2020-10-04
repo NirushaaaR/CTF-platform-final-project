@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 
+
 class Room(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
@@ -10,8 +11,12 @@ class Room(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    prerequisites = models.ManyToManyField("self", symmetrical=False, blank=True, related_name="next_rooms")
-    participants = models.ManyToManyField(get_user_model(), through="UserParcitipation", blank=True)
+    prerequisites = models.ManyToManyField(
+        "self", symmetrical=False, blank=True, related_name="next_rooms"
+    )
+    participants = models.ManyToManyField(
+        get_user_model(), through="UserParcitipation", blank=True
+    )
 
     def __str__(self):
         return self.title
