@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.http import request
 from django.http.response import Http404, HttpResponse, HttpResponseNotFound
 from django.shortcuts import render, get_object_or_404, redirect
@@ -8,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.http import is_safe_url
 from django.db.models import Q
 from django.contrib.auth.views import redirect_to_login
+from django.db.utils import IntegrityError
 
 from django.utils import timezone
 
@@ -130,9 +132,25 @@ def register(request):
     if request.method == "POST":
         username = request.POST.get("username")
         email = request.POST.get("email")
-        password = request.POST.get("email")
+        password = request.POST.get("password")
+        user_exists = (
+            get_user_model()
+            .objects.filter(Q(username=username) | Q(email=email))
+            .exists()
+        )
+        if user_exists:
+            print("can't use the username or password")
+            return redirect("register")
+
+        user = get_user_model().objects.create_user(
+            username=username, email=email, password=password
+        )
+        auth.login(request, user)
+        return redirect(settings.LOGIN_REDIRECT_URL)
 
     else:
+        if request.user.is_authenticated:
+            return redirect(settings.LOGIN_REDIRECT_URL)
         return render(request, "core/register.html")
 
 

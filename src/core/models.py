@@ -21,7 +21,7 @@ class UserManager(BaseUserManager):
 
         return user
 
-    def create_superuser(self, username, email, password):
+    def create_superuser(self, username, email, password=None):
         """ create and save a superuser """
         user = self.create_user(username, email, password)
         user.is_staff = True
@@ -43,6 +43,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = "username"
+    REQUIRED_FIELDS = ["email"]
 
 
 class Room(models.Model):
