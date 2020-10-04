@@ -22,7 +22,6 @@ class UserParcitipation(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     participated_at = models.DateTimeField(auto_now_add=True)
-    is_finish = models.BooleanField(default=False)
     finished_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):

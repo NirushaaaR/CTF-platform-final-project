@@ -8,6 +8,7 @@ black = "==20.8b1"
 
 [packages]
 django = "~=3.1.2"
+django-nested-inline = "~=0.4.2"
 
 [scripts]
 start = "python src/manage.py runserver"
