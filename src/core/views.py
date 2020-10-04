@@ -1,13 +1,16 @@
 from django.http import request
+from django.http.response import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import auth
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.utils.http import is_safe_url
+from django.db.models import Q
+from django.contrib.auth.views import redirect_to_login
 
 from django.conf import settings
 
-from .models import Room
+from .models import Room, UserParcitipation
 
 
 def index(request):
@@ -17,26 +20,46 @@ def index(request):
     return render(request, "core/index.html", context)
 
 
-def room(request, room_id):
+def room(request, pk):
     """when click to see a room shows room information tasks and hints
     if user still not participate room let user participate but check the prerequsuite first
     if room is done show conclusion"""
-    room = get_object_or_404(Room, pk=room_id)
+    if request.method == "POST":
 
-    # get all tasks in room
-    tasks = room.tasks.all().order_by("task_number")
-    hints = {}
-    for task in tasks:
-        hints[task.task_number] = task.hints.all()
+        if not request.user.is_authenticated:
+            return redirect_to_login(request.path)
 
-    context = {
-        "room": room,
-        "tasks": tasks,
-        "hints": hints,
-    }
+        user_finished_room = UserParcitipation.objects.filter(
+            Q(user=request.user), ~Q(finished_at=None)
+        ).values_list("room_id", flat=True)
 
-    print(hints)
-    return render(request, "core/room.html", context)
+        not_finish_prerequisites = Room.objects.filter(
+            Q(next_rooms=pk), ~Q(id__in=user_finished_room)
+        )
+
+        print(not_finish_prerequisites)
+        if len(not_finish_prerequisites) > 0:
+            print("need to do room")
+            print(not_finish_prerequisites)
+        else:
+            print("all finish can begin works now")
+        return HttpResponse("ONGoing")
+    else:
+        # get all tasks in room
+        room = get_object_or_404(Room, pk=pk)
+        tasks = room.tasks.all().order_by("task_number")
+        hints = {}
+        for task in tasks:
+            hints[task.task_number] = task.hints.all()
+
+        context = {
+            "room": room,
+            "tasks": tasks,
+            "hints": hints,
+        }
+
+        print(hints)
+        return render(request, "core/room.html", context)
 
 
 def redirect_after_login(request):

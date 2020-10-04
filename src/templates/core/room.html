@@ -1,6 +1,9 @@
-{% extends 'base.html' %}
-{% block content %}
-    <p>{{room}}</p>
-    <p>{{tasks}}</p>
-    <p>{{hints}}</p>
+{% extends 'base.html' %} {% block content %}
+<p>{{room}}</p>
+<p>{{tasks}}</p>
+<p>{{hints}}</p>
+<form action="{% url 'room' room.pk %}" method="post">
+  {% csrf_token %}
+  <button>Participate</button>
+</form>
 {% endblock content %}

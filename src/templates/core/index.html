@@ -4,6 +4,7 @@
 <div>
   <h3>{{room.title}}</h3>
   <p>{{room.description}}</p>
+  <a href="{% url 'room' room.pk %}">enter room</a>
   <hr />
 </div>
 {% endfor %} {% endblock content %}
