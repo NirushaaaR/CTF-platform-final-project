@@ -61,4 +61,5 @@ def register(request):
 @require_POST
 def logout(request):
     auth.logout(request)
+    print("Log user out")
     return redirect("index")

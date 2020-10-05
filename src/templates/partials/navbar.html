@@ -1,0 +1,17 @@
+<div>
+  <ul>
+    <li><a href="{% url 'index' %}">Home</a></li>
+    <li><a href="{% url 'scoreboard' %}">Scoreboard</a></li>
+
+    {% if request.user.is_authenticated %}
+    <li><a href="{% url 'profile' %}">Profile</a></li>
+    <li><a href="javascript:{document.getElementById('logout').submit()}">logout</a></li>
+    <form action="{% url 'logout' %}" id="logout" method="post">
+    {% csrf_token %}
+    </form></li>
+    {% else %}
+    <li><a href="{% url 'login' %}">LogIn</a>
+    <li><a href="{% url 'register' %}">Register</a>
+    {% endif %}
+  </ul>
+</div>
