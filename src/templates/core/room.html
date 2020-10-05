@@ -1,16 +1,21 @@
-{% extends 'base.html' %} {% block content %}
-<p>{{room}}</p>
-<p>{{tasks}}</p>
-<p>{{hints}}</p>
+{% extends 'base.html' %} {% load custom_filters %} {% block content %}
+<p>Title: {{room.title}}</p>
+<p>Desc: {{room.description}}</p>
 <form action="{% url 'room' room.id %}" method="post">
   {% csrf_token %}
   <button>Participate</button>
 </form>
 {% for task in tasks %}
+<p>{{task.task_number}} - {{task.title}}</p>
+<p>{{task.description}}</p>
 <form action="{% url 'enter_flag' room.id %}" method="post">
   {% csrf_token %}
   <input type="text" name="flag" placeholder="flag here..." />
   <input type="hidden" name="task_id" value="{{task.id}}" />
   <button>Submit</button>
 </form>
-{% endfor %} {% endblock content %}
+{% for hint in hints|get_dict_value:task.task_number %}
+<p>hint{{forloop.counter}}: {{hint.hint}}</p>
+{% if task.task_number in user_answered_tasks %}
+<p>Done - {{user_answered_tasks|get_dict_value:task.task_number}}</p>
+{% endif %} {% endfor %} {% endfor %} {% endblock content %}

@@ -5,10 +5,12 @@
   <h3>{{room.title}}</h3>
   <p>{{room.description}}</p>
   <a href="{% url 'room' room.pk %}">enter room</a>
-  {% if room.id in user_participated %}
-  <p>participating</p>
-  {% if user_participated|get_dict_value:room.id %}
+  {% if room.id in user_participated %} {% comment %}
+  <div></div>
+  {% endcomment %} {% if user_participated|get_dict_value:room.id %}
   <p>Done</p>
+  {% else %}
+  <p>participating</p>
   {% endif %} {% endif %}
   <hr />
 </div>

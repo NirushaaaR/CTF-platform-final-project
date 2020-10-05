@@ -32,10 +32,14 @@ def room(request, pk):
             request.user.participated_rooms.add(pk)
         else:
             print("need to do prerequire room first")
-        return render(request, "core/debug.html")
+        return redirect("room", pk=pk)
     else:
         try:
-            room = Room.objects.prefetch_related("tasks", "tasks__hints").get(pk=pk)
+            room = Room.objects.prefetch_related(
+                "tasks",
+                "tasks__hints",
+            ).get(pk=pk)
+
             tasks = room.tasks.all()
             hints = {}
             for t in tasks:
@@ -45,6 +49,13 @@ def room(request, pk):
                 "tasks": tasks,
                 "hints": hints,
             }
+
+            if request.user.is_authenticated:
+                user_answered_tasks = tasks.filter(
+                    answered_users=request.user
+                ).values_list("task_number", "useransweredtask__answered_at")
+                context["user_answered_tasks"] = {k: v for k, v in user_answered_tasks}
+
             return render(request, "core/room.html", context)
         except Room.DoesNotExist:
             raise Http404
