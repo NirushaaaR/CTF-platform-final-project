@@ -104,7 +104,7 @@ STATIC_URL = "/static/"
 
 # LOGIN
 LOGIN_URL = "/login"
-LOGIN_REDIRECT_URL = "/"
+LOGIN_REDIRECT_URL = "/profile"
 
 # for debug toolbar
 INTERNAL_IPS = [

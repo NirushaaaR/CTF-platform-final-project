@@ -1,0 +1,8 @@
+{% extends 'base.html' %} {% block content %}
+<h1>User Profile Here</h1>
+<p>username: {{ request.user.username }}</p>
+<p>email: {{ request.user.email }}</p>
+<p>score: {{request.user.score}}</p>
+
+<div>cleared room {{request.user.participated_rooms.all}}</div>
+{% endblock content %}
