@@ -4,8 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CTF PLATFORM</title>
+    {% block stylesheet %}{% endblock stylesheet %}
   </head>
   <body>
-    {% include 'partials/navbar.html' %} {% block content %} {% endblock%}
+    {% include 'partials/navbar.html' %} {% block content %} {% endblock content %}
+    <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+    {% block javascript %} {% endblock javascript %}  
   </body>
 </html>
