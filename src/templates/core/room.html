@@ -1,13 +1,14 @@
 {% extends 'base.html' %} {% load custom_filters %} {% block content %}
-<p>Title: {{room.title}}</p>
-<p>Desc: {{room.description}}</p>
+<h3>Title: {{room.title}}</h3>
+<p>Description:</p>
+{{room.description|safe}}
 <form action="{% url 'room' room.id %}" method="post">
   {% csrf_token %}
   <button>Participate</button>
 </form>
 {% for task in tasks %}
 <p>{{task.task_number}} - {{task.title}}</p>
-<p>{{task.description}}</p>
+<p>{{task.description|safe}}</p>
 <form action="{% url 'enter_flag' room.id %}" method="post">
   {% csrf_token %}
   <input type="text" name="flag" placeholder="flag here..." />

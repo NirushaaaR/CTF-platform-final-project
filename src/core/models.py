@@ -48,12 +48,14 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Room(models.Model):
     title = models.CharField(max_length=255)
+    preview = models.CharField(max_length=255)
     description = models.TextField()
     conclusion = models.TextField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    tags = models.ManyToManyField("Tag", blank=True, related_name="rooms")
     prerequisites = models.ManyToManyField(
         "self", symmetrical=False, blank=True, related_name="next_rooms"
     )
@@ -67,6 +69,11 @@ class Room(models.Model):
     def __str__(self):
         return self.title
 
+class Tag(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
 
 class UserParcitipation(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)

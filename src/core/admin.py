@@ -1,7 +1,7 @@
 from django.contrib import admin
 from nested_inline.admin import NestedStackedInline, NestedModelAdmin
 
-from core.models import Room, Task, TaskHint
+from core.models import Room, Tag, Task, TaskHint
 
 
 class TaskHintInline(NestedStackedInline):
@@ -20,3 +20,5 @@ class RoomAdmin(NestedModelAdmin):
     inlines = (TaskInline,)
     class Media:
         js = ('js/tinyInject.js',)
+
+admin.site.register(Tag)

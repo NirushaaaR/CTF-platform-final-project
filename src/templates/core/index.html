@@ -3,7 +3,7 @@
 {% for room in rooms %}
 <div>
   <h3>{{room.title}}</h3>
-  {{room.description|safe}}
+  {{room.preview}}
   <a href="{% url 'room' room.pk %}">enter room</a>
   {% if room.id in user_participated %} {% comment %}
   <div></div>
