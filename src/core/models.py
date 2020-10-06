@@ -5,7 +5,7 @@ from django.contrib.auth.models import (
     PermissionsMixin,
 )
 from django.contrib.auth import get_user_model
-from django.core.validators import MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 class UserManager(BaseUserManager):
@@ -49,6 +49,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 class Room(models.Model):
     title = models.CharField(max_length=255)
     preview = models.CharField(max_length=255)
+    difficulty = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
     description = models.TextField()
     conclusion = models.TextField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
@@ -91,6 +92,7 @@ class Task(models.Model):
     description = models.TextField()
     flag = models.CharField(max_length=255)
     room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="tasks")
+    points = models.PositiveIntegerField()
 
     answered_users = models.ManyToManyField(
         get_user_model(),
@@ -101,6 +103,9 @@ class Task(models.Model):
 
     def __str__(self):
         return self.title
+    
+    class Meta:
+        unique_together = (("room","task_number"),)
 
 
 class UserAnsweredTask(models.Model):
