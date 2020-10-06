@@ -1,3 +1,4 @@
+from django.core.exceptions import PermissionDenied
 from django.http.response import Http404
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_POST
@@ -84,3 +85,9 @@ def enter_flag(request, room_id):
 
     # return render(request, "core/debug.html")
     return redirect("room", pk=room_id)
+
+
+def admin_create_room(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied()
+    return render(request, 'core/create_room.html')

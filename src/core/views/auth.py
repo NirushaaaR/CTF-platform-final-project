@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.http.response import JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib import auth
 from django.views.decorators.http import require_POST
@@ -56,6 +57,24 @@ def register(request):
         if request.user.is_authenticated:
             return redirect(settings.LOGIN_REDIRECT_URL)
         return render(request, "core/register.html")
+
+@require_POST
+def validate_username(request):
+    username = request.POST.get("username")
+    print(username)
+    data = {'is_taken': get_user_model().objects.filter(username__iexact=username).exists()}
+    if data['is_taken']:
+        data['error_message'] = "Can't use this username"
+    return JsonResponse(data)
+
+@require_POST
+def validate_email(request):
+    email = request.POST.get("email")
+    print(email)
+    data = {'is_taken': get_user_model().objects.filter(email__iexact=email).exists()}
+    if data['is_taken']:
+        data['error_message'] = "Can't use this email"
+    return JsonResponse(data)
 
 
 @require_POST
