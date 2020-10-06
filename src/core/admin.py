@@ -1,7 +1,7 @@
 from django.contrib import admin
 from nested_inline.admin import NestedStackedInline, NestedModelAdmin
 
-from .models import Room, UserParcitipation, Task, UserAnsweredTask, TaskHint
+from core.models import Room, Task, TaskHint
 
 
 class TaskHintInline(NestedStackedInline):
@@ -18,7 +18,3 @@ class TaskInline(NestedStackedInline):
 @admin.register(Room)
 class RoomAdmin(NestedModelAdmin):
     inlines = (TaskInline,)
-
-
-admin.site.register(UserParcitipation)
-admin.site.register(UserAnsweredTask)
