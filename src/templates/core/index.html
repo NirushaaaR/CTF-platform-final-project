@@ -1,17 +1,36 @@
-{% extends 'base.html' %} {% load custom_filters %} {% block content %}
-<h1>Show Index Page Here</h1>
-{% for room in rooms %}
-<div>
-  <h3>{{room.title}}</h3>
-  {{room.preview}}
-  <a href="{% url 'room' room.pk %}">enter room</a>
-  {% if room.id in user_participated %} {% comment %}
-  <div></div>
-  {% endcomment %} {% if user_participated|get_dict_value:room.id %}
-  <p>Done</p>
-  {% else %}
-  <p>participating</p>
-  {% endif %} {% endif %}
-  <hr />
+{% extends 'base.html' %} {% load custom_filters %} {% load humanize %} 
+{% block content %}
+<div class="row">
+  {% for room in rooms %}
+  <div class="col-6">
+    <div class="card m-3 bg-light {% if room.id in user_participated %}
+    {% if user_participated|get_dict_value:room.id %}
+    border-success
+    {% else %}
+    border-warning
+    {% endif %}
+    {% endif %}">
+      <div class="card-body">
+        <h5 class="card-title">{{room.title}}</h5>
+        <h6 class="card-subtitle mb-2 text-secondary">Last update: {{room.updated_at|naturaltime}}</h6>
+        <p class="card-text">{{room.preview}}</p>
+        <div class="d-flex align-items-center">
+          <a href="{% url 'room' room.pk %}" class="card-link btn btn-dark mr-auto">Enter</a>
+          {% if room.id in user_participated %}
+          {% if user_participated|get_dict_value:room.id %}
+          <div class="text-success">
+            <i class="fas fa-check"></i> Completed
+          </div>
+          {% else %}
+          <div class="text-warning">
+            <i class="far fa-circle"></i> Incomplete
+          </div>
+          {% endif %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endfor %}
 </div>
-{% endfor %} {% endblock content %}
+{% endblock content %}

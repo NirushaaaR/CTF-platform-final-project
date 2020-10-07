@@ -8,6 +8,7 @@
 </form>
 {% for task in tasks %}
 <p>{{task.task_number}} - {{task.title}}</p>
+<p>Points: {{task.points}}</p>
 <p>{{task.description|safe}}</p>
 <form action="{% url 'enter_flag' room.id %}" method="post">
   {% csrf_token %}

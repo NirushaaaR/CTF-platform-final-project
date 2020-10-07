@@ -17,11 +17,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.humanize",
     # 3rd party
     "nested_inline",
     "debug_toolbar",
     # local app
-    "core",
+    "core.apps.CoreConfig",
 ]
 
 MIDDLEWARE = [

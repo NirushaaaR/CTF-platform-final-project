@@ -4,11 +4,10 @@ from django.shortcuts import render, redirect
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import redirect_to_login
-from django.utils import timezone
 
 
-from core.models import Room, Task, UserParcitipation
-from utils.user_check import pass_prerequisites, clear_all_tasks, already_participate
+from core.models import Room, Task
+from utils.user_check import pass_prerequisites, already_participate
 
 
 def index(request):
@@ -36,11 +35,7 @@ def room(request, pk):
         return redirect("room", pk=pk)
     else:
         try:
-            room = Room.objects.prefetch_related(
-                "tasks",
-                "tasks__hints",
-            ).get(pk=pk)
-
+            room = Room.objects.prefetch_related("tasks__hints").get(pk=pk)
             tasks = room.tasks.all()
             hints = {}
             for t in tasks:
@@ -71,17 +66,12 @@ def enter_flag(request, room_id):
         task_id = request.POST.get("task_id")
         flag = request.POST.get("flag")
 
-        is_correct = Task.objects.filter(pk=task_id, flag=flag).exists()
-        if is_correct:
-            print("user get the right flag")
-            request.user.cleared_tasks.add(task_id)
-            if clear_all_tasks(request.user, room_id):
-                UserParcitipation.objects.filter(
-                    user=request.user, room=room_id
-                ).update(finished_at=timezone.now())
-                print("user cleared room")
+        task = Task.objects.get(id=task_id)
+        if task.flag == flag:
+            print("get right flag")
+            task.answered_users.add(request.user.id)
         else:
-            print("user get wrong tasks")
+            print("user get wrong flag")
 
     # return render(request, "core/debug.html")
     return redirect("room", pk=room_id)

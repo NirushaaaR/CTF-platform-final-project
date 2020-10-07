@@ -1,4 +1,3 @@
-from django.http import request
 from django.shortcuts import render, redirect
 
 from core.models import User
