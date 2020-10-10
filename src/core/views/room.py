@@ -31,8 +31,9 @@ def room(request, pk):
             return redirect_to_login(request.path)
         if pass_prerequisites(request.user, pk):
             request.user.participated_rooms.add(pk)
+            messages.success(request, "participate in room successfully")
         else:
-            print("need to do prerequire room first")
+            messages.warning(request, "need to do the prerequisite room first")
         return redirect("room", pk=pk)
     else:
         try:

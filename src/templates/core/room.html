@@ -1,23 +1,64 @@
 {% extends 'base.html' %} {% load custom_filters %} {% block content %}
-<h3>Title: {{room.title}}</h3>
-<p>Description:</p>
+<h2 class="mt-4">{{room.title}}</h2>
+<hr>
 {{room.description|safe}}
 <form action="{% url 'room' room.id %}" method="post">
   {% csrf_token %}
-  <button>Participate</button>
+  <button type="button" class="btn btn-secondary">Participate</button>
 </form>
+<hr>
 {% for task in tasks %}
-<p>{{task.task_number}} - {{task.title}}</p>
-<p>Points: {{task.points}}</p>
-<p>{{task.description|safe}}</p>
-<form action="{% url 'enter_flag' room.id %}" method="post">
-  {% csrf_token %}
-  <input type="text" name="flag" placeholder="{{task.flag|censor_flag}}" />
-  <input type="hidden" name="task_id" value="{{task.id}}" />
-  <button>Submit</button>
-</form>
-{% for hint in hints|get_dict_value:task.task_number %}
-<p>hint{{forloop.counter}}: {{hint.hint}}</p>
-{% if task.task_number in user_answered_tasks %}
+<div class="card my-3">
+  <div class="card-header d-flex justify-content-between">
+    <h3>{{task.task_number}} - {{task.title}}</h3>
+    <div class="align-self-end pb-1">{{task.points}} points</div>
+  </div>
+  <div class="card-body">
+    <div class="card-text">
+      {{task.description|safe}}
+    </div>
+    <hr>
+    <form action="{% url 'enter_flag' room.id %}" method="post">
+      <div class="form-row">
+        <div class="col-md-11">
+          {% csrf_token %}
+          <input type="hidden" name="task_id" value="{{task.id}}" />
+          <input class="form-control" type="text" name="flag" placeholder="{{task.flag|censor_flag}}" />
+        </div>
+        <div class="col-md-1 text-center">
+          <button type="submit" class="btn btn-secondary">Submit</button>
+        </div>
+      </div>
+    </form>
+    <div class="d-inline-flex mt-2">
+      {% for hint in hints|get_dict_value:task.task_number %}
+      <button type="button" class="btn mr-2" data-toggle="modal" data-target="#task{{task.id}}-hint{{hint.id}}">
+        Hint {{forloop.counter}}
+      </button>
+      <div class="modal fade" id="task{{task.id}}-hint{{hint.id}}" tabindex="-1" role="dialog"
+        aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLongTitle">Hint {{forloop.counter}}</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              {{hint.hint}}
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+<!-- {% if task.task_number in user_answered_tasks %}
 <p>Done - {{user_answered_tasks|get_dict_value:task.task_number}}</p>
-{% endif %} {% endfor %} {% endfor %} {% endblock content %}
+{% endif %} -->
+{% endfor %} {% endblock content %}
