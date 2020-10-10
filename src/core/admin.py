@@ -18,7 +18,9 @@ class TaskInline(NestedStackedInline):
 @admin.register(Room)
 class RoomAdmin(NestedModelAdmin):
     inlines = (TaskInline,)
+
     class Media:
-        js = ('js/tinyInject.js',)
+        js = ("js/tinyInject.js",)
+
 
 admin.site.register(Tag)

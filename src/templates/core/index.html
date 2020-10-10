@@ -3,13 +3,13 @@
 <div class="row">
   {% for room in rooms %}
   <div class="col-6">
-    <div class="card m-3 bg-light {% if room.id in user_participated %}
+    <div class="card btn text-left m-3 bg-light {% if room.id in user_participated %}
     {% if user_participated|get_dict_value:room.id %}
     border-success
     {% else %}
     border-warning
     {% endif %}
-    {% endif %}">
+  {% endif %}" onclick="window.location='{% url 'room' room.id %}'">
       <div class="card-body">
         <h5 class="card-title">{{room.title}}</h5>
         <h6 class="card-subtitle mb-2 text-secondary">Last update: {{room.updated_at|naturaltime}}</h6>

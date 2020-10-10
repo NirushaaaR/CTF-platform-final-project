@@ -21,7 +21,7 @@ def tiny_jwt(request):
         privateKey = ""
         with open(settings.BASE_DIR / "tiny_privatekey.pem") as f:
             privateKey = f.read()  
-        token = jwt.encode(payload, privateKey,algorithm='RS256')
+        token = jwt.encode(payload, privateKey, algorithm='RS256')
         return JsonResponse({ "token": token.decode('utf-8') })
     except Exception as e:
         print(e)

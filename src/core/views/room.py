@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.http.response import Http404
 from django.shortcuts import render, redirect
@@ -61,17 +62,17 @@ def room(request, pk):
 @require_POST
 def enter_flag(request, room_id):
     if not already_participate(request.user, room_id):
-        print("Error user not participated can't enter flag")
+        messages.warning(request, "Participate first before enter the flag")
     else:
         task_id = request.POST.get("task_id")
         flag = request.POST.get("flag")
 
         task = Task.objects.get(id=task_id)
         if task.flag == flag:
-            print("get right flag")
+            messages.success(request, "Correct Flag!!")
             task.answered_users.add(request.user.id)
         else:
-            print("user get wrong flag")
+            messages.error(request, "Wrong Flag!!")
 
     # return render(request, "core/debug.html")
     return redirect("room", pk=room_id)

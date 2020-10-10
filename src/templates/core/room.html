@@ -12,7 +12,7 @@
 <p>{{task.description|safe}}</p>
 <form action="{% url 'enter_flag' room.id %}" method="post">
   {% csrf_token %}
-  <input type="text" name="flag" placeholder="flag here..." />
+  <input type="text" name="flag" placeholder="{{task.flag|censor_flag}}" />
   <input type="hidden" name="task_id" value="{{task.id}}" />
   <button>Submit</button>
 </form>

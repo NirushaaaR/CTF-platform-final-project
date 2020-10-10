@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.http.response import JsonResponse
 from django.shortcuts import render, redirect
@@ -44,7 +45,7 @@ def register(request):
             .exists()
         )
         if user_exists:
-            print("can't use the username or password")
+            messages.error(request, "can't use that username or email")
             return redirect("register")
 
         user = get_user_model().objects.create_user(
@@ -80,5 +81,5 @@ def validate_email(request):
 @require_POST
 def logout(request):
     auth.logout(request)
-    print("Log user out")
+    messages.success(request, "Logout successfully")
     return redirect("index")

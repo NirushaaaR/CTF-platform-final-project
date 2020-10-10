@@ -123,3 +123,9 @@ INTERNAL_IPS = [
 
 # CUSTOM USER
 AUTH_USER_MODEL = "core.User"
+
+# MESSAGES
+from django.contrib.messages import constants as messages
+MESSAGE_TAGS = {
+    messages.ERROR: 'danger',
+}
