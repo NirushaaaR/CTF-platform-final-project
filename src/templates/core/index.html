@@ -9,7 +9,7 @@
     {% else %}
     border-warning
     {% endif %}
-  {% endif %}" onclick="window.location='{% url 'room' room.id %}'">
+  {% endif %} box-shadow" onclick="window.location='{% url 'room' room.id %}'">
       <div class="card-body">
         <h5 class="card-title">{{room.title}}</h5>
         <h6 class="card-subtitle mb-2 text-secondary">Last update: {{room.updated_at|naturaltime}}</h6>

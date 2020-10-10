@@ -1,15 +1,19 @@
-{% extends 'base.html' %} {% load custom_filters %} {% block content %}
+{% extends 'base.html' %} {% load custom_filters %} {% load humanize %} {% block content %}
 <h2 class="mt-4">{{room.title}}</h2>
 <hr>
 {{room.description|safe}}
+{% if not is_participated %}
 <form action="{% url 'room' room.id %}" method="post">
   {% csrf_token %}
-  <button type="button" class="btn btn-secondary">Participate</button>
+  <button type="submit" class="btn btn-lg btn-secondary">Participate</button>
 </form>
+{% endif %}
 <hr>
+
 {% for task in tasks %}
-<div class="card my-3">
-  <div class="card-header d-flex justify-content-between">
+<div class="card my-3 {% if task.task_number in user_answered_tasks %}border-success{% endif %}">
+  <div
+    class="card-header d-flex justify-content-between {% if task.task_number in user_answered_tasks %}border-success{% endif %}">
     <h3>{{task.task_number}} - {{task.title}}</h3>
     <div class="align-self-end pb-1">{{task.points}} points</div>
   </div>
@@ -19,14 +23,14 @@
     </div>
     <hr>
     <form action="{% url 'enter_flag' room.id %}" method="post">
-      <div class="form-row">
+      <div class="form-row align-items-center">
         <div class="col-md-11">
           {% csrf_token %}
           <input type="hidden" name="task_id" value="{{task.id}}" />
           <input class="form-control" type="text" name="flag" placeholder="{{task.flag|censor_flag}}" />
         </div>
         <div class="col-md-1 text-center">
-          <button type="submit" class="btn btn-secondary">Submit</button>
+          <button type="submit" class="btn btn-success">Submit</button>
         </div>
       </div>
     </form>
@@ -57,8 +61,19 @@
       {% endfor %}
     </div>
   </div>
+  {% if task.task_number in user_answered_tasks %}
+  <div class="card-footer border-success text-success text-right">
+    <i class="fas fa-check"></i> cleared {{user_answered_tasks|get_dict_value:task.task_number|naturaltime}}
+  </div>
+  {% endif %}
 </div>
-<!-- {% if task.task_number in user_answered_tasks %}
-<p>Done - {{user_answered_tasks|get_dict_value:task.task_number}}</p>
-{% endif %} -->
-{% endfor %} {% endblock content %}
+{% endfor %}
+{% if is_finish %}
+<div class="card mb-3 box-shadow">
+  <h3 class="card-header">Conclusion</h3>
+  <div class="card-body">
+    {{room.conclusion|safe}}
+  </div>
+</div>
+{% endif %}
+{% endblock content %}

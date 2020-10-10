@@ -8,7 +8,7 @@ from django.contrib.auth.views import redirect_to_login
 
 
 from core.models import Room, Task
-from utils.user_check import pass_prerequisites, already_participate
+from utils.user_check import check_unfinish_prerequisites, already_participate
 
 
 def index(request):
@@ -29,11 +29,15 @@ def room(request, pk):
     if request.method == "POST":
         if not request.user.is_authenticated:
             return redirect_to_login(request.path)
-        if pass_prerequisites(request.user, pk):
+        unfinished_rooms = check_unfinish_prerequisites(request.user, pk)
+        if len(unfinished_rooms) == 0:
             request.user.participated_rooms.add(pk)
             messages.success(request, "participate in room successfully")
         else:
-            messages.warning(request, "need to do the prerequisite room first")
+            message = "participate in these rooms first:"
+            for room in unfinished_rooms:
+                message += f" <{room.title}>"
+            messages.warning(request, message)
         return redirect("room", pk=pk)
     else:
         try:
@@ -53,7 +57,9 @@ def room(request, pk):
                     answered_users=request.user
                 ).values_list("task_number", "useransweredtask__answered_at")
                 context["user_answered_tasks"] = {k: v for k, v in user_answered_tasks}
-
+                context["is_finish"] = len(tasks) == len(user_answered_tasks)
+                context["is_participated"] = context["is_finish"] or room.participants.filter(pk=request.user.id).exists()
+            
             return render(request, "core/room.html", context)
         except Room.DoesNotExist:
             raise Http404
@@ -67,7 +73,6 @@ def enter_flag(request, room_id):
     else:
         task_id = request.POST.get("task_id")
         flag = request.POST.get("flag")
-
         task = Task.objects.get(id=task_id)
         if task.flag == flag:
             messages.success(request, "Correct Flag!!")
@@ -75,7 +80,6 @@ def enter_flag(request, room_id):
         else:
             messages.error(request, "Wrong Flag!!")
 
-    # return render(request, "core/debug.html")
     return redirect("room", pk=room_id)
 
 

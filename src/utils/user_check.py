@@ -3,17 +3,17 @@ from django.db.models import Q
 from core.models import Room, Task, UserAnsweredTask, UserParcitipation
 
 
-def pass_prerequisites(user, room_id):
+def check_unfinish_prerequisites(user, room_id):
     """ check if user pass all the pass_prerequisites to enter the room """
     user_finished_room = UserParcitipation.objects.filter(
         Q(user=user), ~Q(finished_at=None)
     ).values_list("room_id", flat=True)
 
-    have_unfinished_room = Room.objects.filter(
+    unfinished_rooms = Room.objects.filter(
         Q(next_rooms=room_id), ~Q(id__in=user_finished_room)
-    ).exists()
+    )
 
-    return not have_unfinished_room
+    return unfinished_rooms
 
 
 # <QuerySet [<UserAnsweredTask: nirus - Try CTF>, <UserAnsweredTask: nirus - xss1>, <UserAnsweredTask: nirus - xss2>]>
