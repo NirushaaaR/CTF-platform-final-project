@@ -1,10 +1,12 @@
 from django.shortcuts import render, redirect
 
-from core.models import User
+from core.models import User, UserParcitipation
 
 
 def profile(request):
-    return render(request, "core/profile.html")
+    parcitipations = UserParcitipation.objects.filter(user=request.user).select_related("room")
+    context = {"parcitipations": parcitipations}
+    return render(request, "core/profile.html", context)
 
 
 def scoreboard(request):

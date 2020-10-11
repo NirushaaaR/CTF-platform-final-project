@@ -9,13 +9,13 @@
     {% else %}
     border-warning
     {% endif %}
-  {% endif %} box-shadow" onclick="window.location='{% url 'room' room.id %}'">
+  {% endif %} box-shadow" onclick="window.location='{{room.get_absolute_url}}'">
       <div class="card-body">
         <h5 class="card-title">{{room.title}}</h5>
         <h6 class="card-subtitle mb-2 text-secondary">Last update: {{room.updated_at|naturaltime}}</h6>
         <p class="card-text">{{room.preview}}</p>
         <div class="d-flex align-items-center">
-          <a href="{% url 'room' room.pk %}" class="card-link btn btn-dark mr-auto">Enter</a>
+          <a href="{{room.get_absolute_url}}" class="card-link btn btn-dark mr-auto">Enter</a>
           {% if room.id in user_participated %}
           {% if user_participated|get_dict_value:room.id %}
           <div class="text-success">

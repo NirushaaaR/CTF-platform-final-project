@@ -3,7 +3,14 @@
 <p>username: {{ request.user.username }}</p>
 <p>email: {{ request.user.email }}</p>
 <p>score: {{request.user.score}}</p>
-{% for room in request.user.participated_rooms.all %}
-<div>room - {{room}}</div>
-{% endfor %}
+<hr>
+<h3>Parcitipation</h3>
+<ul>
+    {% for parcitipation in parcitipations %}
+    <li>
+        room - <a href="{{parcitipation.room.get_absolute_url}}">{{parcitipation.room}}</a>
+        finish - {{parcitipation.finished_at}}
+    </li>
+    {% endfor %}
+</ul>
 {% endblock content %}
