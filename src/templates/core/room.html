@@ -13,13 +13,21 @@
     {% csrf_token %}
     <button type="submit" class="btn btn-lg btn-secondary">Participate</button>
   </form>
-  <hr>
   {% else %}
 
+  {% if is_finish %}
+  <div class="card mb-3 border-warning box-shadow">
+    <h3 class="card-header border-warning">Conclusion</h3>
+    <div class="card-body">
+      {{room.conclusion|safe}}
+    </div>
+  </div>
+  {% endif %}
+  <hr>
   {% for task in tasks %}
   <div class="card my-3 {% if task.task_number in user_answered_tasks %}border-success{% endif %}">
     <div
-      class="card-header d-flex justify-content-between {% if task.task_number in user_answered_tasks %}border-success{% endif %}">
+      class="card-header d-flex justify-content-between {% if task.task_number in user_answered_tasks %}border-success{% endif %} box-shadow">
       <h3>{{task.task_number}} - {{task.title}}</h3>
       <div class="align-self-end pb-1">{{task.points}} points</div>
     </div>
@@ -74,14 +82,6 @@
     {% endif %}
   </div>
   {% endfor %}
-  {% if is_finish %}
-  <div class="card mb-3 box-shadow">
-    <h3 class="card-header">Conclusion</h3>
-    <div class="card-body">
-      {{room.conclusion|safe}}
-    </div>
-  </div>
-  {% endif %}
   {% endif %}
 </div>
 {% endblock content %}
