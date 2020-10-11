@@ -22,9 +22,9 @@
 <body>
   {% include 'partials/_navbar.html' %}
   {% include "partials/_alert.html" %}
-  <div class="container">
-    {% block content %} {% endblock content %}
-  </div>
+
+  {% block content %} {% endblock content %}
+
   <!-- bootstrap js -->
   <script src="{% static 'js/jquery.js' %}"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
@@ -33,7 +33,7 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
     integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
     crossorigin="anonymous"></script>
-  
+
   <!-- control messages -->
   {% if messages %}
   <script src="{% static 'js/alert.js' %}"></script>

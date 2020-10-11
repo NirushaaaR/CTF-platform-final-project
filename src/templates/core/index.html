@@ -1,36 +1,40 @@
-{% extends 'base.html' %} {% load custom_filters %} {% load humanize %} 
+{% extends 'base.html' %} {% load custom_filters %} {% load humanize %}
 {% block content %}
-<div class="row">
-  {% for room in rooms %}
-  <div class="col-6">
-    <div class="card btn text-left m-3 bg-light {% if room.id in user_participated %}
+<div class="container">
+  <div class="row">
+    {% for room in rooms %}
+    <div class="col-6">
+      <div class="card text-left m-3 bg-light {% if room.id in user_participated %}
     {% if user_participated|get_dict_value:room.id %}
     border-success
     {% else %}
     border-warning
     {% endif %}
   {% endif %} box-shadow" onclick="window.location='{{room.get_absolute_url}}'">
-      <div class="card-body">
-        <h5 class="card-title">{{room.title}}</h5>
-        <h6 class="card-subtitle mb-2 text-secondary">Last update: {{room.updated_at|naturaltime}}</h6>
-        <p class="card-text">{{room.preview}}</p>
-        <div class="d-flex align-items-center">
-          <a href="{{room.get_absolute_url}}" class="card-link btn btn-dark mr-auto">Enter</a>
-          {% if room.id in user_participated %}
-          {% if user_participated|get_dict_value:room.id %}
-          <div class="text-success">
-            <i class="fas fa-check"></i> Completed
+      <div class="card-header">
+        <h5>{{room.title}}</h5>
+      </div>
+        <div class="card-body">
+          <h6 class="card-subtitle mb-2 text-secondary">Last update: {{room.updated_at|naturaltime}}</h6>
+          <p class="card-text">{{room.preview}}</p>
+          <div class="d-flex align-items-center">
+            <a href="{{room.get_absolute_url}}" class="card-link btn btn-dark mr-auto">Enter</a>
+            {% if room.id in user_participated %}
+            {% if user_participated|get_dict_value:room.id %}
+            <div class="text-success">
+              <i class="fas fa-check"></i> Completed
+            </div>
+            {% else %}
+            <div class="text-warning">
+              <i class="far fa-circle"></i> Incomplete
+            </div>
+            {% endif %}
+            {% endif %}
           </div>
-          {% else %}
-          <div class="text-warning">
-            <i class="far fa-circle"></i> Incomplete
-          </div>
-          {% endif %}
-          {% endif %}
         </div>
       </div>
     </div>
+    {% endfor %}
   </div>
-{% endfor %}
 </div>
 {% endblock content %}
