@@ -25,6 +25,7 @@ def login(request):
         redirect_to = request.path
         if request.GET.get("next"):
             redirect_to += f"?next={request.GET.get('next')}"
+        messages.error(request, "Invalid Username or Password")
         return redirect(redirect_to)
 
     else:

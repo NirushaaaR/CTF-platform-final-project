@@ -1,12 +1,14 @@
 from pathlib import Path
-
+import environ
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-SECRET_KEY = "rg2q4l$l%eweb&7w!g)ma$ilg865_e4#f%3w+wjg=f7-u+#$k$"
 
-DEBUG = True
+env = environ.Env()
+environ.Env.read_env(str(BASE_DIR.parent / ".env"))
 
-ALLOWED_HOSTS = []
+SECRET_KEY = env.str("SECRET_KEY")
+DEBUG = env.bool("DEBUG", default=False)
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
 
 # Application definition
 
@@ -110,7 +112,7 @@ STATIC_ROOT = BASE_DIR / "static"
 MEDIA_ROOT = BASE_DIR / "media"
 
 # python manage.py collectstatic
-STATICFILES_DIRS = [BASE_DIR / "app/mystatic"]
+STATICFILES_DIRS = [BASE_DIR / "app" / "mystatic"]
 
 # LOGIN
 LOGIN_URL = "/login"
