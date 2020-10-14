@@ -1,9 +1,11 @@
 {% extends 'base.html' %} {% load custom_filters %} {% load humanize %} {% block content %}
 <div class="container">
   <h2 class="mt-4">{{room.title}}</h2>
-  <p>Require room:
-  {% for require_room in room.prerequisites.all  %}
+  <p>
+  {% for require_room in room.prerequisites.all %}
+  {% if forloop.first %}ต้องผ่าน {% endif %}
   <a href="{{require_room.get_absolute_url}}">&lt;{{require_room}}&gt;</a>
+  {% if forloop.last %} ก่อน{% endif %}
   {% endfor %}
   </p>
   <hr>
@@ -17,9 +19,17 @@
 
   {% if is_finish %}
   <div class="card mb-3 border-warning box-shadow">
-    <h3 class="card-header border-warning">Conclusion</h3>
+    <h3 class="card-header border-warning">บทสรุป</h3>
     <div class="card-body">
-      {{room.conclusion|safe}}
+      <div class="card-text">
+        {{room.conclusion|safe}}
+      </div>
+      <div>
+        {% for next_room in room.next_rooms.all %}
+          {% if forloop.counter == 1 %}ถัดไป: {% endif %}
+          <a href="{{next_room.get_absolute_url}}">&lt;{{next_room}}&gt;</a>
+        {% endfor %}
+      </div>
     </div>
   </div>
   {% endif %}
@@ -49,16 +59,16 @@
         </div>
       </form>
       <div class="d-inline-flex mt-2">
-        {% for hint in hints|get_dict_value:task.task_number %}
+        {% for hint in task.hints.all %}
         <button type="button" class="btn mr-2" data-toggle="modal" data-target="#task{{task.id}}-hint{{hint.id}}">
-          Hint {{forloop.counter}}
+          คำใบ้ {{forloop.counter}}
         </button>
         <div class="modal fade" id="task{{task.id}}-hint{{hint.id}}" tabindex="-1" role="dialog"
           aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
           <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
               <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLongTitle">Hint {{forloop.counter}}</h5>
+                <h5 class="modal-title" id="exampleModalLongTitle">คำใบ้ {{forloop.counter}}</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                 </button>

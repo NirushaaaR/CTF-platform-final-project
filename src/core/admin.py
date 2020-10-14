@@ -17,6 +17,8 @@ class TaskInline(NestedStackedInline):
 
 @admin.register(Room)
 class RoomAdmin(NestedModelAdmin):
+    list_display = ("title", "is_active",)
+    list_editable = ("is_active",)
     inlines = (TaskInline,)
 
     class Media:

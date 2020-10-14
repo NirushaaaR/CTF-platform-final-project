@@ -3,7 +3,7 @@ from django.db.models.signals import m2m_changed
 from django.utils import timezone
 from django.dispatch.dispatcher import receiver
 
-from core.models import Task, UserParcitipation
+from core.models import Task, UserParcitipation, Room
 from utils.user_check import clear_all_tasks
 
 
@@ -20,3 +20,10 @@ def user_clear_tasks(sender, instance, action, model, pk_set, **kwargs):
             UserParcitipation.objects.filter(
                 user=user_id, room=instance.room_id
             ).update(finished_at=timezone.now())
+
+
+@receiver(m2m_changed, sender=Room.prerequisites.through)
+def add_room_prerequisites(sender, instance, action, pk_set, **kwargs):
+    if action == "pre_add":
+        if instance.id in pk_set:
+            raise ValueError("Room Can't prerequisite itself")

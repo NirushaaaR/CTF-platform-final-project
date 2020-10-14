@@ -13,7 +13,7 @@ from utils.user_check import check_unfinish_prerequisites, already_participate
 
 def index(request):
     """ The Fist page. Will Get Rooms and shows a paginated result """
-    rooms = Room.objects.all().order_by("created_at")
+    rooms = Room.objects.filter(is_active=True).order_by("updated_at")
     context = {"rooms": rooms}
 
     if request.user.is_authenticated:
@@ -43,13 +43,10 @@ def room(request, pk):
         try:
             room = Room.objects.prefetch_related("tasks__hints").get(pk=pk)
             tasks = room.tasks.all()
-            hints = {}
-            for t in tasks:
-                hints[t.task_number] = t.hints.all()
+            
             context = {
                 "room": room,
                 "tasks": tasks,
-                "hints": hints,
             }
 
             if request.user.is_authenticated:

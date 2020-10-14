@@ -5,4 +5,4 @@ class CoreConfig(AppConfig):
     name = "core"
 
     def ready(self) -> None:
-        from core.signals import user_clear_tasks # noqa
+        from core.signals import user_clear_tasks, add_room_prerequisites  # noqa

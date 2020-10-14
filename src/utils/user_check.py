@@ -16,8 +16,6 @@ def check_unfinish_prerequisites(user, room_id):
     return unfinished_rooms
 
 
-# <QuerySet [<UserAnsweredTask: nirus - Try CTF>, <UserAnsweredTask: nirus - xss1>, <UserAnsweredTask: nirus - xss2>]>
-# <QuerySet [<Task: xss1>, <Task: xss2>]>
 def clear_all_tasks(user, room_id):
     """ check if the user clear every task in the room """
     answered_tasks_id = UserAnsweredTask.objects.filter(user=user).values_list(
