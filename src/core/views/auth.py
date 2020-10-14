@@ -1,8 +1,9 @@
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-from django.http.response import JsonResponse
+from django.http.response import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib import auth
+from django.urls import reverse
 from django.views.decorators.http import require_POST
 from django.db.models import Q
 
@@ -25,7 +26,7 @@ def login(request):
         redirect_to = request.path
         if request.GET.get("next"):
             redirect_to += f"?next={request.GET.get('next')}"
-        messages.error(request, "Invalid Username or Password")
+        messages.error(request, "Username หรือ Password ผิด")
         return redirect(redirect_to)
 
     else:
@@ -46,7 +47,7 @@ def register(request):
             .exists()
         )
         if user_exists:
-            messages.error(request, "can't use that username or email")
+            messages.error(request, "ไม่สามารถใช้ email หรือ username นี้ได้")
             return redirect("register")
 
         user = get_user_model().objects.create_user(
@@ -66,7 +67,7 @@ def validate_username(request):
     print(username)
     data = {'is_taken': get_user_model().objects.filter(username__iexact=username).exists()}
     if data['is_taken']:
-        data['error_message'] = "Can't use this username"
+        data['error_message'] = "ไม่สามารถใช้ username นี้ได้"
     return JsonResponse(data)
 
 @require_POST
@@ -75,12 +76,18 @@ def validate_email(request):
     print(email)
     data = {'is_taken': get_user_model().objects.filter(email__iexact=email).exists()}
     if data['is_taken']:
-        data['error_message'] = "Can't use this email"
+        data['error_message'] = "ไม่สามารถใช้ email นี้ได้"
     return JsonResponse(data)
 
 
 @require_POST
 def logout(request):
-    auth.logout(request)
-    messages.success(request, "Logout successfully")
-    return redirect("index")
+    # if Bob logout don't remove his session but remove sessionid cookies!!
+    if request.user.username == "Bob":
+        response = HttpResponseRedirect(reverse("index"))
+        response.delete_cookie("sessionid")
+    else:
+        auth.logout(request)
+        response = redirect("index")
+    messages.success(request, "Logout สำเร็จ")
+    return response

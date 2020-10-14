@@ -4,8 +4,9 @@
 <p>username: {{ request.user.username }}</p>
 <p>email: {{ request.user.email }}</p>
 <p>score: {{request.user.score}}</p>
+
 <hr>
-<h3>Parcitipation</h3>
+<h3>การเข้าร่วม</h3>
 <ul>
     {% for parcitipation in parcitipations %}
     <li>

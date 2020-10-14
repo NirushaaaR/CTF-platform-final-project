@@ -32,9 +32,9 @@ def room(request, pk):
         unfinished_rooms = check_unfinish_prerequisites(request.user, pk)
         if len(unfinished_rooms) == 0:
             request.user.participated_rooms.add(pk)
-            messages.success(request, "participate in room successfully")
+            messages.success(request, "เข้าร่วมสำเร็จ")
         else:
-            message = "participate in these rooms first:"
+            message = "ต้องเข้าร่วมห้องเหล่นนี้ก่อน:"
             for room in unfinished_rooms:
                 message += f" <{room.title}>"
             messages.warning(request, message)
@@ -66,16 +66,16 @@ def room(request, pk):
 @require_POST
 def enter_flag(request, room_id):
     if not already_participate(request.user, room_id):
-        messages.warning(request, "Participate first before enter the flag")
+        messages.warning(request, "ต้องเข้าร่วมก่อนถึงจะใส่ Flag ได้")
     else:
         task_id = request.POST.get("task_id")
         flag = request.POST.get("flag")
         task = Task.objects.get(id=task_id)
         if task.flag == flag:
-            messages.success(request, "Correct Flag!!")
+            messages.success(request, "Flag ถูกต้อง!!")
             task.answered_users.add(request.user.id)
         else:
-            messages.error(request, "Wrong Flag!!")
+            messages.error(request, "Flag ผิด!!")
 
     return redirect("room", pk=room_id)
 

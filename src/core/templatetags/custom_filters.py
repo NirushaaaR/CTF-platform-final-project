@@ -11,6 +11,8 @@ def get_dict_value(dict_instance, key):
 
 
 @register.filter
-def censor_flag(flag):
+def censor_flag(flag: str):
     """ Make Flag format FLAG{----------} """
-    return "FLAG{"+("-"*(len(flag)-6))+"}"
+    if flag.startswith("FLAG{") and flag.endswith("}"):
+        return "FLAG{" + ("-" * (len(flag) - 6)) + "}"
+    return "-" * len(flag)
