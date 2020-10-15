@@ -17,4 +17,4 @@ django-environ = "~=0.4.5"
 start = "python src/manage.py runserver"
 
 [requires]
-python_version = "3.8"
+python_version = "3.7"

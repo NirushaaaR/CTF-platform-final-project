@@ -54,3 +54,4 @@ db.sqlite3
 tiny_privatekey.pem
 
 .env
+.vscode/
