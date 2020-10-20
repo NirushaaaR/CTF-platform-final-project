@@ -1,14 +1,11 @@
 from pathlib import Path
-import environ
+import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-env = environ.Env()
-environ.Env.read_env(str(BASE_DIR / ".env"))
-
-SECRET_KEY = env.str("SECRET_KEY")
-DEBUG = env.bool("DEBUG", default=False)
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
+SECRET_KEY = os.environ.get("SECRET_KEY")
+DEBUG = os.environ.get("DEBUG", False)
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(",")
 # Application definition
 
 INSTALLED_APPS = [
@@ -61,13 +58,24 @@ WSGI_APPLICATION = "app.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+DB_HOST = os.environ.get("DB_HOST", None)
+if DB_HOST:
+    DATABASES = {
+        "default": {   
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'HOST': DB_HOST,
+            'NAME': os.environ.get("POSTGRES_DB"),
+            'USER': os.environ.get("POSTGRES_USER"),
+            'PASSWORD': os.environ.get("POSTGRES_PASSWORD"),
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 
 # Password validation
