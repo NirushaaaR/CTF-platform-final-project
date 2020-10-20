@@ -4,12 +4,11 @@ import environ
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env()
-environ.Env.read_env(str(BASE_DIR.parent / ".env"))
+environ.Env.read_env(str(BASE_DIR / ".env"))
 
 SECRET_KEY = env.str("SECRET_KEY")
 DEBUG = env.bool("DEBUG", default=False)
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
-print(ALLOWED_HOSTS)
 # Application definition
 
 INSTALLED_APPS = [
@@ -106,10 +105,10 @@ USE_TZ = True
 STATIC_URL = "/static/"
 MEDIA_URL = "/media/"
 # where to store
-# MEDIA_ROOT = "/vol/web/media"
-# STATIC_ROOT = "/vol/web/static"
-STATIC_ROOT = BASE_DIR / "static"
-MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_ROOT = "/vol/web/media"
+STATIC_ROOT = "/vol/web/static"
+# STATIC_ROOT = BASE_DIR / "static"
+# MEDIA_ROOT = BASE_DIR / "media"
 
 # python manage.py collectstatic
 STATICFILES_DIRS = [BASE_DIR / "app" / "mystatic"]
