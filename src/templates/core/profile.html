@@ -11,7 +11,9 @@
     {% for parcitipation in parcitipations %}
     <li>
         room - <a href="{{parcitipation.room.get_absolute_url}}">{{parcitipation.room}}</a>
+        {% if parcitipation.finished_at %}
         finish - {{parcitipation.finished_at}}
+        {% endif %}
     </li>
     {% endfor %}
 </ul>

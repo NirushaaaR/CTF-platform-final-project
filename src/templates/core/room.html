@@ -3,19 +3,13 @@
   <h2 class="mt-4">{{room.title}}</h2>
   <p>
   {% for require_room in room.prerequisites.all %}
-  {% if forloop.first %}ต้องผ่าน {% endif %}
+  {% if forloop.first %}ควรทำ {% endif %}
   <a href="{{require_room.get_absolute_url}}">&lt;{{require_room}}&gt;</a>
   {% if forloop.last %} ก่อน{% endif %}
   {% endfor %}
   </p>
   <hr>
   {{room.description|safe}}
-  {% if not is_participated %}
-  <form action="{% url 'room' room.id %}" method="post">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-lg btn-secondary">Participate</button>
-  </form>
-  {% else %}
 
   {% if is_finish %}
   <div class="card mb-3 border-warning box-shadow">
@@ -34,6 +28,7 @@
   </div>
   {% endif %}
   <hr>
+
   {% for task in tasks %}
   <div class="card my-3 {% if task.task_number in user_answered_tasks %}border-success{% endif %}">
     <div
@@ -92,6 +87,5 @@
     {% endif %}
   </div>
   {% endfor %}
-  {% endif %}
 </div>
 {% endblock content %}
