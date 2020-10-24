@@ -5,11 +5,11 @@ verify_ssl = true
 
 [dev-packages]
 black = "==20.8b1"
+django-debug-toolbar = "~=3.1.1"
 
 [packages]
 Django = "~=3.1.2"
 django-nested-inline = "~=0.4.2"
-django-debug-toolbar = "~=3.1.1"
 psycopg2-binary = "~=2.8.6"
 Pillow = "~=7.1.2"
 whitenoise = "~=5.2.0"

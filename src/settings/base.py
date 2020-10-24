@@ -4,10 +4,7 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
-DEBUG = bool(os.environ.get("DEBUG"))
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(",")
-# ALLOWED_HOSTS = []
-# Application definition
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -15,12 +12,10 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
     "django.contrib.humanize",
     # 3rd party
     "nested_inline",
-    "debug_toolbar",
     # local app
     "core.apps.CoreConfig",
 ]
@@ -35,8 +30,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    # 3rd party
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 ROOT_URLCONF = "app.urls"
@@ -57,29 +50,17 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "app.wsgi.application"
-
-
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-DB_HOST = os.environ.get("DB_HOST", None)
-if DB_HOST:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql_psycopg2",
-            "HOST": DB_HOST,
-            "NAME": os.environ.get("POSTGRES_DB"),
-            "USER": os.environ.get("POSTGRES_USER"),
-            "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
-        }
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "HOST": os.environ.get("DB_HOST"),
+        "NAME": os.environ.get("POSTGRES_DB"),
+        "USER": os.environ.get("POSTGRES_USER"),
+        "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
     }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
-    }
+}
 
 
 # Password validation
@@ -102,7 +83,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # Internationalization
-# https://docs.djangoproject.com/en/3.1/topics/i18n/
 
 LANGUAGE_CODE = "th"
 TIME_ZONE = "Asia/Bangkok"
@@ -112,25 +92,21 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.0/howto/static-files/
-
 STATIC_URL = "/static/"
 MEDIA_URL = "/media/"
 # where to store
 MEDIA_ROOT = BASE_DIR / "media"
 STATIC_ROOT = BASE_DIR / "static"
 
-# python manage.py collectstatic
 STATICFILES_DIRS = [BASE_DIR / "app" / "static"]
+
+# whitenoise cache static files
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # LOGIN
 LOGIN_URL = "/login"
 LOGIN_REDIRECT_URL = "/profile"
 
-# for debug toolbar
-INTERNAL_IPS = [
-    "127.0.0.1",
-]
 
 # CUSTOM USER
 AUTH_USER_MODEL = "core.User"
@@ -141,6 +117,3 @@ from django.contrib.messages import constants as messages
 MESSAGE_TAGS = {
     messages.ERROR: "danger",
 }
-
-# whitenoise cache static files
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
