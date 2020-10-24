@@ -19,33 +19,36 @@ class TaskInline(NestedStackedInline):
 
 @admin.register(Room)
 class RoomAdmin(NestedModelAdmin):
-    list_display = ("title", "is_active",)
+    list_display = ("title", "preview", "is_active", "created_at", "updated_at")
     list_editable = ("is_active",)
     inlines = (TaskInline,)
 
     class Media:
-        js = ("js/tinyInject.js",)
+        js = ("js/tinyinject.js",)
+
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
-    ordering = ('id',)
-    list_display = ('email', 'username', 'score', 'is_superuser')
-    list_editable = ('is_superuser',)
+    ordering = ("id",)
+    list_display = ("email", "username", "score", "is_superuser")
+    list_editable = ("is_superuser",)
 
-    fieldsets = ((None, {
-        'fields': ('username', 'email', 'password')
-    }), (_("Personal info"), {
-        'fields': ('score', )
-    }), (_("Permission"), {
-        'fields': ('is_active', 'is_staff', 'is_superuser')
-    }), (_("Importent dates"), {
-        'fields': ('last_login', )
-    }))
+    fieldsets = (
+        (None, {"fields": ("username", "email", "password")}),
+        (_("Personal info"), {"fields": ("score",)}),
+        (_("Permission"), {"fields": ("is_active", "is_staff", "is_superuser")}),
+        (_("Importent dates"), {"fields": ("last_login",)}),
+    )
 
-    add_fieldsets = ((None, {
-        'classes': ('wide', ),
-        'fields': ('username', 'email', 'password1', 'password2')
-    }), )
+    add_fieldsets = (
+        (
+            None,
+            {
+                "classes": ("wide",),
+                "fields": ("username", "email", "password1", "password2"),
+            },
+        ),
+    )
 
 
 admin.site.register(Tag)

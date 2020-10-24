@@ -4,8 +4,9 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
-DEBUG = os.environ.get("DEBUG", False)
+DEBUG = bool(os.environ.get("DEBUG"))
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(",")
+# ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
@@ -14,6 +15,7 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
     "django.contrib.humanize",
     # 3rd party
@@ -25,6 +27,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    # whitenoise for static files
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -61,12 +65,12 @@ WSGI_APPLICATION = "app.wsgi.application"
 DB_HOST = os.environ.get("DB_HOST", None)
 if DB_HOST:
     DATABASES = {
-        "default": {   
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'HOST': DB_HOST,
-            'NAME': os.environ.get("POSTGRES_DB"),
-            'USER': os.environ.get("POSTGRES_USER"),
-            'PASSWORD': os.environ.get("POSTGRES_PASSWORD"),
+        "default": {
+            "ENGINE": "django.db.backends.postgresql_psycopg2",
+            "HOST": DB_HOST,
+            "NAME": os.environ.get("POSTGRES_DB"),
+            "USER": os.environ.get("POSTGRES_USER"),
+            "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
         }
     }
 else:
@@ -113,13 +117,11 @@ USE_TZ = True
 STATIC_URL = "/static/"
 MEDIA_URL = "/media/"
 # where to store
-MEDIA_ROOT = "/vol/web/media"
-STATIC_ROOT = "/vol/web/static"
-# STATIC_ROOT = BASE_DIR / "static"
-# MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_ROOT = BASE_DIR / "media"
+STATIC_ROOT = BASE_DIR / "static"
 
 # python manage.py collectstatic
-STATICFILES_DIRS = [BASE_DIR / "app" / "mystatic"]
+STATICFILES_DIRS = [BASE_DIR / "app" / "static"]
 
 # LOGIN
 LOGIN_URL = "/login"
@@ -135,6 +137,10 @@ AUTH_USER_MODEL = "core.User"
 
 # MESSAGES
 from django.contrib.messages import constants as messages
+
 MESSAGE_TAGS = {
-    messages.ERROR: 'danger',
+    messages.ERROR: "danger",
 }
+
+# whitenoise cache static files
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
