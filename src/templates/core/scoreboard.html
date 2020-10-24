@@ -1,4 +1,8 @@
 {% extends 'base.html' %} {% block content %}
-<p>---Show User Score---</p>
-<p>{{top_10}}</p>
+<div class="container">
+    <p>---Show User Score---</p>
+    {% for user in top_10 %}
+    <p>{{user.username}}: {{user.score}}</p>
+    {% endfor %}
+</div>
 {% endblock content %}

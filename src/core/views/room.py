@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
+from django.core.paginator import Paginator
 from django.http.response import Http404
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_POST
@@ -12,7 +13,11 @@ from utils.user_check import already_participate
 def index(request):
     """ The Fist page. Will Get Rooms and shows a paginated result """
     rooms = Room.objects.filter(is_active=True).order_by("-updated_at")
-    context = {"rooms": rooms}
+    pgination = Paginator(rooms, 6)
+    current_page = request.GET.get("page", 1)
+    context = {
+        "rooms": pgination.get_page(current_page),
+    }
 
     if request.user.is_authenticated:
         participated_room = rooms.filter(participants=request.user).values_list(
@@ -21,6 +26,7 @@ def index(request):
         context["user_participated"] = {k: v for k, v in participated_room}
 
     return render(request, "core/index.html", context)
+
 
 @login_required
 def room(request, pk):
