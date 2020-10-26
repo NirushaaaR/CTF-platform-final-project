@@ -15,9 +15,9 @@ from utils.redirect_check import redirect_after_login
 def login(request):
     """ login the user """
     if request.method == "POST":
-        username = request.POST.get("username")
+        email = request.POST.get("email")
         password = request.POST.get("password")
-        user = auth.authenticate(request, username=username, password=password)
+        user = auth.authenticate(request, email=email, password=password)
         if user is not None:
             auth.login(request, user)
             return redirect_after_login(request)
@@ -26,7 +26,7 @@ def login(request):
         redirect_to = request.path
         if request.GET.get("next"):
             redirect_to += f"?next={request.GET.get('next')}"
-        messages.error(request, "Username หรือ Password ผิด")
+        messages.error(request, "Email หรือ Password ผิด")
         return redirect(redirect_to)
 
     else:
