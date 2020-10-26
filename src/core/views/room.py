@@ -54,6 +54,10 @@ def room(request, pk):
 @login_required
 @require_POST
 def enter_flag(request, room_id):
+    # check is Bob ?
+    if request.user.username == "Bob":
+        messages.warning(request, "Bob ไม่สามารถใส่ Flag ได้กรุณา Logout")
+        return redirect('room', pk=room_id)
 
     if not already_participate(request.user, room_id):
         request.user.participated_rooms.add(room_id)

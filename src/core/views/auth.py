@@ -43,7 +43,7 @@ def register(request):
         password = request.POST.get("password")
         user_exists = (
             get_user_model()
-            .objects.filter(Q(username=username) | Q(email=email))
+            .objects.filter(Q(username__iexact=username) | Q(email__iexact=email))
             .exists()
         )
         if user_exists:
