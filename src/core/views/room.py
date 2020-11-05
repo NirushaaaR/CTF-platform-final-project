@@ -7,7 +7,7 @@ from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 
 from core.models import Room, Task
-from utils.user_check import already_participate
+from core.utils import already_participate
 
 
 def index(request):

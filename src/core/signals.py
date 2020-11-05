@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.dispatch.dispatcher import receiver
 
 from core.models import Task, UserParcitipation, Room
-from utils.user_check import clear_all_tasks
+from core.utils import clear_all_tasks
 
 
 @receiver(m2m_changed, sender=Task.answered_users.through)

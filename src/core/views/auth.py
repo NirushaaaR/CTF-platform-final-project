@@ -9,7 +9,7 @@ from django.db.models import Q
 
 from django.conf import settings
 
-from utils.redirect_check import redirect_after_login
+from core.utils import redirect_after_login
 
 
 def login(request):
