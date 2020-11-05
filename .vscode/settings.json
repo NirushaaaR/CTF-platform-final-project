@@ -8,5 +8,5 @@
     "**/.DS_Store": true,
     "**/__pycache__/**": true
   },
-  "python.pythonPath": "/home/senzou/.local/share/virtualenvs/CTF-platform-final-project-T-ziEiHM/bin/python"
+  "python.pythonPath": "/home/senzou/.virtualenvs/CTF-platform-final-project-T-ziEiHM/bin/python"
 }

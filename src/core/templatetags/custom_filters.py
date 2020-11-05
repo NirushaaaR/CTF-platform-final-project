@@ -9,10 +9,12 @@ def get_dict_value(dict_instance, key):
         return None
     return dict_instance.get(key)
 
+def replace_char(char):
+    return char if char == "_" else "*"
 
 @register.filter
 def censor_flag(flag: str):
     """ Make Flag format FLAG{----------} """
     if flag.startswith("FLAG{") and flag.endswith("}"):
-        return "FLAG{" + ("-" * (len(flag) - 6)) + "}"
+        return "FLAG{"+''.join([replace_char(char) for char in flag[4:-1]])+"}"
     return "-" * len(flag)
