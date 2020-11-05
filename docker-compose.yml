@@ -8,7 +8,7 @@ services:
             - "8000:8000"
         volumes: 
             - ./src:/src
-        command: sh -c "python manage.py wait_for_db &&
+        command: sh -c "python manage.py wait_for_db --settings=settings.local &&
                         python manage.py runserver 0.0.0.0:8000 --settings=settings.local"
         env_file: .env
     
