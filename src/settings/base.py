@@ -7,6 +7,10 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(",")
 
 INSTALLED_APPS = [
+    # channels
+    "channels",
+    "game",
+    # django contrib
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -116,4 +120,15 @@ from django.contrib.messages import constants as messages
 
 MESSAGE_TAGS = {
     messages.ERROR: "danger",
+}
+
+# Channels
+ASGI_APPLICATION = 'app.asgi.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [(os.environ.get("REDIS_HOST"), os.environ.get("REDIS_PORT"))],
+        },
+    },
 }

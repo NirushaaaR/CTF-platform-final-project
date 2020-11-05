@@ -3,6 +3,8 @@ from .base import *
 DEBUG = True
 
 INSTALLED_APPS = [
+    "channels",
+    "game",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
