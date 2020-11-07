@@ -2,4 +2,12 @@ from .base import *
 
 DEBUG = False
 
-WSGI_APPLICATION = "app.wsgi.application"
+# Channels
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [(os.environ.get("REDIS_HOST"), os.environ.get("REDIS_PORT"))],
+        },
+    },
+}

@@ -18,9 +18,7 @@ def tiny_jwt(request):
     # When this is set the user will only be able to manage and see files in the specified root
     # directory. This makes it possible to have a dedicated home directory for each user.
     try:
-        privateKey = ""
-        with open(settings.BASE_DIR / "tiny_privatekey.pem") as f:
-            privateKey = f.read()  
+        privateKey = settings.TINY_KEY
         token = jwt.encode(payload, privateKey, algorithm='RS256')
         return JsonResponse({ "token": token.decode('utf-8') })
     except Exception as e:

@@ -11,7 +11,7 @@ script.onload = function () {
     // selector: ".tinymce-editor",
     selector: "textarea",
     height: 500,
-    plugins: 'advcode advlist link image lists media tinydrive imagetools',
+    plugins: 'code advlist link image lists media tinydrive imagetools',
     toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | outdent indent',
     tinydrive_token_provider: '/jwt'
   });

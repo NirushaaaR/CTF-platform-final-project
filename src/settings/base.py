@@ -1,7 +1,10 @@
 from pathlib import Path
 import os
+import environ
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+environ.Env.read_env(env_file=str(BASE_DIR / ".env"))
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(",")
@@ -122,13 +125,8 @@ MESSAGE_TAGS = {
     messages.ERROR: "danger",
 }
 
-# Channels
+WSGI_APPLICATION = "app.wsgi.application"
 ASGI_APPLICATION = 'app.asgi.application'
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [(os.environ.get("REDIS_HOST"), os.environ.get("REDIS_PORT"))],
-        },
-    },
-}
+
+# Tiny private key
+TINY_KEY=environ.Env().str("TINY_KEY", multiline=True)

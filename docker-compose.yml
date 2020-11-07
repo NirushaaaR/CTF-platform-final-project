@@ -10,7 +10,7 @@ services:
             - ./src:/src
         command: sh -c "python manage.py wait_for_db --settings=settings.local &&
                         python manage.py runserver 0.0.0.0:8000 --settings=settings.local"
-        env_file: .env
+        # env_file: ./src/.env
     
     redis_db:
         image: redis:5
