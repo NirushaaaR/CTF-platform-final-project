@@ -47,10 +47,29 @@ class User(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ["username"]
 
 
+class ScoreHistory(models.Model):
+    gained = models.IntegerField()
+    type = models.CharField(
+        max_length=9, choices=(("task", "task"), ("challenge", "challenge"))
+    )
+    object_id = models.CharField(max_length=255)
+    group_id = models.CharField(max_length=255)
+    time = models.DateTimeField(auto_now_add=True)
+
+    user = models.ForeignKey(
+        get_user_model(), on_delete=models.DO_NOTHING, related_name="score_history"
+    )
+
+    def __str__(self) -> str:
+        return f"{self.user_id} gain {self.gained} from {self.type}"
+
+
 class Room(models.Model):
     title = models.CharField(max_length=255)
     preview = models.CharField(max_length=255)
-    difficulty = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    difficulty = models.PositiveIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)]
+    )
     description = models.TextField()
     conclusion = models.TextField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
@@ -69,16 +88,18 @@ class Room(models.Model):
     )
 
     def get_absolute_url(self):
-        return reverse('room', args=[str(self.pk)])
+        return reverse("room", args=[str(self.pk)])
 
     def __str__(self):
         return self.title
+
 
 class Tag(models.Model):
     name = models.CharField(max_length=255)
 
     def __str__(self):
         return self.name
+
 
 class UserParcitipation(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
@@ -107,9 +128,9 @@ class Task(models.Model):
 
     def __str__(self):
         return self.title
-    
+
     class Meta:
-        unique_together = (("room","task_number"),)
+        unique_together = (("room", "task_number"),)
 
 
 class UserAnsweredTask(models.Model):
