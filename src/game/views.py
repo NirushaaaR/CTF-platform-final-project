@@ -5,5 +5,5 @@ from django.shortcuts import render
 def index(request):
     return HttpResponse("Index")
 
-def room(request, room_name):
-    return HttpResponse("room "+ room_name)
+def game(request, game_slug):
+    return HttpResponse("game "+ game_slug)

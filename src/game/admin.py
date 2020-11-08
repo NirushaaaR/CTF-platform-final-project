@@ -1,3 +1,29 @@
 from django.contrib import admin
+from nested_inline.admin import NestedStackedInline, NestedModelAdmin
 
-# Register your models here.
+from game.models import Game, Challenge, ChallengeFlag
+
+
+class ChallengeFlagInline(NestedStackedInline):
+    model = ChallengeFlag
+    extra = 1
+
+
+class ChallengeInline(NestedStackedInline):
+    model = Challenge
+    extra = 0
+    inlines = (ChallengeFlagInline,)
+
+    readonly_fields = ("url",)
+
+
+@admin.register(Game)
+class GameAdmin(NestedModelAdmin):
+    list_display = ("title", "start", "end")
+    list_editable = ("start", "end")
+    inlines = (ChallengeInline,)
+
+    prepopulated_fields = {"slug": ("title",)}    
+
+    class Media:
+        js = ("js/tinyinject.js",)
