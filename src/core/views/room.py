@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.http.response import Http404
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 
@@ -30,25 +30,23 @@ def index(request):
 
 @login_required
 def room(request, pk):
-    try:
-        room = Room.objects.prefetch_related("tasks__hints").get(pk=pk)
-        tasks = room.tasks.all()
+    room = get_object_or_404(Room.objects.prefetch_related("tasks__hints"), pk=pk)
+    tasks = room.tasks.all()
 
-        context = {
-            "room": room,
-            "tasks": tasks,
-        }
+    context = {
+        "room": room,
+        "tasks": tasks,
+    }
 
-        if request.user.is_authenticated:
-            user_answered_tasks = tasks.filter(answered_users=request.user).values_list(
-                "task_number", "useransweredtask__answered_at"
-            )
-            context["user_answered_tasks"] = {k: v for k, v in user_answered_tasks}
-            context["is_finish"] = len(tasks) == len(user_answered_tasks)
+    if request.user.is_authenticated:
+        user_answered_tasks = tasks.filter(answered_users=request.user).values_list(
+            "task_number", "useransweredtask__answered_at"
+        )
+        context["user_answered_tasks"] = {k: v for k, v in user_answered_tasks}
+        context["is_finish"] = len(tasks) == len(user_answered_tasks)
 
-        return render(request, "core/room.html", context)
-    except Room.DoesNotExist:
-        raise Http404
+    return render(request, "core/room.html", context)
+ 
 
 
 @login_required
