@@ -4,7 +4,8 @@
     <ul>
         {% for game in games %}
         <li>
-            <a href="{{game.get_absolute_url}}">{{game}}</a>
+            {{game.title}}
+            <a href="{{game.get_absolute_url}}">{{Enter}}</a>
         </li>
         {% endfor %}
     </ul>

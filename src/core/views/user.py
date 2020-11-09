@@ -4,7 +4,9 @@ from core.models import User, UserParcitipation
 
 
 def profile(request):
-    parcitipations = UserParcitipation.objects.filter(user=request.user).select_related("room")
+    parcitipations = UserParcitipation.objects.filter(user=request.user).select_related(
+        "room"
+    )
     context = {"parcitipations": parcitipations}
     return render(request, "core/profile.html", context)
 

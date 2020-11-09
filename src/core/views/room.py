@@ -1,7 +1,6 @@
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
-from django.http.response import Http404
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
@@ -46,7 +45,6 @@ def room(request, pk):
         context["is_finish"] = len(tasks) == len(user_answered_tasks)
 
     return render(request, "core/room.html", context)
- 
 
 
 @login_required
@@ -55,7 +53,7 @@ def enter_flag(request, room_id):
     # check is Bob ?
     if request.user.username == "Bob":
         messages.warning(request, "Bob ไม่สามารถใส่ Flag ได้กรุณา Logout")
-        return redirect('room', pk=room_id)
+        return redirect("room", pk=room_id)
 
     if not already_participate(request.user, room_id):
         request.user.participated_rooms.add(room_id)

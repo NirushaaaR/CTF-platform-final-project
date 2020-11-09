@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container">
-    {{game}}
+    <h1>{{game}}</h1>
+    {% for challenge in game.challenges.all %}
+    <p>{{challenge}}</p>
+    {% endfor %}
 </div>
 {% endblock %}

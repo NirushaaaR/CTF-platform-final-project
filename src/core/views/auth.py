@@ -61,22 +61,26 @@ def register(request):
             return redirect(settings.LOGIN_REDIRECT_URL)
         return render(request, "core/register.html")
 
+
 @require_POST
 def validate_username(request):
     username = request.POST.get("username")
     print(username)
-    data = {'is_taken': get_user_model().objects.filter(username__iexact=username).exists()}
-    if data['is_taken']:
-        data['error_message'] = "ไม่สามารถใช้ username นี้ได้"
+    data = {
+        "is_taken": get_user_model().objects.filter(username__iexact=username).exists()
+    }
+    if data["is_taken"]:
+        data["error_message"] = "ไม่สามารถใช้ username นี้ได้"
     return JsonResponse(data)
+
 
 @require_POST
 def validate_email(request):
     email = request.POST.get("email")
     print(email)
-    data = {'is_taken': get_user_model().objects.filter(email__iexact=email).exists()}
-    if data['is_taken']:
-        data['error_message'] = "ไม่สามารถใช้ email นี้ได้"
+    data = {"is_taken": get_user_model().objects.filter(email__iexact=email).exists()}
+    if data["is_taken"]:
+        data["error_message"] = "ไม่สามารถใช้ email นี้ได้"
     return JsonResponse(data)
 
 
