@@ -15,21 +15,11 @@ from game.models import (
 from core.models import ScoreHistory
 
 
-def index(request):
-    games = Game.objects.all()
-    context = {"games": games}
-    return render(request, "game/index.html", context)
-
-
-@login_required
-def game_view(request, game_slug):
-    game = get_object_or_404(Game, slug=game_slug)
+def populate_game_challenges(game, user_id):
     challenges = tuple(Challenge.objects.filter(game=game).order_by("id").values())
-
-    game.participants.add(request.user)
     user_flags = tuple(
         UserChallengeRecord.objects.filter(
-            participated_user__user=request.user, participated_user__game=game
+            participated_user__user_id=user_id, participated_user__game=game
         )
         .values(
             "challenge",
@@ -39,9 +29,71 @@ def game_view(request, game_slug):
     )
 
     for idx, challenge in enumerate(challenges):
-        challenge["cleared_flag"] = user_flags[idx]["cleared_flag"] if idx < len(user_flags) else 0
+        challenge["cleared_flag"] = (
+            user_flags[idx]["cleared_flag"] if idx < len(user_flags) else 0
+        )
 
-    context = {"game": game, "challenges": challenges}
+    return {"game": game, "challenges": challenges}
+
+
+def update_score_process(game, remaingin_time, flag, user_id):
+    already_answered = UserChallengeRecord.objects.filter(
+        participated_user__user_id=user_id, participated_user__game=game, challenge_flag=flag
+    ).exists()
+
+    if already_answered:
+        return JsonResponse({"message": "Already Enter That Flag", "correct": False})
+    else:
+        points_gained = (flag.point * remaingin_time) // 1
+        participation = UserParticipateGame.objects.filter(user=user_id, game=game)
+        UserChallengeRecord.objects.create(
+            participated_user_id=Subquery(participation.values("id")),
+            challenge=flag.challenge,
+            challenge_flag=flag,
+            points_gained=points_gained,
+        )
+
+        # add score
+        participation.update(game_score=F("game_score") + points_gained)
+        ScoreHistory.objects.create(
+            gained=points_gained,
+            type="challenge",
+            object_id=flag.id,
+            group_id=game.id,
+            user_id=user_id,
+        )
+        return JsonResponse(
+            {
+                "message": "Right Flag",
+                "correct": True,
+                "points_gained": points_gained,
+            }
+        )
+
+
+def index(request):
+    games = Game.objects.all()
+    context = {"games": games}
+    return render(request, "game/index.html", context)
+
+
+@login_required
+def game_view(request, game_slug):
+    game = get_object_or_404(Game, slug=game_slug)
+    remaining_time = game.get_remaining_time_percentage()
+
+    if remaining_time > 0:
+        # game ongoing...
+        game.participants.add(request.user)
+    elif not game.is_archive:
+        # game end and not is_archive
+        # should denied the access
+        pass
+    else:
+        # is_archive can do it but not record the participation
+        pass
+
+    context = populate_game_challenges(game, request.user.id)
     return render(request, "game/game.html", context)
 
 
@@ -57,48 +109,15 @@ def enter_challenge_flag(request):
         )
 
         game = right_flag.challenge.game
-        remain_time = game.get_remaining_time_percentage()
+        remaingin_time = game.get_remaining_time_percentage()
 
-        points_gained = 0
-
-        if remain_time > 1:
+        if remaingin_time < 0:
             # games already ends...
             pass
         else:
-
-            points_gained = (right_flag.point * remain_time) // 1
-            participation = UserParticipateGame.objects.filter(
-                user=request.user, game=game
+            return update_score_process(
+                game, remaingin_time, right_flag, request.user.id
             )
-
-            created = UserChallengeRecord.objects.get_or_create(
-                participated_user_id=Subquery(participation.values("id")),
-                challenge=right_flag.challenge,
-                challenge_flag=right_flag,
-                defaults={"points_gained": points_gained},
-            )[1]
-
-            if created:
-                # add score
-                participation.update(game_score=F("game_score") + points_gained)
-                ScoreHistory.objects.create(
-                    gained=points_gained,
-                    type="challenge",
-                    object_id=right_flag.id,
-                    group_id=game.id,
-                    user_id=request.user.id,
-                )
-                return JsonResponse(
-                    {
-                        "message": "Right Flag",
-                        "correct": True,
-                        "points_gained": points_gained,
-                    }
-                )
-            else:
-                return JsonResponse(
-                    {"message": "Already Enter That Flag", "correct": False}
-                )
 
     except ChallengeFlag.DoesNotExist:
         return JsonResponse({"message": "Wrong flag", "correct": False})

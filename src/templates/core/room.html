@@ -1,30 +1,4 @@
 {% extends 'base.html' %} {% load static %} {% load custom_filters %} {% load humanize %}
-
-{% block stylesheet %}
-<style>
-  .overlay {
-    display: none;
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    z-index: 999;
-    background: rgba(255, 255, 255, 0.6) url("https://flevix.com/wp-content/uploads/2020/01/Loading-Image.gif") center no-repeat;
-  }
-
-  /* Turn off scrollbar when body element has the loading class */
-  body.loading {
-    overflow: hidden;
-  }
-
-  /* Make spinner image visible when body element has the loading class */
-  body.loading .overlay {
-    display: block;
-  }
-</style>
-{% endblock %}
-
 {% block content %}
 <div class="container">
   <h2 class="mt-4">{{room.title}}</h2>
@@ -115,11 +89,12 @@
     {% endif %}
   </div>
   {% endfor %}
-  <div class="overlay"></div>
 </div>
+<div class="overlay"></div>
 {% endblock content %}
 
 {% block javascript %}
+<script src="{% static 'js/ajaxLoadingSpinner.js' %}"></script>
 <script>
   $(".task-form").submit(function (e) {
     e.preventDefault();
@@ -144,16 +119,6 @@
         
       }
     });
-  });
-
-  // Add remove loading class on body element based on Ajax request status
-  $(document).on({
-    ajaxStart: function () {
-      $("body").addClass("loading");
-    },
-    ajaxStop: function () {
-      $("body").removeClass("loading");
-    }
   });
 </script>
 {% endblock %}

@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} {% load static %}
 {% block content %}
 <div class="container">
     <h1>{{game}}</h1>
@@ -17,27 +17,23 @@
     <hr>
     {% endfor %}
 </div>
+<div class="overlay"></div>
 {% endblock %}
 
 {% block javascript %}
-{{ game.id|json_script:"game-id" }}
+<script src="{% static 'js/ajaxLoadingSpinner.js' %}"></script>
 <script>
-    const gameID = JSON.parse(document.getElementById('game-id').textContent);
-
+    const gameID = "{{game.id}}";
     const gameSocket = new WebSocket(
         `ws://${window.location.host}/ws/game/${gameID}/`
     );
-
-
     gameSocket.onmessage = function (e) {
         const data = JSON.parse(e.data);
         console.log("onmessage", data)
     }
-
     gameSocket.onclose = function (e) {
         console.error("Game Socket Close unexpected", e);
     }
-
     $(".form-challenge").submit(function (e) {
         e.preventDefault();
         const form = $(this);
