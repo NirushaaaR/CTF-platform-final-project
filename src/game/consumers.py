@@ -2,7 +2,7 @@ import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 
-class ChatConsumer(AsyncWebsocketConsumer):
+class GameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.game_name = self.scope["url_route"]["kwargs"]["game_slug"]
         self.game_group_name = "game_%s" % self.game_name

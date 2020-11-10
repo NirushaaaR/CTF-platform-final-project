@@ -1,7 +1,7 @@
 from django.db import models
 from django.urls import reverse
 from django.contrib.auth import get_user_model
-
+from django.utils import timezone
 
 class Game(models.Model):
     title = models.CharField(max_length=255, unique=True)
@@ -21,8 +21,10 @@ class Game(models.Model):
     def get_absolute_url(self):
         return reverse("game", args=[str(self.slug)])
 
-    def get_remaining_time(self):
-        return self.end - self.start
+    def get_remaining_time_percentage(self):
+        rest = self.end - timezone.now()
+        total = self.end - self.start
+        return rest.total_seconds()/total.total_seconds() * 100
 
     def __str__(self) -> str:
         return self.title
