@@ -1,11 +1,17 @@
-from django.db.models import F, Subquery
+from django.db.models import F, Subquery, Count
 from django.http.response import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 
-from game.models import ChallengeFlag, Game, UserChallengeRecord, UserParticipateGame
+from game.models import (
+    Challenge,
+    ChallengeFlag,
+    Game,
+    UserChallengeRecord,
+    UserParticipateGame,
+)
 from core.models import ScoreHistory
 
 
@@ -17,12 +23,25 @@ def index(request):
 
 @login_required
 def game_view(request, game_slug):
-    game = get_object_or_404(
-        Game.objects.prefetch_related("challenges__flags"), slug=game_slug
-    )
-    context = {"game": game}
-    game.participants.add(request.user)
+    game = get_object_or_404(Game, slug=game_slug)
+    challenges = tuple(Challenge.objects.filter(game=game).order_by("id").values())
 
+    game.participants.add(request.user)
+    user_flags = tuple(
+        UserChallengeRecord.objects.filter(
+            participated_user__user=request.user, participated_user__game=game
+        )
+        .values(
+            "challenge",
+        )
+        .annotate(cleared_flag=Count("challenge"))
+        .order_by("challenge")
+    )
+
+    for idx, challenge in enumerate(challenges):
+        challenge["cleared_flag"] = user_flags[idx]["cleared_flag"] if idx < len(user_flags) else 0
+
+    context = {"game": game, "challenges": challenges}
     return render(request, "game/game.html", context)
 
 

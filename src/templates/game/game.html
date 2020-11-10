@@ -4,8 +4,9 @@
     <h1>{{game}}</h1>
     <p>Time remain <span id="days"></span> <span id="hours"></span> <span id="minutes"></span> <span
             id="seconds"></span> </p>
-    {% for challenge in game.challenges.all %}
-    <p>{{challenge}}</p>
+    {% for challenge in challenges %}
+    <p>{{challenge.docker}}</p>
+    <p>Cleared {{challenge.cleared_flag}}/{{challenge.flag_count}}</p>
     <form class="form-challenge" id="challenge_{{challenge.id}}" action="{% url 'enter_challenge_flag' %}" method="POST">
         {% csrf_token %}
         <input type="hidden" name="challenge_id" value="{{challenge.id}}">
