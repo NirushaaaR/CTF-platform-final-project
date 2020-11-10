@@ -1,12 +1,39 @@
-{% extends 'base.html' %} {% load custom_filters %} {% load humanize %} {% block content %}
+{% extends 'base.html' %} {% load static %} {% load custom_filters %} {% load humanize %}
+
+{% block stylesheet %}
+<style>
+  .overlay {
+    display: none;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 999;
+    background: rgba(255, 255, 255, 0.6) url("https://flevix.com/wp-content/uploads/2020/01/Loading-Image.gif") center no-repeat;
+  }
+
+  /* Turn off scrollbar when body element has the loading class */
+  body.loading {
+    overflow: hidden;
+  }
+
+  /* Make spinner image visible when body element has the loading class */
+  body.loading .overlay {
+    display: block;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
 <div class="container">
   <h2 class="mt-4">{{room.title}}</h2>
   <p>
-  {% for require_room in room.prerequisites.all %}
-  {% if forloop.first %}ควรทำ {% endif %}
-  <a href="{{require_room.get_absolute_url}}">&lt;{{require_room}}&gt;</a>
-  {% if forloop.last %} ก่อน{% endif %}
-  {% endfor %}
+    {% for require_room in room.prerequisites.all %}
+    {% if forloop.first %}ควรทำ {% endif %}
+    <a href="{{require_room.get_absolute_url}}">&lt;{{require_room}}&gt;</a>
+    {% if forloop.last %} ก่อน{% endif %}
+    {% endfor %}
   </p>
   <hr>
   {{room.description|safe}}
@@ -20,8 +47,8 @@
       </div>
       <div>
         {% for next_room in room.next_rooms.all %}
-          {% if forloop.counter == 1 %}ถัดไป: {% endif %}
-          <a href="{{next_room.get_absolute_url}}">&lt;{{next_room}}&gt;</a>
+        {% if forloop.counter == 1 %}ถัดไป: {% endif %}
+        <a href="{{next_room.get_absolute_url}}">&lt;{{next_room}}&gt;</a>
         {% endfor %}
       </div>
     </div>
@@ -30,8 +57,9 @@
   <hr>
 
   {% for task in tasks %}
-  <div class="card my-3 {% if task.task_number in user_answered_tasks %}border-success{% endif %}">
-    <div
+  <div id="card_{{task.id}}"
+    class="card my-3 {% if task.task_number in user_answered_tasks %}border-success{% endif %}">
+    <div id="card_header_{{task.id}}"
       class="card-header d-flex justify-content-between {% if task.task_number in user_answered_tasks %}border-success{% endif %} box-shadow">
       <h3>{{task.task_number}} - {{task.title}}</h3>
       <div class="align-self-end pb-1">{{task.points}} points</div>
@@ -41,7 +69,7 @@
         {{task.description|safe}}
       </div>
       <hr>
-      <form action="{% url 'enter_flag' room.id %}" method="post">
+      <form id="formtask_{{task.id}}" class="task-form" action="{% url 'enter_flag' room.id %}" method="post">
         <div class="form-row align-items-center">
           <div class="col-md-11">
             {% csrf_token %}
@@ -87,5 +115,45 @@
     {% endif %}
   </div>
   {% endfor %}
+  <div class="overlay"></div>
 </div>
 {% endblock content %}
+
+{% block javascript %}
+<script>
+  $(".task-form").submit(function (e) {
+    e.preventDefault();
+
+    const form = $(this);
+    const url = form.attr('action');
+    const task_id = $('input[name="task_id"]', form).val();
+
+    $.ajax({
+      type: "POST",
+      url: url,
+      data: form.serialize(),
+      success: function (data) {
+        alert(data.message);
+        console.log(data);
+        if (data.correct) {
+          $("#card_" + task_id).addClass("border-success");
+          $("#card_header_" + task_id).addClass("border-success");
+          $("#card_" + task_id).append(`<div class="card-footer border-success text-success text-right">
+            <i class="fas fa-check"></i> cleared </div>`);
+        }
+        
+      }
+    });
+  });
+
+  // Add remove loading class on body element based on Ajax request status
+  $(document).on({
+    ajaxStart: function () {
+      $("body").addClass("loading");
+    },
+    ajaxStop: function () {
+      $("body").removeClass("loading");
+    }
+  });
+</script>
+{% endblock %}
