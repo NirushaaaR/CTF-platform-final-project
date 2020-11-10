@@ -6,7 +6,14 @@
             id="seconds"></span> </p>
     {% for challenge in game.challenges.all %}
     <p>{{challenge}}</p>
-    <form action=""></form>
+    <form class="form-challenge" id="challenge_{{challenge.id}}" action="{% url 'enter_challenge_flag' %}" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="challenge_id" value="{{challenge.id}}">
+        <label for="flag">Enter Flag</label>
+        <input type="text" name="flag">
+        <button class="submit-flag">Submit</button>
+    </form>
+    <hr>
     {% endfor %}
 </div>
 {% endblock %}
@@ -16,10 +23,10 @@
 <script>
     const gameID = JSON.parse(document.getElementById('game-id').textContent);
 
-
     const gameSocket = new WebSocket(
         `ws://${window.location.host}/ws/game/${gameID}/`
     );
+
 
     gameSocket.onmessage = function (e) {
         const data = JSON.parse(e.data);
@@ -27,8 +34,32 @@
     }
 
     gameSocket.onclose = function (e) {
-        console.error("Game Socket Close unexpected");
+        console.error("Game Socket Close unexpected", e);
     }
+
+    $(".form-challenge").submit(function (e) {
+        e.preventDefault();
+        const form = $(this);
+        const url = form.attr('action');
+
+        const challenge_id = $('input[name="challenge_id"]', $(this)).val();
+
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: form.serialize(),
+            success: function (data) {
+                alert(data.message);
+                console.log(data);
+                if (data.correct) {
+                    // TODO: update score
+                    gameSocket.send(JSON.stringify({
+                        "type": "update_score"
+                    }));
+                }
+            }
+        });
+    });
 
     function makeTimer() {
         let endTime = new Date('{{game.end|date:"U"}}' * 1000);

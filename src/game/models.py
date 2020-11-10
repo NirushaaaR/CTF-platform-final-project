@@ -24,7 +24,7 @@ class Game(models.Model):
     def get_remaining_time_percentage(self):
         rest = self.end - timezone.now()
         total = self.end - self.start
-        return rest.total_seconds()/total.total_seconds() * 100
+        return rest.total_seconds()/total.total_seconds()
 
     def __str__(self) -> str:
         return self.title
@@ -58,6 +58,7 @@ class ChallengeFlag(models.Model):
 class UserParticipateGame(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    game_score = models.IntegerField(default=0)
     participate_at = models.DateTimeField(auto_now_add=True)
 
 
@@ -65,5 +66,6 @@ class UserChallengeRecord(models.Model):
     participated_user = models.ForeignKey(UserParticipateGame, on_delete=models.PROTECT)
     challenge = models.ForeignKey(Challenge, on_delete=models.DO_NOTHING)
     challenge_flag = models.ForeignKey(ChallengeFlag, on_delete=models.DO_NOTHING)
+    answered_at = models.DateTimeField(auto_now_add=True)
 
     points_gained = models.PositiveIntegerField()

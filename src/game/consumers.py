@@ -1,5 +1,18 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.db import database_sync_to_async
+from django.db.models import F
+
+from game.models import UserParticipateGame
+
+
+@database_sync_to_async
+def get_all_participants_score(game_id):
+    return tuple(
+        UserParticipateGame.objects.filter(game_id=game_id).values(
+            "game_score", username=F("user__username")
+        )
+    )
 
 
 class GameConsumer(AsyncWebsocketConsumer):
@@ -11,6 +24,12 @@ class GameConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(self.game_group_name, self.channel_name)
 
         await self.accept()
+        await self.channel_layer.group_send(
+            self.game_group_name,
+            {
+                "type": "update_score",
+            },
+        )
 
     async def disconnect(self, close_code):
         # Leave room group
@@ -19,16 +38,11 @@ class GameConsumer(AsyncWebsocketConsumer):
     # Receive message from WebSocket
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
+        await self.channel_layer.group_send(self.game_group_name, text_data_json)
 
-        # Send message to room group
-        await self.channel_layer.group_send(
-            self.game_group_name,
-            text_data_json,
+    async def update_score(self, event):
+        # send an initial score
+        participants = await get_all_participants_score(self.game_id)
+        await self.send(
+            text_data=json.dumps({"data": participants, "type": "update_score"})
         )
-
-    # Receive message from room group
-    async def answer_flag(self, event):
-        flag = event["data"]["flag"]
-
-        # check flag
-        print(flag)
