@@ -6,12 +6,30 @@
             id="seconds"></span> </p>
     {% for challenge in game.challenges.all %}
     <p>{{challenge}}</p>
+    <form action=""></form>
     {% endfor %}
 </div>
 {% endblock %}
 
 {% block javascript %}
+{{ game.id|json_script:"game-id" }}
 <script>
+    const gameID = JSON.parse(document.getElementById('game-id').textContent);
+
+
+    const gameSocket = new WebSocket(
+        `ws://${window.location.host}/ws/game/${gameID}/`
+    );
+
+    gameSocket.onmessage = function (e) {
+        const data = JSON.parse(e.data);
+        console.log("onmessage", data)
+    }
+
+    gameSocket.onclose = function (e) {
+        console.error("Game Socket Close unexpected");
+    }
+
     function makeTimer() {
         let endTime = new Date('{{game.end|date:"U"}}' * 1000);
         endTime = (Date.parse(endTime) / 1000);
