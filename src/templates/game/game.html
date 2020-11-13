@@ -4,10 +4,14 @@
     <h1>{{game}}</h1>
     <p>Time remain <span id="days"></span> <span id="hours"></span> <span id="minutes"></span> <span
             id="seconds"></span> </p>
+    <div id="challenges">
+
+    </div>
     {% for challenge in challenges %}
     <p>{{challenge.docker}}</p>
-    <p>Cleared {{challenge.cleared_flag}}/{{challenge.flag_count}}</p>
-    <form class="form-challenge" id="challenge_{{challenge.id}}" action="{% url 'enter_challenge_flag' %}" method="POST">
+    <p>Cleared <span id="challenge_cleared_{{challenge.id}}"></span>/{{challenge.flag_count}}</p>
+    <form class="form-challenge" id="challenge_{{challenge.id}}" action="{% url 'enter_challenge_flag' %}"
+        method="POST">
         {% csrf_token %}
         <input type="hidden" name="challenge_id" value="{{challenge.id}}">
         <label for="flag">Enter Flag</label>
@@ -22,6 +26,7 @@
 
 {% block javascript %}
 <script src="{% static 'js/ajaxLoadingSpinner.js' %}"></script>
+{{challenges|json_script:"challenges-data"}}
 <script>
     const gameID = "{{game.id}}";
     const gameSocket = new WebSocket(
@@ -34,6 +39,16 @@
     gameSocket.onclose = function (e) {
         console.error("Game Socket Close unexpected", e);
     }
+
+    const challenges = JSON.parse(document.getElementById('challenges-data').textContent);
+    function updateClearedFlag() {
+        challenges.forEach(function (c) {
+            $("#challenge_cleared_" + c.id).html(c.cleared_flag);
+        });
+    }
+    updateClearedFlag();
+
+
     $(".form-challenge").submit(function (e) {
         e.preventDefault();
         const form = $(this);
@@ -47,12 +62,13 @@
             data: form.serialize(),
             success: function (data) {
                 alert(data.message);
-                console.log(data);
                 if (data.correct) {
-                    // TODO: update score
                     gameSocket.send(JSON.stringify({
                         "type": "update_score"
                     }));
+                    const idx = challenges.findIndex(obj => obj.id == challenge_id);
+                    challenges[idx].cleared_flag += 1; 
+                    updateClearedFlag();
                 }
             }
         });

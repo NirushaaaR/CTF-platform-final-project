@@ -1,18 +1,27 @@
 import json
+from datetime import datetime
+
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.db.models import F
 
-from game.models import UserParticipateGame
+from game.models import UserChallengeRecord
 
 
 @database_sync_to_async
 def get_all_participants_score(game_id):
     return tuple(
-        UserParticipateGame.objects.filter(game_id=game_id).values(
-            "game_score", username=F("user__username")
-        )
+        UserChallengeRecord.objects.filter(participated_user__game_id=game_id).values(
+            "points_gained",
+            "answered_at",
+            username=F("participated_user__user__username"),
+        ).order_by("answered_at")
     )
+
+
+def datetime_json_converter(obj):
+    if isinstance(obj, datetime):
+        return str(obj)
 
 
 class GameConsumer(AsyncWebsocketConsumer):
@@ -43,6 +52,10 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def update_score(self, event):
         # send an initial score
         participants = await get_all_participants_score(self.game_id)
+
         await self.send(
-            text_data=json.dumps({"data": participants, "type": "update_score"})
+            text_data=json.dumps(
+                {"data": participants, "type": "update_score"},
+                default=datetime_json_converter,
+            )
         )
