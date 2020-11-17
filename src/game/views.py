@@ -16,11 +16,7 @@ from core.models import ScoreHistory
 
 
 def populate_game_challenges(game, user_id):
-    challenges = tuple(
-        Challenge.objects.filter(game=game)
-        .order_by("id")
-        .values()
-    )
+    challenges = tuple(Challenge.objects.filter(game=game).order_by("id").values())
     user_flags = tuple(
         UserChallengeRecord.objects.filter(
             participated_user__user_id=user_id, participated_user__game=game

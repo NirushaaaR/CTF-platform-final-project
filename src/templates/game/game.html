@@ -4,37 +4,46 @@
     <h1>{{game}}</h1>
     <p>Time remain <span id="days"></span> <span id="hours"></span> <span id="minutes"></span> <span
             id="seconds"></span> </p>
-    <div id="challenges">
-
-    </div>
-    {% for challenge in challenges %}
-    <p>{{challenge.docker}}</p>
-    <p>Cleared <span id="challenge_cleared_{{challenge.id}}"></span>/{{challenge.flag_count}}</p>
-    <form class="form-challenge" id="challenge_{{challenge.id}}" action="{% url 'enter_challenge_flag' %}"
-        method="POST">
-        {% csrf_token %}
-        <input type="hidden" name="challenge_id" value="{{challenge.id}}">
-        <label for="flag">Enter Flag</label>
-        <input type="text" name="flag">
-        <button class="submit-flag">Submit</button>
-    </form>
+    <div id='chart-area'></div>
     <hr>
-    {% endfor %}
+    <div id="challenges">
+        {% for challenge in challenges %}
+        <p>{{challenge.docker}}</p>
+        <p>Cleared <span id="challenge_cleared_{{challenge.id}}"></span>/{{challenge.flag_count}}</p>
+        <form class="form-challenge" id="challenge_{{challenge.id}}" action="{% url 'enter_challenge_flag' %}"
+            method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="challenge_id" value="{{challenge.id}}">
+            <label for="flag">Enter Flag</label>
+            <input type="text" name="flag">
+            <button class="submit-flag">Submit</button>
+        </form>
+        <hr>
+        {% endfor %}
+    </div>
 </div>
 <div class="overlay"></div>
 {% endblock %}
 
 {% block javascript %}
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script src="{% static 'js/ajaxLoadingSpinner.js' %}"></script>
 {{challenges|json_script:"challenges-data"}}
 <script>
     const gameID = "{{game.id}}";
+    let score_data;
     const gameSocket = new WebSocket(
         `ws://${window.location.host}/ws/game/${gameID}/`
     );
     gameSocket.onmessage = function (e) {
         const data = JSON.parse(e.data);
         console.log("onmessage", data)
+        // console.log(data);
+        // users_score = data.data;
+        if (data.type === "initial_score") {
+            score_data = data.data;
+            console.log(score_data)
+        }
     }
     gameSocket.onclose = function (e) {
         console.error("Game Socket Close unexpected", e);
@@ -67,7 +76,7 @@
                         "type": "update_score"
                     }));
                     const idx = challenges.findIndex(obj => obj.id == challenge_id);
-                    challenges[idx].cleared_flag += 1; 
+                    challenges[idx].cleared_flag += 1;
                     updateClearedFlag();
                 }
             }
@@ -99,5 +108,28 @@
     }
     makeTimer();
     setInterval(makeTimer, 1000);
+
+    var options = {
+        chart: {
+            height: 250,
+            type: 'line'
+        },
+        xaxis: {
+            categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999]
+        },
+        series: [{
+            name: 'sales1',
+            data: [30, 40, 35, 50, 49, 60, 70, 91, 125]
+        },
+        {
+            name: 'sales1',
+            data: [32, 44, 39, 58, 47, 61, 65, 72, 100]
+        }],
+        
+    }
+
+    var chart = new ApexCharts(document.querySelector("#chart-area"), options);
+
+    chart.render();
 </script>
 {% endblock %}

@@ -63,7 +63,7 @@ class UserParticipateGame(models.Model):
 
 
 class UserChallengeRecord(models.Model):
-    participated_user = models.ForeignKey(UserParticipateGame, on_delete=models.PROTECT)
+    participated_user = models.ForeignKey(UserParticipateGame, on_delete=models.PROTECT, related_name="records")
     challenge = models.ForeignKey(Challenge, on_delete=models.DO_NOTHING)
     challenge_flag = models.ForeignKey(ChallengeFlag, on_delete=models.DO_NOTHING)
     answered_at = models.DateTimeField(auto_now_add=True)
