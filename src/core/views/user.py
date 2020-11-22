@@ -14,7 +14,6 @@ def profile(request):
 
 
 def scoreboard(request):
-    # top_10_users = User.objects.all().order_by("-score").va[:10]
     top10 = (
         ScoreHistory.objects.values(username=F("user__username"))
         .annotate(score=Sum("gained"))

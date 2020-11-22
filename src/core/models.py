@@ -8,6 +8,8 @@ from django.contrib.auth.models import (
 from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 
+from docker_instance.models import DockerWeb
+
 
 class UserManager(BaseUserManager):
     def create_user(self, username, email, password=None, **kwargs):
@@ -86,6 +88,13 @@ class Room(models.Model):
         blank=True,
         related_name="participated_rooms",
     )
+    docker = models.ForeignKey(
+        DockerWeb,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="rooms",
+    )
 
     def get_absolute_url(self):
         return reverse("room", args=[str(self.pk)])
@@ -118,6 +127,13 @@ class Task(models.Model):
     flag = models.CharField(max_length=255)
     room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="tasks")
     points = models.PositiveIntegerField()
+    docker = models.ForeignKey(
+        DockerWeb,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="tasks",
+    )
 
     answered_users = models.ManyToManyField(
         get_user_model(),

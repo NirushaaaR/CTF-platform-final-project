@@ -14,8 +14,6 @@ class ChallengeInline(NestedStackedInline):
     extra = 0
     inlines = (ChallengeFlagInline,)
 
-    readonly_fields = ("url",)
-
 
 @admin.register(Game)
 class GameAdmin(NestedModelAdmin):
