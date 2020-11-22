@@ -12,7 +12,8 @@ from game.models import (
     UserChallengeRecord,
     UserParticipateGame,
 )
-from core.models import ScoreHistory
+
+from core.models import ScoreHistory, User
 
 
 def populate_game_challenges(game, user_id):
@@ -25,13 +26,13 @@ def populate_game_challenges(game, user_id):
             "challenge",
         )
         .annotate(cleared_flag=Count("challenge"))
-        .order_by("challenge")
     )
 
-    for idx, challenge in enumerate(challenges):
-        challenge["cleared_flag"] = (
-            user_flags[idx]["cleared_flag"] if idx < len(user_flags) else 0
-        )
+    for challenge in challenges:
+        cleared_flags = next(
+            (item for item in user_flags if item["challenge"] == challenge['id']), {}
+        ).get("cleared_flag", 0)
+        challenge["cleared_flag"] = cleared_flags
 
     return {"game": game, "challenges": challenges}
 
@@ -64,6 +65,10 @@ def update_score_process(game, remaingin_time, flag, user_id):
             group_id=game.id,
             user_id=user_id,
         )
+
+        # update the overall user score too
+        User.objects.filter(id=user_id).update(score=F("score")+points_gained)
+
         return JsonResponse(
             {
                 "message": "Right Flag",

@@ -4,6 +4,7 @@
     <h1>{{game}}</h1>
     <p>Time remain <span id="days"></span> <span id="hours"></span> <span id="minutes"></span> <span
             id="seconds"></span> </p>
+    <div class="chart-title">Users Score</div>
     <div id='chart-area'></div>
     <hr>
     <div id="challenges">
@@ -31,18 +32,85 @@
 {{challenges|json_script:"challenges-data"}}
 <script>
     const gameID = "{{game.id}}";
-    let score_data;
+    let date_list;
     const gameSocket = new WebSocket(
         `ws://${window.location.host}/ws/game/${gameID}/`
     );
+
+    var chartOptions = {
+        chart: {
+            height: 350,
+            type: 'line',
+        },
+        xaxis: {
+            type: 'numeric',
+            labels: {
+                show: false
+            },
+            tooltip: {
+                enabled: false
+            }
+        },
+        dataLabels: {
+            enabled: false
+        },
+        series: [],
+        tooltip: {
+            x: {
+                formatter: function (val, { dataPointIndex }) {
+                    const date = new Date(date_list[dataPointIndex]);
+                    return `${date.toDateString()} at ${date.getHours()}:${date.getMinutes()}`;
+                }
+            }
+        },
+        noData: {
+            text: 'Loading...'
+        }
+    }
+
+    var chart = new ApexCharts(
+        document.querySelector("#chart-area"),
+        chartOptions
+    );
+
+    chart.render();
+
     gameSocket.onmessage = function (e) {
         const data = JSON.parse(e.data);
         console.log("onmessage", data)
-        // console.log(data);
-        // users_score = data.data;
-        if (data.type === "initial_score") {
-            score_data = data.data;
-            console.log(score_data)
+
+        if (data.type === "get_score") {
+            const score_data = [];
+            date_list = [];
+            data.data.forEach((d, index) => {
+                const idx = score_data.findIndex(s => s.name === d.username);
+                if (idx >= 0) {
+                    // add to existing user data
+                    score_data[idx].current_score += d.points_gained
+
+                    for (let i = 0; i < score_data.length; i++) {
+                        score_data[i].data.push(score_data[i].current_score);
+                    }
+
+                } else {
+                    // update others user data
+                    for (let i = 0; i < score_data.length; i++) {
+                        score_data[i].data.push(score_data[i].current_score);
+                    }
+
+                    // add new user data
+                    score_data.push({
+                        name: d.username,
+                        data: [...date_list.map(dl => 0), d.points_gained],
+                        current_score: d.points_gained,
+                    })
+                }
+                date_list.push(d.answered_at);
+            });
+
+            score_data.sort((a, b) => b.current_score - a.current_score);
+            console.log(score_data);
+            chart.updateSeries(score_data);
         }
     }
     gameSocket.onclose = function (e) {
@@ -108,28 +176,5 @@
     }
     makeTimer();
     setInterval(makeTimer, 1000);
-
-    var options = {
-        chart: {
-            height: 250,
-            type: 'line'
-        },
-        xaxis: {
-            categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999]
-        },
-        series: [{
-            name: 'sales1',
-            data: [30, 40, 35, 50, 49, 60, 70, 91, 125]
-        },
-        {
-            name: 'sales1',
-            data: [32, 44, 39, 58, 47, 61, 65, 72, 100]
-        }],
-        
-    }
-
-    var chart = new ApexCharts(document.querySelector("#chart-area"), options);
-
-    chart.render();
 </script>
 {% endblock %}

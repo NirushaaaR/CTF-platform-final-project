@@ -8,39 +8,27 @@ from django.db.models import F
 from game.models import UserParticipateGame, UserChallengeRecord
 
 
-def map_user_score_data(users, score):
-    mapping = []
-
-    for u in users:
-        user_dict = {"username": u["username"], "score": []}
-        for s in score:
-            if u["id"] == s.participated_user_id:
-                user_dict["score"].append(
-                    {"date": s.answered_at, "points_gained": s.points_gained}
-                )
-        mapping.append(user_dict)
-
-    return mapping
-
-
 @database_sync_to_async
-def get_all_participants_score(game_id, user_id):
-    top10 = (
-        UserParticipateGame.objects.filter(game_id=game_id)
-        .order_by("-game_score")
-        .values("id", "user_id", username=F("user__username"))[:10]
-    )
-    all_user = top10.union(
-        UserParticipateGame.objects.filter(user=user_id).values(
-            "id", "user_id", username=F("user__username")
+def get_participants_score(game_id, user_id):
+    top10 = UserParticipateGame.objects.filter(game_id=game_id).order_by("-game_score")[
+        :10
+    ]
+
+    participate_id = top10.union(
+        UserParticipateGame.objects.filter(user_id=user_id)
+    ).values_list("id", flat=True)
+
+    score = (
+        UserChallengeRecord.objects.filter(participated_user_id__in=participate_id)
+        .values(
+            "points_gained",
+            "answered_at",
+            username=F("participated_user__user__username"),
         )
+        .order_by("answered_at")
     )
 
-    score = UserChallengeRecord.objects.filter(
-        participated_user_id__in=[u["id"] for u in all_user]
-    )
-
-    return map_user_score_data(all_user, score)
+    return tuple(score)
 
 
 def datetime_json_converter(obj):
@@ -55,16 +43,10 @@ class GameConsumer(AsyncWebsocketConsumer):
 
         # Join room group
         await self.channel_layer.group_add(self.game_group_name, self.channel_name)
-
         await self.accept()
 
-        data = await get_all_participants_score(self.game_id, self.scope["user"].id)
-        await self.send(
-            text_data=json.dumps(
-                {"data": data, "type": "initial_score"},
-                default=datetime_json_converter,
-            )
-        )
+        # get all users score...
+        await self.get_score({"type": "initiate score"})
 
     async def disconnect(self, close_code):
         # Leave room group
@@ -73,22 +55,17 @@ class GameConsumer(AsyncWebsocketConsumer):
     # Receive message from WebSocket
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        await self.channel_layer.group_send(self.game_group_name, text_data_json)
+        if text_data_json["type"] == "update_score":
+            await self.channel_layer.group_send(
+                self.game_group_name, {"type": "get_score"}
+            )
 
-    async def update_score(self, event):
+    async def get_score(self, event):
         # send an initial score
-        start = datetime.now()
-        # participants = await get_all_participants_score(self.game_id, self.scope['user'].id)
-        end = datetime.now()
-
-        print("time usage", (end - start).total_seconds())
-
+        data = await get_participants_score(self.game_id, self.scope["user"].id)
         await self.send(
             text_data=json.dumps(
-                {
-                    # "data": participants,
-                    "type": "update_score"
-                },
+                {"data": data, "type": "get_score"},
                 default=datetime_json_converter,
             )
         )
