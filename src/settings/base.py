@@ -13,6 +13,7 @@ INSTALLED_APPS = [
     # channels
     "channels",
     "game",
+    "docker_instance",
     # django contrib
     "django.contrib.admin",
     "django.contrib.auth",

@@ -5,6 +5,7 @@ DEBUG = True
 INSTALLED_APPS = [
     "channels",
     "game",
+    "docker_instance",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",

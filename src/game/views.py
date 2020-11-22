@@ -88,6 +88,7 @@ def index(request):
 def game_view(request, game_slug):
     game = get_object_or_404(Game, slug=game_slug)
     remaining_time = game.get_remaining_time_percentage()
+    game_ends = False
     if remaining_time > 0:
         # game ongoing...
         game.participants.add(request.user)
@@ -97,9 +98,9 @@ def game_view(request, game_slug):
         pass
     else:
         # is_archive can do it but not record the participation
-        pass
+        game_ends = True
 
-    context = populate_game_challenges(game, request.user.id)
+    context = {**populate_game_challenges(game, request.user.id), "game_ends": game_ends}
     return render(request, "game/game.html", context)
 
 

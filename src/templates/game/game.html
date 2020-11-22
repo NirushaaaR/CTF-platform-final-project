@@ -2,8 +2,12 @@
 {% block content %}
 <div class="container">
     <h1>{{game}}</h1>
+    {% if not game_ends %}
     <p>Time remain <span id="days"></span> <span id="hours"></span> <span id="minutes"></span> <span
             id="seconds"></span> </p>
+    {% else %}
+        <p>Game Already Ends But you can still answer the flag</p>
+    {% endif %}
     <div class="chart-title">Users Score</div>
     <div id='chart-area'></div>
     <hr>
@@ -32,11 +36,6 @@
 {{challenges|json_script:"challenges-data"}}
 <script>
     const gameID = "{{game.id}}";
-    let date_list = [];
-    const gameSocket = new WebSocket(
-        `ws://${window.location.host}/ws/game/${gameID}/`
-    );
-
     var chartOptions = {
         chart: {
             height: 350,
@@ -59,7 +58,9 @@
             x: {
                 formatter: function (val, { dataPointIndex }) {
                     const date = new Date(date_list[dataPointIndex]);
-                    return `${date.toDateString()} at ${date.getHours()}:${date.getMinutes()}`;
+                    let minute = date.getMinutes();
+                    minute = minute < 10 ? `0${minute}` : minute;
+                    return `${date.toDateString()} at ${date.getHours()}:${minute}`;
                 }
             }
         },
@@ -74,6 +75,11 @@
     );
 
     chart.render();
+
+    let date_list = [];
+    const gameSocket = new WebSocket(
+        `ws://${window.location.host}/ws/game/${gameID}/`
+    );
 
     gameSocket.onopen = function (e) {
         console.log("open", e)
@@ -172,6 +178,9 @@
         });
     });
 
+</script>
+{% if not game_ends %}
+<script>
     function makeTimer() {
         let endTime = new Date('{{game.end|date:"U"}}' * 1000);
         endTime = (Date.parse(endTime) / 1000);
@@ -198,4 +207,5 @@
     makeTimer();
     setInterval(makeTimer, 1000);
 </script>
+{% endif %}
 {% endblock %}
