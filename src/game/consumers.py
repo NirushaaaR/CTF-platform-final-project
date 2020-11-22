@@ -9,17 +9,11 @@ from game.models import UserParticipateGame, UserChallengeRecord
 
 
 @database_sync_to_async
-def get_participants_score(game_id, user_id):
-    top10 = UserParticipateGame.objects.filter(game_id=game_id).order_by("-game_score")[
-        :10
-    ]
-
-    participate_id = top10.union(
-        UserParticipateGame.objects.filter(user_id=user_id)
-    ).values_list("id", flat=True)
+def get_top10_score(game_id):
+    top10 = UserParticipateGame.objects.filter(game_id=game_id).order_by("-game_score").values_list("id", flat=True)[:10]
 
     score = (
-        UserChallengeRecord.objects.filter(participated_user_id__in=participate_id)
+        UserChallengeRecord.objects.filter(participated_user_id__in=top10)
         .values(
             "points_gained",
             "answered_at",
@@ -46,7 +40,13 @@ class GameConsumer(AsyncWebsocketConsumer):
         await self.accept()
 
         # get all users score...
-        await self.get_score({"type": "initiate score"})
+        data = await get_top10_score(self.game_id)
+        await self.send(
+            text_data=json.dumps(
+                {"data": data, "type": "get_score"},
+                default=datetime_json_converter,
+            )
+        )
 
     async def disconnect(self, close_code):
         # Leave room group
@@ -55,17 +55,19 @@ class GameConsumer(AsyncWebsocketConsumer):
     # Receive message from WebSocket
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
+        print(text_data_json)
         if text_data_json["type"] == "update_score":
+            data = await get_top10_score(self.game_id)
             await self.channel_layer.group_send(
-                self.game_group_name, {"type": "get_score"}
+                self.game_group_name, 
+                {"type": "get_score", "data": data}
             )
 
     async def get_score(self, event):
         # send an initial score
-        data = await get_participants_score(self.game_id, self.scope["user"].id)
         await self.send(
             text_data=json.dumps(
-                {"data": data, "type": "get_score"},
+                {"data": event['data'], "type": "get_score"},
                 default=datetime_json_converter,
             )
         )

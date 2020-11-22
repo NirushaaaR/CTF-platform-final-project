@@ -16,7 +16,7 @@
             {% csrf_token %}
             <input type="hidden" name="challenge_id" value="{{challenge.id}}">
             <label for="flag">Enter Flag</label>
-            <input type="text" name="flag">
+            <input class="input-challenge-flag" type="text" name="flag" required>
             <button class="submit-flag">Submit</button>
         </form>
         <hr>
@@ -32,7 +32,7 @@
 {{challenges|json_script:"challenges-data"}}
 <script>
     const gameID = "{{game.id}}";
-    let date_list;
+    let date_list = [];
     const gameSocket = new WebSocket(
         `ws://${window.location.host}/ws/game/${gameID}/`
     );
@@ -75,6 +75,14 @@
 
     chart.render();
 
+    gameSocket.onopen = function (e) {
+        console.log("open", e)
+        // $(".input-challenge-flag").each(function(i, e){
+        //     e.removeAttribute("disabled");
+        //     e.setAttribute("placeholder", "Enter Flag Here");
+        // })
+    }
+
     gameSocket.onmessage = function (e) {
         const data = JSON.parse(e.data);
         console.log("onmessage", data)
@@ -111,6 +119,9 @@
             score_data.sort((a, b) => b.current_score - a.current_score);
             console.log(score_data);
             chart.updateSeries(score_data);
+        } else if (data.type === "answer_flag") {
+            // $("body").removeClass("loading");
+
         }
     }
     gameSocket.onclose = function (e) {
@@ -132,6 +143,16 @@
         const url = form.attr('action');
 
         const challenge_id = $('input[name="challenge_id"]', $(this)).val();
+        const flag = $('input[name="flag"]', $(this)).val();
+
+        // gameSocket.send(JSON.stringify({
+        //     type: "answer_flag",
+        //     user_id: "{{request.user.id}}",
+        //     challenge_id: challenge_id,
+        //     flag: flag
+        // }));
+
+        // $("body").addClass("loading");
 
         $.ajax({
             type: "POST",
@@ -141,7 +162,7 @@
                 alert(data.message);
                 if (data.correct) {
                     gameSocket.send(JSON.stringify({
-                        "type": "update_score"
+                        type: "update_score",
                     }));
                     const idx = challenges.findIndex(obj => obj.id == challenge_id);
                     challenges[idx].cleared_flag += 1;

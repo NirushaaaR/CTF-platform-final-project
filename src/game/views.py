@@ -30,14 +30,14 @@ def populate_game_challenges(game, user_id):
 
     for challenge in challenges:
         cleared_flags = next(
-            (item for item in user_flags if item["challenge"] == challenge['id']), {}
+            (item for item in user_flags if item["challenge"] == challenge["id"]), {}
         ).get("cleared_flag", 0)
         challenge["cleared_flag"] = cleared_flags
 
     return {"game": game, "challenges": challenges}
 
 
-def update_score_process(game, remaingin_time, flag, user_id):
+def update_score_process(game, remaingin_time, flag, user_id, username):
     already_answered = UserChallengeRecord.objects.filter(
         participated_user__user_id=user_id,
         participated_user__game=game,
@@ -49,12 +49,13 @@ def update_score_process(game, remaingin_time, flag, user_id):
     else:
         points_gained = (flag.point * remaingin_time) // 1
         participation = UserParticipateGame.objects.filter(user=user_id, game=game)
-        UserChallengeRecord.objects.create(
+        user_challenges_record = UserChallengeRecord(
             participated_user_id=Subquery(participation.values("id")),
             challenge=flag.challenge,
             challenge_flag=flag,
             points_gained=points_gained,
         )
+        user_challenges_record.save()
 
         # add score
         participation.update(game_score=F("game_score") + points_gained)
@@ -66,14 +67,13 @@ def update_score_process(game, remaingin_time, flag, user_id):
             user_id=user_id,
         )
 
-        # update the overall user score too
-        User.objects.filter(id=user_id).update(score=F("score")+points_gained)
-
         return JsonResponse(
             {
                 "message": "Right Flag",
                 "correct": True,
                 "points_gained": points_gained,
+                "answered_at": user_challenges_record.answered_at,
+                "username": username,
             }
         )
 
@@ -88,7 +88,6 @@ def index(request):
 def game_view(request, game_slug):
     game = get_object_or_404(Game, slug=game_slug)
     remaining_time = game.get_remaining_time_percentage()
-
     if remaining_time > 0:
         # game ongoing...
         game.participants.add(request.user)
@@ -123,7 +122,7 @@ def enter_challenge_flag(request):
             pass
         else:
             return update_score_process(
-                game, remaingin_time, right_flag, request.user.id
+                game, remaingin_time, right_flag, request.user.id, request.user.username
             )
 
     except ChallengeFlag.DoesNotExist:
