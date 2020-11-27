@@ -41,12 +41,10 @@ class Challenge(models.Model):
         blank=True,
         related_name="challenges",
     )
+    description = models.TextField()
     flag_count = models.PositiveIntegerField()
 
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="challenges")
-
-    def __str__(self) -> str:
-        return self.docker
 
 
 class ChallengeFlag(models.Model):
