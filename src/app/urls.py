@@ -7,7 +7,7 @@ urlpatterns = (
     [
         path("admin/", admin.site.urls),
         path("game/", include("game.urls")),
-        path("docker/", include("docker_instance.urls")),
+        # path("docker/", include("docker_instance.urls")),
         path("", include("core.urls")),
     ]
     + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
