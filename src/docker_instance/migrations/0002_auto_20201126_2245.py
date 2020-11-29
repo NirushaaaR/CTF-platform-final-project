@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='dockerweb',
             name='port',
-            field=models.PositiveIntegerField(default=10000, unique=True, validators=[django.core.validators.MinValueValidator(1024), django.core.validators.MaxValueValidator(65535)]),
+            field=models.PositiveIntegerField(default=10000, unique=True),
             preserve_default=False,
         ),
     ]
