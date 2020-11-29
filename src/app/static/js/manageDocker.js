@@ -33,37 +33,37 @@ async function deleteDocker(docker) {
 
 function checkDockerStatus(data, docker) {
     const url = BASEURL + urlencode(docker);
-    console.log(data);
-    changeDeployStatus(JSON.stringify(data));
+    changeDeployStatus(data);
 
     setTimeout(function () {
         fetch(url)
             .then(res => res.json())
             .then(res => {
                 const data = res.data;
-                changeDeployStatus(data.status);
-                console.log("status", data);
-
                 if (data.status === "deployed") {
                     // deploy success!!
                     document.getElementById("id_url").disabled = false;
                     document.getElementById("id_url").value = res.url;
                     // submit form
                     document.getElementById("dockerweb_form").submit();
-                } else if ( data.status === "remove from server" ) {
+                } else if (data.status === "remove from server") {
                     // remove success
-                    const deleteLink =  document.querySelector(".deletelink").getAttribute("href");
+                    const deleteLink = document.querySelector(".deletelink").getAttribute("href");
                     window.location.replace(deleteLink);
 
                 } else {
                     // check every 1.5 secconds
-                    checkDockerStatus(data, docker);
+                    if (!data.isError) {
+                        checkDockerStatus(data.status, docker);
+                    } else {
+                        throw new Error(data.status);
+                    }
                 }
             })
             .catch(err => {
                 document.querySelector(".deletelink").disabled = false;
                 deployButton.disabled = false;
-                changeDeployStatus("error checking status:", err)
+                changeDeployStatus(err);
             });
     }, 1500);
 }
@@ -73,7 +73,6 @@ deployButton.addEventListener("click", function (e) {
     deployButton.disabled = true;
     const docker = document.getElementById("id_docker").value;
     const port = document.getElementById("id_port").value;
-    console.log(docker, port);
 
     fetch("http://workspace:3000/docker", {
         // fetch("https://jsonplaceholder.typicode.com/posts", {
@@ -91,7 +90,6 @@ deployButton.addEventListener("click", function (e) {
         });
 
     changeDeployStatus("uploading...");
-    console.log("deploying check status every .. second");
 })
 
 const spanForDeploy = document.createElement("span");
@@ -119,6 +117,7 @@ document.addEventListener("DOMContentLoaded", function (e) {
             deleteLinkButton.addEventListener("click", async function (e) {
                 e.preventDefault();
                 deleteLinkButton.disabled = true;
+                checkDockerStatus("deleting...");
                 const docker = document.getElementById("id_docker").value;
                 const data = await deleteDocker(docker);
                 checkDockerStatus(data.status, docker);
