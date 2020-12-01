@@ -1,4 +1,4 @@
-const BASEURL = "http://workspace:3000/docker/";
+const BASEURL = "http://139.162.48.22:3000/docker/";
 
 function urlencode(str) {
     return encodeURIComponent(str)
@@ -58,8 +58,9 @@ function checkDockerStatus(data, docker, isDelete, isDeleteLink) {
                         const deleteLink = document.querySelector(".deletelink").getAttribute("href");
                         window.location.replace(deleteLink);
                     } else {
+                        console.table(data);
                         document.getElementById("id_url").disabled = false;
-                        document.getElementById("id_url").value = res.url;
+                        document.getElementById("id_url").value = "";
                         document.getElementById("dockerweb_form").submit();
                     }
                 }
