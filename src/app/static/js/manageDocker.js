@@ -11,15 +11,17 @@ function urlencode(str) {
         .replace(/%20/g, '+')
 }
 
-// div of all button
-const divButton = document.createElement("div");
-divButton.classList.add("form-row");
-
 // deploy docker button
 const deployButton = document.createElement("input");
 deployButton.classList.add("deploy-button")
 deployButton.type = "button";
 deployButton.value = "Deploy";
+
+// delete docker button
+const deleteButton = document.createElement("input");
+deleteButton.classList.add("delete-button")
+deleteButton.type = "button";
+deleteButton.value = "Delete";
 
 async function deleteDocker(docker) {
     try {
@@ -31,30 +33,40 @@ async function deleteDocker(docker) {
     }
 }
 
-function checkDockerStatus(data, docker) {
+function checkDockerStatus(data, docker, isDelete, isDeleteLink) {
     const url = BASEURL + urlencode(docker);
-    changeDeployStatus(data);
+    if (isDelete) {
+        changeDeleteStatus(data);
+    } else {
+        changeDeployStatus(data);
+    }
 
     setTimeout(function () {
         fetch(url)
             .then(res => res.json())
             .then(res => {
                 const data = res.data;
-                if (data.status === "deployed") {
+                if (data.status === "deployed" && !isDelete) {
                     // deploy success!!
                     document.getElementById("id_url").disabled = false;
                     document.getElementById("id_url").value = res.url;
                     // submit form
                     document.getElementById("dockerweb_form").submit();
-                } else if (data.status === "remove from server") {
+                } else if (data.status === "remove from server" && isDelete) {
                     // remove success
-                    const deleteLink = document.querySelector(".deletelink").getAttribute("href");
-                    window.location.replace(deleteLink);
-
-                } else {
+                    if (isDeleteLink) {
+                        const deleteLink = document.querySelector(".deletelink").getAttribute("href");
+                        window.location.replace(deleteLink);
+                    } else {
+                        document.getElementById("id_url").disabled = false;
+                        document.getElementById("id_url").value = res.url;
+                        document.getElementById("dockerweb_form").submit();
+                    }
+                }
+                else {
                     // check every 1.5 secconds
                     if (!data.isError) {
-                        checkDockerStatus(data.status, docker);
+                        checkDockerStatus(data.status, docker, isDelete, isDeleteLink);
                     } else {
                         throw new Error(data.status);
                     }
@@ -63,6 +75,7 @@ function checkDockerStatus(data, docker) {
             .catch(err => {
                 document.querySelector(".deletelink").disabled = false;
                 deployButton.disabled = false;
+                deleteButton.disabled = false;
                 changeDeployStatus(err);
             });
     }, 1500);
@@ -71,10 +84,11 @@ function checkDockerStatus(data, docker) {
 deployButton.addEventListener("click", function (e) {
     // e.preventDefault();
     deployButton.disabled = true;
+    deleteButton.disabled = true;
     const docker = document.getElementById("id_docker").value;
     const port = document.getElementById("id_port").value;
 
-    fetch("http://workspace:3000/docker", {
+    fetch(BASEURL, {
         // fetch("https://jsonplaceholder.typicode.com/posts", {
         method: "POST",
         headers: {
@@ -83,14 +97,33 @@ deployButton.addEventListener("click", function (e) {
         body: JSON.stringify({ docker, port })
     })
         .then(res => res.json())
-        .then(res => checkDockerStatus(res.status, docker))
+        .then(res => checkDockerStatus(res.status, docker, false, false))
         .catch(err => {
             deployButton.disabled = false;
             changeDeployStatus(err);
         });
 
     changeDeployStatus("uploading...");
-})
+});
+
+deleteButton.addEventListener("click", function (e) {
+    deployButton.disabled = true;
+    deleteButton.disabled = true;
+
+    const docker = document.getElementById("id_docker").value;
+    fetch(BASEURL + urlencode(docker), {
+        method: "DELETE",
+    })
+        .then(res => res.json())
+        .then(res => checkDockerStatus(res.status, docker, true, false))
+        .catch(err => {
+            deployButton.disabled = false;
+            deleteButton.disabled = true;
+            changeDeleteStatus(err);
+        });
+
+    changeDeleteStatus("deleteing...");
+});
 
 const spanForDeploy = document.createElement("span");
 spanForDeploy.id = "deploy-status";
@@ -100,15 +133,32 @@ function changeDeployStatus(text) {
     spanForDeploy.innerHTML = text;
 }
 
+const spanForDelete = document.createElement("span");
+spanForDelete.id = "Delete-status";
+spanForDelete.setAttribute("style", "margin-left:3px");
+
+function changeDeleteStatus(text) {
+    spanForDelete.innerHTML = text;
+}
+
+// div of all button
+const divDeployButton = document.createElement("div");
+divDeployButton.classList.add("form-row");
 // add all button to div
-divButton.appendChild(deployButton);
-divButton.appendChild(spanForDeploy);
+divDeployButton.appendChild(deployButton);
+divDeployButton.appendChild(spanForDeploy);
+
+const divDeleteButton = document.createElement("div");
+divDeleteButton.classList.add("form-row");
+divDeleteButton.appendChild(deleteButton);
+divDeleteButton.appendChild(spanForDelete);
 
 
 document.addEventListener("DOMContentLoaded", function (e) {
     const formFieldset = document.querySelector("form fieldset");
     if (formFieldset !== null) {
-        formFieldset.appendChild(divButton);
+        formFieldset.appendChild(divDeployButton);
+        formFieldset.appendChild(divDeleteButton);
         document.getElementById("id_url").disabled = true;
 
         // delete link
@@ -117,10 +167,9 @@ document.addEventListener("DOMContentLoaded", function (e) {
             deleteLinkButton.addEventListener("click", async function (e) {
                 e.preventDefault();
                 deleteLinkButton.disabled = true;
-                checkDockerStatus("deleting...");
                 const docker = document.getElementById("id_docker").value;
                 const data = await deleteDocker(docker);
-                checkDockerStatus(data.status, docker);
+                checkDockerStatus(data.status, docker, true, true);
             });
         }
 

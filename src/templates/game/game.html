@@ -13,7 +13,8 @@
     <hr>
     <div id="challenges">
         {% for challenge in challenges %}
-        <p>{{challenge.docker}}</p>
+        <p>{{challenge.docker}} - <a href="{{challenge.url}}">{{challenge.url}}</a></p>
+        <p>{{challenge.description|safe}}</p>
         <p>Cleared <span id="challenge_cleared_{{challenge.id}}"></span>/{{challenge.flag_count}}</p>
         <form class="form-challenge" id="challenge_{{challenge.id}}" action="{% url 'enter_challenge_flag' %}"
             method="POST">
@@ -63,9 +64,6 @@
                     return `${date.toDateString()} at ${date.getHours()}:${minute}`;
                 }
             }
-        },
-        noData: {
-            text: 'Loading...'
         }
     }
 

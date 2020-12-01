@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db.models import F, Subquery, Count
 from django.http.response import JsonResponse
 from django.shortcuts import get_object_or_404
@@ -17,7 +19,16 @@ from core.models import ScoreHistory, User
 
 
 def populate_game_challenges(game, user_id):
-    challenges = tuple(Challenge.objects.filter(game=game).order_by("id").values())
+    challenges = tuple(
+        Challenge.objects.filter(game=game)
+        .order_by("id")
+        .values()
+        .annotate(
+            docker=F("docker__docker"),
+            url=F("docker__url"),
+            flag_count=Count("flags"),
+        )
+    )
     user_flags = tuple(
         UserChallengeRecord.objects.filter(
             participated_user__user_id=user_id, participated_user__game=game
@@ -79,7 +90,8 @@ def update_score_process(game, remaingin_time, flag, user_id, username):
 
 
 def index(request):
-    games = Game.objects.all()
+    now = datetime.now()
+    games = Game.objects.filter(start__lt=now, end__gt=now)
     context = {"games": games}
     return render(request, "game/index.html", context)
 
@@ -100,7 +112,10 @@ def game_view(request, game_slug):
         # is_archive can do it but not record the participation
         game_ends = True
 
-    context = {**populate_game_challenges(game, request.user.id), "game_ends": game_ends}
+    context = {
+        **populate_game_challenges(game, request.user.id),
+        "game_ends": game_ends,
+    }
     return render(request, "game/game.html", context)
 
 

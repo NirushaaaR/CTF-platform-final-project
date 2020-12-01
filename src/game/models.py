@@ -42,7 +42,6 @@ class Challenge(models.Model):
         related_name="challenges",
     )
     description = models.TextField()
-    flag_count = models.PositiveIntegerField()
 
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="challenges")
 
