@@ -124,7 +124,7 @@ class Task(models.Model):
     task_number = models.PositiveIntegerField(validators=[MinValueValidator(1)])
     title = models.CharField(max_length=255)
     description = models.TextField()
-    flag = models.CharField(max_length=255)
+    flag = models.CharField(max_length=255, null=True, blank=True)
     room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="tasks")
     points = models.PositiveIntegerField()
     docker = models.ForeignKey(
@@ -134,6 +134,8 @@ class Task(models.Model):
         blank=True,
         related_name="tasks",
     )
+    docker_url_path = models.CharField(max_length=100, null=True, blank=True)
+    conclusion = models.TextField(null=True, blank=True)
 
     answered_users = models.ManyToManyField(
         get_user_model(),

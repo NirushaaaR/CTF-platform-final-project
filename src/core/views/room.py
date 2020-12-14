@@ -30,7 +30,7 @@ def index(request):
 
 @login_required
 def room(request, pk):
-    room = get_object_or_404(Room.objects.prefetch_related("tasks__hints"), pk=pk)
+    room = get_object_or_404(Room.objects.select_related("docker").prefetch_related("tasks__hints"), pk=pk)
     tasks = room.tasks.all()
 
     context = {

@@ -74,7 +74,10 @@ function checkDockerStatus(data, docker, isDelete, isDeleteLink) {
                 }
             })
             .catch(err => {
-                document.querySelector(".deletelink").disabled = false;
+                const deleteLinks = document.querySelector(".deletelink");
+                if (deleteLinks !== null) {
+                    deleteLinks.disabled = false;
+                }
                 deployButton.disabled = false;
                 deleteButton.disabled = false;
                 changeDeployStatus(err);
