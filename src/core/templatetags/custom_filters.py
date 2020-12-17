@@ -15,6 +15,8 @@ def replace_char(char):
 @register.filter
 def censor_flag(flag: str):
     """ Make Flag format FLAG{----------} """
-    if flag.startswith("FLAG{") and flag.endswith("}"):
+    if flag == None:
+        return ""
+    elif flag.startswith("FLAG{") and flag.endswith("}"):
         return "FLAG{"+''.join([replace_char(char) for char in flag[4:-1]])+"}"
     return "-" * len(flag)
