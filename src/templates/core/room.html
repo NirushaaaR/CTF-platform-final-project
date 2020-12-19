@@ -41,9 +41,14 @@
     <div class="card-body">
       <div class="card-text">
         {% if task.docker %}
-        docker: {{task.docker}} <br>
+        <p>docker: {{task.docker}}</p>
+        <p>สามารถรันเว็บโดยใช้คำสั่ง "docker run --rm -P {{task.docker.port}} {{task.docker}}"</p>
+        {% if task.docker.url %}
         url: <a href="{{task.docker.url}}{{task.docker_url_path}}">{{task.docker.url}}{{task.docker_url_path}}</a>
         <br>
+        {% else %}
+        <p>ไปที่ {{task.docker_url_path}}</p>
+        {% endif %}
         {% endif %}
         {{task.description|safe}}
       </div>
