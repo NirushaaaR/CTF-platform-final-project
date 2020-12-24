@@ -50,5 +50,10 @@ class UserAdmin(BaseUserAdmin):
         ),
     )
 
+@admin.register(Task)
+class TaskAdmin(admin.ModelAdmin):
+    list_display = ("title", "room")
+    class Media:
+        js = ("js/tinyinject.js",)
 
 admin.site.register(Tag)

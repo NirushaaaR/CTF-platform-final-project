@@ -58,7 +58,11 @@
           <div class="col-md-11">
             {% csrf_token %}
             <input type="hidden" name="task_id" value="{{task.id}}" />
+            {% if task.flag %}
             <input class="form-control" type="text" name="flag" placeholder="{{task.flag|censor_flag}}" />
+            {% else %}
+            <input class="form-control" type="text" name="flag" placeholder="ทำความเข้าใจตามข้างบน" disabled/>
+            {% endif %}
           </div>
           <div class="col-md-1 text-center">
             <button type="submit" class="btn btn-success">Submit</button>

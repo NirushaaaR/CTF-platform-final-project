@@ -69,6 +69,7 @@ function checkDockerStatus(data, docker, isDelete, isDeleteLink) {
                     if (!data.isError) {
                         checkDockerStatus(data.status, docker, isDelete, isDeleteLink);
                     } else {
+                        console.log("error",data);
                         throw new Error(data.status);
                     }
                 }
