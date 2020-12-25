@@ -65,9 +65,9 @@ def enter_flag(request, room_id):
 
     if task.flag == flag:
         task.answered_users.add(request.user.id)
-        return JsonResponse({"message": "Flag ถูกต้อง!!", "correct": True})
+        return JsonResponse({"message": "ถูกต้อง!!", "correct": True})
     else:
-        return JsonResponse({"message": "Flag ผิด!!", "correct": False})
+        return JsonResponse({"message": "ผิด!!", "correct": False})
 
 
 def admin_create_room(request):

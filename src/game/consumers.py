@@ -55,7 +55,6 @@ class GameConsumer(AsyncWebsocketConsumer):
     # Receive message from WebSocket
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        print(text_data_json)
         if text_data_json["type"] == "update_score":
             data = await get_top10_score(self.game_id)
             await self.channel_layer.group_send(

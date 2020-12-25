@@ -81,10 +81,6 @@
 
     gameSocket.onopen = function (e) {
         console.log("open", e)
-        // $(".input-challenge-flag").each(function(i, e){
-        //     e.removeAttribute("disabled");
-        //     e.setAttribute("placeholder", "Enter Flag Here");
-        // })
     }
 
     gameSocket.onmessage = function (e) {
@@ -109,13 +105,14 @@
                     for (let i = 0; i < score_data.length; i++) {
                         score_data[i].data.push(score_data[i].current_score);
                     }
-
-                    // add new user data
-                    score_data.push({
+                    const newUserSeries = {
                         name: d.username,
                         data: [...date_list.map(dl => 0), d.points_gained],
                         current_score: d.points_gained,
-                    })
+                    }
+                    // add new user data
+                    score_data.push(newUserSeries);
+                    chart.appendSeries(newUserSeries);
                 }
                 date_list.push(d.answered_at);
             });
@@ -123,9 +120,6 @@
             score_data.sort((a, b) => b.current_score - a.current_score);
             console.log(score_data);
             chart.updateSeries(score_data);
-        } else if (data.type === "answer_flag") {
-            // $("body").removeClass("loading");
-
         }
     }
     gameSocket.onclose = function (e) {
@@ -148,15 +142,6 @@
 
         const challenge_id = $('input[name="challenge_id"]', $(this)).val();
         const flag = $('input[name="flag"]', $(this)).val();
-
-        // gameSocket.send(JSON.stringify({
-        //     type: "answer_flag",
-        //     user_id: "{{request.user.id}}",
-        //     challenge_id: challenge_id,
-        //     flag: flag
-        // }));
-
-        // $("body").addClass("loading");
 
         $.ajax({
             type: "POST",

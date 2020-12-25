@@ -56,13 +56,16 @@ def update_score_process(game, flag, user_id, username):
     ).exists()
 
     if already_answered:
-        return {"message": "Already Enter That Flag", "correct": False}
+        return {"message": "ตอบ flag นี้ไปแล้ว", "correct": False}
     else:
         points_gained = flag.point
 
-        if game.period_id:
-            remaingin_time = game.period.get_remaining_time_percentage()
-            points_gained = round(points_gained * remaingin_time)
+        try:
+            if game.period:
+                remaingin_time = game.period.get_remaining_time_percentage()
+                points_gained = round(points_gained * remaingin_time)
+        except Game.period.RelatedObjectDoesNotExist:
+            pass
 
         participation = UserParticipateGame.objects.filter(user=user_id, game=game)
         user_challenges_record = UserChallengeRecord(
@@ -84,7 +87,7 @@ def update_score_process(game, flag, user_id, username):
         )
 
         return {
-            "message": "Right Flag",
+            "message": "ถูกต้อง",
             "correct": True,
             "points_gained": points_gained,
             "answered_at": user_challenges_record.answered_at,
@@ -112,6 +115,7 @@ def game_view(request, game_slug):
             # game already ends hmmm what todo...
             pass
     except Game.period.RelatedObjectDoesNotExist:
+        # no periods game always ongoning
         game.period = None
         game.participants.add(request.user)
         
@@ -138,4 +142,4 @@ def enter_challenge_flag(request):
         return JsonResponse(result)
 
     except ChallengeFlag.DoesNotExist:
-        return JsonResponse({"message": "Wrong flag", "correct": False})
+        return JsonResponse({"message": "ผิด", "correct": False})

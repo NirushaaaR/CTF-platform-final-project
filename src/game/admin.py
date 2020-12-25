@@ -2,7 +2,7 @@ from django.contrib import admin
 from nested_inline.admin import NestedStackedInline, NestedModelAdmin
 from django.forms import ModelForm
 
-from game.models import Game, Challenge, ChallengeFlag, GamePeriod
+from game.models import Game, Challenge, ChallengeFlag, GamePeriod, UserChallengeRecord
 
 class GameForm(ModelForm):
     class Meta:
@@ -33,3 +33,8 @@ class GameAdmin(NestedModelAdmin):
 
     class Media:
         js = ("js/tinyinject.js",)
+
+
+@admin.register(UserChallengeRecord)
+class UserChallengeRecordAdmin(admin.ModelAdmin):
+    list_display = ("answered_at", "challenge", "challenge_flag")
