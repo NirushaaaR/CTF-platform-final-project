@@ -2,6 +2,8 @@ from django.db import models
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.utils import timezone
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 
 from docker_instance.models import DockerWeb
 
@@ -10,10 +12,11 @@ class Game(models.Model):
     title = models.CharField(max_length=255, unique=True)
     slug = models.SlugField(max_length=255)
     description = models.TextField()
-    start = models.DateTimeField()
-    end = models.DateTimeField()
 
     is_archive = models.BooleanField(default=False)
+    # time_mode = models.BooleanField(default=True) # game will lower the point each time
+    # start = models.DateTimeField(null=True, blank=True) # have value when time_mode is true
+    # end = models.DateTimeField(null=True, blank=True) # have value when time_mode is true
     participants = models.ManyToManyField(
         get_user_model(),
         through="UserParticipateGame",
@@ -24,13 +27,27 @@ class Game(models.Model):
     def get_absolute_url(self):
         return reverse("game", args=[str(self.slug)])
 
+    def __str__(self) -> str:
+        return self.title
+
+class GamePeriod(models.Model):
+    start = models.DateTimeField()
+    end = models.DateTimeField()
+
+    game = models.OneToOneField(Game, on_delete=models.CASCADE, related_name="period")
+
     def get_remaining_time_percentage(self):
         rest = self.end - timezone.now()
         total = self.end - self.start
-        return rest.total_seconds() / total.total_seconds()
-
-    def __str__(self) -> str:
-        return self.title
+        time_percentage = rest.total_seconds() / total.total_seconds()
+        return max(time_percentage, 0)
+    
+    def clean(self):
+        if self.start >= self.end:
+            raise ValidationError({"start": _("start ต้องเป็นเวลาก่อน end")})
+    
+    def __str__(self):
+        return f"{self.start} - {self.end}"
 
 
 class Challenge(models.Model):

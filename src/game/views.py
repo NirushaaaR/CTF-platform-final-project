@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from django.db.models import F, Subquery, Count
+from django.db.models import F, Subquery, Count, Q
 from django.http.response import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
@@ -48,7 +48,7 @@ def populate_game_challenges(game, user_id):
     return {"game": game, "challenges": challenges}
 
 
-def update_score_process(game, remaingin_time, flag, user_id, username):
+def update_score_process(game, flag, user_id, username):
     already_answered = UserChallengeRecord.objects.filter(
         participated_user__user_id=user_id,
         participated_user__game=game,
@@ -56,9 +56,14 @@ def update_score_process(game, remaingin_time, flag, user_id, username):
     ).exists()
 
     if already_answered:
-        return JsonResponse({"message": "Already Enter That Flag", "correct": False})
+        return {"message": "Already Enter That Flag", "correct": False}
     else:
-        points_gained = (flag.point * remaingin_time) // 1
+        points_gained = flag.point
+
+        if game.period_id:
+            remaingin_time = game.period.get_remaining_time_percentage()
+            points_gained = round(points_gained * remaingin_time)
+
         participation = UserParticipateGame.objects.filter(user=user_id, game=game)
         user_challenges_record = UserChallengeRecord(
             participated_user_id=Subquery(participation.values("id")),
@@ -78,44 +83,40 @@ def update_score_process(game, remaingin_time, flag, user_id, username):
             user_id=user_id,
         )
 
-        return JsonResponse(
-            {
-                "message": "Right Flag",
-                "correct": True,
-                "points_gained": points_gained,
-                "answered_at": user_challenges_record.answered_at,
-                "username": username,
-            }
-        )
+        return {
+            "message": "Right Flag",
+            "correct": True,
+            "points_gained": points_gained,
+            "answered_at": user_challenges_record.answered_at,
+            "username": username,
+        }
 
 
 def index(request):
     now = datetime.now()
-    games = Game.objects.filter(start__lt=now, end__gt=now)
+    games = Game.objects.select_related("period").filter(is_archive=False)
     context = {"games": games}
     return render(request, "game/index.html", context)
 
 
 @login_required
 def game_view(request, game_slug):
-    game = get_object_or_404(Game, slug=game_slug)
-    remaining_time = game.get_remaining_time_percentage()
-    game_ends = False
-    if remaining_time > 0:
-        # game ongoing...
+    game = get_object_or_404(Game.objects.select_related("period"), slug=game_slug)
+    
+    try:
+        remaining_time = game.period.get_remaining_time_percentage()
+        if remaining_time > 0:
+            # game ongoing...
+            game.participants.add(request.user)
+        else:
+            # game already ends hmmm what todo...
+            pass
+    except Game.period.RelatedObjectDoesNotExist:
+        game.period = None
         game.participants.add(request.user)
-    elif not game.is_archive:
-        # game end and not is_archive
-        # should denied the access
-        pass
-    else:
-        # is_archive can do it but not record the participation
-        game_ends = True
-
-    context = {
-        **populate_game_challenges(game, request.user.id),
-        "game_ends": game_ends,
-    }
+        
+        
+    context = populate_game_challenges(game, request.user.id)
     return render(request, "game/game.html", context)
 
 
@@ -131,15 +132,10 @@ def enter_challenge_flag(request):
         )
 
         game = right_flag.challenge.game
-        remaingin_time = game.get_remaining_time_percentage()
-
-        if remaingin_time < 0:
-            # games already ends...
-            pass
-        else:
-            return update_score_process(
-                game, remaingin_time, right_flag, request.user.id, request.user.username
-            )
+        result = update_score_process(
+            game, right_flag, request.user.id, request.user.username
+        )
+        return JsonResponse(result)
 
     except ChallengeFlag.DoesNotExist:
         return JsonResponse({"message": "Wrong flag", "correct": False})

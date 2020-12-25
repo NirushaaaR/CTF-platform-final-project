@@ -2,11 +2,11 @@
 {% block content %}
 <div class="container">
     <h1>{{game}}</h1>
-    {% if not game_ends %}
+    {% if game.period %}
     <p>Time remain <span id="days"></span> <span id="hours"></span> <span id="minutes"></span> <span
             id="seconds"></span> </p>
     {% else %}
-        <p>Game Already Ends But you can still answer the flag</p>
+    <p>Game Already Ends But you can still answer the flag</p>
     {% endif %}
     <div class="chart-title">Top 10 Users Score</div>
     <div id='chart-area'></div>
@@ -177,10 +177,10 @@
     });
 
 </script>
-{% if not game_ends %}
+{% if game.period %}
 <script>
     function makeTimer() {
-        let endTime = new Date('{{game.end|date:"U"}}' * 1000);
+        let endTime = new Date("{{game.period.end|date:'U'}}" * 1000);
         endTime = (Date.parse(endTime) / 1000);
 
         const now = (Date.parse(new Date()) / 1000);
@@ -204,6 +204,7 @@
     }
     makeTimer();
     setInterval(makeTimer, 1000);
+
 </script>
 {% endif %}
 {% endblock %}
