@@ -1,21 +1,35 @@
 {% extends 'base.html' %} {% load custom_filters %} {% load humanize %}
 {% block content %}
 <div class="container mb-3">
+  <!-- search bar -->
+  <form>
+    <div class="input-group md-form form-sm form-1 pl-0">
+      <div class="input-group-prepend">
+        <span class="input-group-text lighten-3"><i class="fas fa-search text-primary" aria-hidden="true"></i></span>
+      </div>
+      <input class="form-control my-0 py-1" type="text" placeholder="Search" aria-label="Search" name="search" 
+        {% if search %}value="{{search}}"{% endif %}>
+      <div class="input-group-append">
+        <button class="btn btn-outline-primary" type="button">Search</button>
+      </div>
+    </div>
+  </form>
+  {% if rooms %}
   <div class="row">
     {% for room in rooms %}
     <div class="col-6">
-      <div class="card text-left m-3 bg-light {% if room.id in user_participated %}
+      <div class="card text-left my-3 bg-light {% if room.id in user_participated %}
     {% if user_participated|get_dict_value:room.id %}
     border-success
     {% else %}
     border-warning
     {% endif %}
   {% endif %} box-shadow">
-      <div class="card-header">
-        <h5>{{room.title}}</h5>
-      </div>
+        <div class="card-header">
+          <h5>{{room.title}}</h5>
+        </div>
         <div class="card-body">
-          <h6 class="card-subtitle mb-2 text-secondary">อัพเดตล่าสุด {{room.updated_at|naturaltime}}</h6>
+          <h6 class="card-subtitle mb-2 text-secondary">{{room.created_at|naturaltime}}</h6>
           <p class="card-text">{{room.preview}}</p>
           <div class="d-flex align-items-center">
             <a href="{{room.get_absolute_url}}" class="card-link btn btn-dark mr-auto">Enter</a>
@@ -36,23 +50,26 @@
     </div>
     {% endfor %}
   </div>
+  {% else %}
+  <p class="my-4">ไม่พบผลการค้นหา</p>
+  {% endif %}
   <hr>
   <div class="pagination">
     <span class="step-links">
-        {% if rooms.has_previous %}
-            <a href="?page=1">&laquo; first</a>
-            <a href="?page={{ rooms.previous_page_number }}">previous</a>
-        {% endif %}
+      {% if rooms.has_previous %}
+      <a href="?page=1">&laquo; first</a>
+      <a href="?page={{ rooms.previous_page_number }}">previous</a>
+      {% endif %}
 
-        <span class="current">
-            Page {{ rooms.number }} of {{ rooms.paginator.num_pages }}.
-        </span>
+      <span class="current">
+        Page {{ rooms.number }} of {{ rooms.paginator.num_pages }}.
+      </span>
 
-        {% if rooms.has_next %}
-            <a href="?page={{ rooms.next_page_number }}">next</a>
-            <a href="?page={{ rooms.paginator.num_pages }}">last &raquo;</a>
-        {% endif %}
+      {% if rooms.has_next %}
+      <a href="?page={{ rooms.next_page_number }}">next</a>
+      <a href="?page={{ rooms.paginator.num_pages }}">last &raquo;</a>
+      {% endif %}
     </span>
-</div>
+  </div>
 </div>
 {% endblock %}

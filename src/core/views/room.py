@@ -5,6 +5,7 @@ from django.http.response import JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 
 from core.models import Room, Task
 from core.utils import already_participate
@@ -12,12 +13,18 @@ from core.utils import already_participate
 
 def index(request):
     """ The Fist page. Will Get Rooms and shows a paginated result """
-    rooms = Room.objects.filter(is_active=True).order_by("-updated_at")
+    search = request.GET.get("search")
+    rooms = Room.objects.filter(is_active=True).order_by("difficulty")
+    if search:
+        rooms = rooms.filter(
+            Q(title__icontains=search)
+            | Q(preview__icontains=search)
+            | Q(description__icontains=search)
+        )
+
     pgination = Paginator(rooms, 6)
     current_page = request.GET.get("page", 1)
-    context = {
-        "rooms": pgination.get_page(current_page),
-    }
+    context = {"rooms": pgination.get_page(current_page), "search": search}
 
     if request.user.is_authenticated:
         participated_room = rooms.filter(participants=request.user).values_list(
@@ -30,7 +37,9 @@ def index(request):
 
 @login_required
 def room(request, pk):
-    room = get_object_or_404(Room.objects.select_related("docker").prefetch_related("tasks__hints"), pk=pk)
+    room = get_object_or_404(
+        Room.objects.select_related("docker").prefetch_related("tasks__hints"), pk=pk
+    )
     tasks = room.tasks.all()
 
     context = {

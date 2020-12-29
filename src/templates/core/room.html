@@ -42,9 +42,11 @@
       <div class="card-text">
         {% if task.docker %}
         <p>docker: {{task.docker}}</p>
-        <p>สามารถรันเว็บโดยใช้คำสั่ง "docker run --rm -P {{task.docker.port}} {{task.docker}}"</p>
-        {% if task.docker.url %}
-        url: <a href="{{task.docker.url}}{{task.docker_url_path}}">{{task.docker.url}}{{task.docker_url_path}}</a>
+        <p>สามารถรันเว็บโดยใช้คำสั่ง "docker run --rm -p {{task.docker.port}}:{{task.docker.port}} {{task.docker}}"
+          {% if task.docker.url %}
+          <br> หรือ ไปที่ url: <a
+            href="{{task.docker.url}}{{task.docker_url_path}}">{{task.docker.url}}{{task.docker_url_path}}</a>
+        </p>
         <br>
         {% else %}
         <p>ไปที่ {{task.docker_url_path}}</p>
@@ -61,7 +63,7 @@
             {% if task.flag %}
             <input class="form-control" type="text" name="flag" placeholder="{{task.flag|censor_flag}}" />
             {% else %}
-            <input class="form-control" type="text" name="flag" placeholder="ทำความเข้าใจตามข้างบน" disabled/>
+            <input class="form-control" type="text" name="flag" placeholder="ทำความเข้าใจตามข้างบน" disabled />
             {% endif %}
           </div>
           <div class="col-md-1 text-center">
