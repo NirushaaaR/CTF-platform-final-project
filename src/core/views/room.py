@@ -5,7 +5,7 @@ from django.http.response import JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
+from django.db.models import Q, F
 
 from core.models import Room, Task
 from core.utils import already_participate
@@ -14,7 +14,7 @@ from core.utils import already_participate
 def index(request):
     """ The Fist page. Will Get Rooms and shows a paginated result """
     search = request.GET.get("search")
-    rooms = Room.objects.filter(is_active=True).order_by("difficulty")
+    rooms = Room.objects.prefetch_related("tags").filter(is_active=True).order_by("difficulty", "created_at")
     if search:
         rooms = rooms.filter(
             Q(title__icontains=search)

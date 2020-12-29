@@ -29,7 +29,11 @@
           <h5>{{room.title}}</h5>
         </div>
         <div class="card-body">
-          <h6 class="card-subtitle mb-2 text-secondary">{{room.created_at|naturaltime}}</h6>
+          <div class="card-subtitle mb-2">
+            {% for tag in room.tags.all %}
+            <span class="badge badge-secondary">{{tag}}</span>
+            {% endfor %}
+          </div>
           <p class="card-text">{{room.preview}}</p>
           <div class="d-flex align-items-center">
             <a href="{{room.get_absolute_url}}" class="card-link btn btn-dark mr-auto">Enter</a>
