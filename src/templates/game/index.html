@@ -1,13 +1,23 @@
 {% extends 'base.html' %}
+{% load humanize %}
 {% block content %}
 <div class="container">
-    <ul>
+    <div class="game-list">
         {% for game in games %}
-        <li>
-            {{game.title}}
-            <a href="{{game.get_absolute_url}}">Enter</a>
-        </li>
+        <div class="card my-5 bg-light box-shadow">
+            {% if game.period %}
+            <h5 class="card-header">Event เริ่ม {{game.period.start}} - จบ {{game.period.end}}</h5>
+            {% else %}
+            <h5 class="card-header">All times</h5>
+            {% endif %}
+            <div class="card-body">
+              <h5 class="card-title">{{game.title}}</h5>
+              <p class="card-text">{{game.description|safe}}</p>
+              <hr>
+              <a href="{{game.get_absolute_url}}" class="btn btn-dark">Enter</a>
+            </div>
+          </div>
         {% endfor %}
-    </ul>
+    </div>
 </div>
 {% endblock %}

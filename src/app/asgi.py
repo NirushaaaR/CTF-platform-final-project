@@ -6,7 +6,7 @@ from channels.security.websocket import AllowedHostsOriginValidator
 from django.core.asgi import get_asgi_application
 import game.routing
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings.production")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings.local")
 
 application = ProtocolTypeRouter(
     {

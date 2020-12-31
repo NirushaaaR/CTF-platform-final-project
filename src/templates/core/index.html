@@ -26,15 +26,14 @@
     {% endif %}
   {% endif %} box-shadow">
         <div class="card-header">
-          <h5>{{room.title}}</h5>
+          {% for tag in room.tags.all %}
+            <span class="badge badge-secondary small-text">{{tag}}</span>
+            {% endfor %}
         </div>
         <div class="card-body">
-          <div class="card-subtitle mb-2">
-            {% for tag in room.tags.all %}
-            <span class="badge badge-secondary">{{tag}}</span>
-            {% endfor %}
-          </div>
+          <h5 class="card-title">{{room.title}}</h5>
           <p class="card-text">{{room.preview}}</p>
+          <hr>
           <div class="d-flex align-items-center">
             <a href="{{room.get_absolute_url}}" class="card-link btn btn-dark mr-auto">Enter</a>
             {% if room.id in user_participated %}

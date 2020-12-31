@@ -105,7 +105,7 @@ def index(request):
 @login_required
 def game_view(request, game_slug):
     game = get_object_or_404(Game.objects.select_related("period"), slug=game_slug)
-    
+
     try:
         remaining_time = game.period.get_remaining_time_percentage()
         if remaining_time > 0:
@@ -118,8 +118,7 @@ def game_view(request, game_slug):
         # no periods game always ongoning
         game.period = None
         game.participants.add(request.user)
-        
-        
+
     context = populate_game_challenges(game, request.user.id)
     return render(request, "game/game.html", context)
 

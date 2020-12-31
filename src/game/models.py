@@ -14,9 +14,6 @@ class Game(models.Model):
     description = models.TextField()
 
     is_archive = models.BooleanField(default=False)
-    # time_mode = models.BooleanField(default=True) # game will lower the point each time
-    # start = models.DateTimeField(null=True, blank=True) # have value when time_mode is true
-    # end = models.DateTimeField(null=True, blank=True) # have value when time_mode is true
     participants = models.ManyToManyField(
         get_user_model(),
         through="UserParticipateGame",
@@ -30,6 +27,7 @@ class Game(models.Model):
     def __str__(self) -> str:
         return self.title
 
+
 class GamePeriod(models.Model):
     start = models.DateTimeField()
     end = models.DateTimeField()
@@ -41,11 +39,11 @@ class GamePeriod(models.Model):
         total = self.end - self.start
         time_percentage = rest.total_seconds() / total.total_seconds()
         return max(time_percentage, 0)
-    
+
     def clean(self):
         if self.start >= self.end:
             raise ValidationError({"start": _("start ต้องเป็นเวลาก่อน end")})
-    
+
     def __str__(self):
         return f"{self.start} - {self.end}"
 

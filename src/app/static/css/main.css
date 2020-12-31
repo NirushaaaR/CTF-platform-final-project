@@ -29,3 +29,8 @@ body {
   body.loading .overlay {
     display: block;
   }
+
+
+  .small-text {
+    font-size: small;
+  }

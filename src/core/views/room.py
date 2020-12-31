@@ -14,14 +14,17 @@ from core.utils import already_participate
 def index(request):
     """ The Fist page. Will Get Rooms and shows a paginated result """
     search = request.GET.get("search")
-    rooms = Room.objects.prefetch_related("tags").filter(is_active=True).order_by("difficulty", "created_at")
+    rooms = (
+        Room.objects.prefetch_related("tags")
+        .filter(is_active=True)
+        .order_by("difficulty", "created_at")
+    )
     if search:
         rooms = rooms.filter(
             Q(title__icontains=search)
             | Q(preview__icontains=search)
             | Q(description__icontains=search)
         )
-
     pgination = Paginator(rooms, 6)
     current_page = request.GET.get("page", 1)
     context = {"rooms": pgination.get_page(current_page), "search": search}
