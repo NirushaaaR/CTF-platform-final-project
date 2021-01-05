@@ -67,10 +67,17 @@ class ScoreHistory(models.Model):
 
 
 class Room(models.Model):
+    class DifficultyChoices(models.IntegerChoices):
+        VERY_HARD = 5
+        HARD = 4
+        MEDIUM = 3
+        EASY = 2
+        VERY_EASY = 1
+
     title = models.CharField(max_length=255)
     preview = models.CharField(max_length=255)
-    difficulty = models.PositiveIntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(5)]
+    difficulty = models.IntegerField(
+        choices=DifficultyChoices.choices,
     )
     description = models.TextField()
     conclusion = models.TextField(null=True, blank=True)
