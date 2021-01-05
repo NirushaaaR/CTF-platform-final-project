@@ -14,11 +14,11 @@
         <li class="nav-item {% if request.path == '/game/' %}active{% endif %}">
           <a class="nav-link" href="{% url 'game_index' %}">Game</a>
         </li>
-      </ul>
-      <ul class="navbar-nav">
         <li class="nav-item {% if request.path == '/scoreboard/' %}active{% endif %}">
           <a href="{% url 'scoreboard' %}" class="nav-link">ScoreBoard</a>
         </li>
+      </ul>
+      <ul class="navbar-nav">
         {% if request.user.is_authenticated %}
         <li class="nav-item {% if request.path == '/profile/' %}active{% endif %}">
           <a class="nav-link" href="{% url 'profile' %}">Profile</a>
@@ -31,7 +31,7 @@
         </li>
         {% else %}
         <li class="nav-item {% if request.path == '/login/' %}active{% endif %}">
-          <a class="nav-link" href="{% url 'login' %}">LogIn</a>
+          <a class="nav-link" href="{% url 'login' %}">Login</a>
         </li>
         <li class="nav-item {% if request.path == '/register/' %}active{% endif %}">
           <a class="nav-link" href="{% url 'register' %}">Register</a>
