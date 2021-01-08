@@ -39,6 +39,9 @@ class GamePeriod(models.Model):
         total = self.end - self.start
         time_percentage = rest.total_seconds() / total.total_seconds()
         return max(time_percentage, 0)
+    
+    def is_game_end(self):
+        return timezone.now() > self.end
 
     def clean(self):
         if self.start >= self.end:
@@ -62,8 +65,11 @@ class Challenge(models.Model):
 
 
 class ChallengeFlag(models.Model):
+    name = models.CharField(max_length=255)
     flag = models.CharField(max_length=255)
+    explanation = models.CharField(max_length=255)
     point = models.PositiveIntegerField()
+
 
     challenge = models.ForeignKey(
         Challenge, on_delete=models.CASCADE, related_name="flags"

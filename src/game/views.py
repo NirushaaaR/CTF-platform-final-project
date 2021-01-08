@@ -21,31 +21,32 @@ from core.models import ScoreHistory, User
 def populate_game_challenges(game, user_id):
     challenges = tuple(
         Challenge.objects.filter(game=game)
-        .order_by("id")
-        .values()
+        .prefetch_related("flags")
         .annotate(
-            docker=F("docker__docker"),
+            docker_image=F("docker__docker"),
             url=F("docker__url"),
-            flag_count=Count("flags"),
         )
     )
-    user_flags = tuple(
-        UserChallengeRecord.objects.filter(
-            participated_user__user_id=user_id, participated_user__game=game
-        )
-        .values(
-            "challenge",
-        )
-        .annotate(cleared_flag=Count("challenge"))
+
+    # find all cleared flags
+    user_records = UserChallengeRecord.objects.filter(
+        challenge__in=challenges, participated_user__user_id=user_id
     )
+    flags = []
+    for c in challenges:
+        for flag in c.flags.all():
+            # find if user already answer the flag
+            flag.status = "Not Solved " + "\u2715"
+            flag.answered = False
+            for record in user_records:
+                if record.challenge_flag_id == flag.id:
+                    flag.status = "Solved "+ "\u2713"
+                    flag.answered = True
+                    flag.points_gained = record.points_gained
+                    break
+            flags.append(flag)
 
-    for challenge in challenges:
-        cleared_flags = next(
-            (item for item in user_flags if item["challenge"] == challenge["id"]), {}
-        ).get("cleared_flag", 0)
-        challenge["cleared_flag"] = cleared_flags
-
-    return {"game": game, "challenges": challenges}
+    return {"game": game, "challenges": challenges, "flags": flags}
 
 
 def update_score_process(game, flag, user_id, username):

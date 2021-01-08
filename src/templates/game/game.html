@@ -2,7 +2,7 @@
 {% block content %}
 <div class="container">
     <h1>{{game}}</h1>
-    {% if game.period %}
+    {% if game.period and not game.period.is_game_end %}
     <p>Time remain <span id="days"></span> <span id="hours"></span> <span id="minutes"></span> <span
             id="seconds"></span> </p>
     {% else %}
@@ -13,19 +13,44 @@
     <hr>
     <div id="challenges">
         {% for challenge in challenges %}
-        <p>{{challenge.docker}} - <a href="{{challenge.url}}">{{challenge.url}}</a></p>
+        <p>{{challenge.docker_image}} - <a href="{{challenge.url}}">{{challenge.url}}</a></p>
         <p>{{challenge.description|safe}}</p>
-        <p>Cleared <span id="challenge_cleared_{{challenge.id}}"></span>/{{challenge.flag_count}}</p>
+        <hr>
+        {% endfor %}
+    </div>
+
+    <div class="flag-enter">
         <form class="form-challenge" id="challenge_{{challenge.id}}" action="{% url 'enter_challenge_flag' %}"
             method="POST">
             {% csrf_token %}
-            <input type="hidden" name="challenge_id" value="{{challenge.id}}">
-            <label for="flag">Enter Flag</label>
-            <input class="input-challenge-flag" type="text" name="flag" required>
-            <button class="submit-flag">Submit</button>
+            <div class="form-group">
+                <label for="flag">ใส่ Flag</label>
+                <input class="input-challenge-flag form-control" type="text" name="flag"
+                    placeholder="FLAG{........................}" required>
+            </div>
+            <button class="submit-flag btn btn-primary">Submit</button>
         </form>
-        <hr>
-        {% endfor %}
+
+        <table id="allflags" class="table table-bordered my-4">
+            <thead>
+                <tr>
+                    <th scope="col">ชื่อ</th>
+                    <th scope="col" colspan="2">คำอธิบาย</th>
+                    <th scope="col">สถานะ</th>
+                    <th scope="col">แต้มที่ได้</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for flag in flags %}
+                <tr>
+                    <td>{{flag.name}}</td>
+                    <td colspan="2">{{flag.explanation}}</td>
+                    <td class="{% if flag.answered %}text-success{% else %}text-danger{% endif %}">{{flag.status}}</td>
+                    <td>{% if flag.answered %}{{flag.points_gained}}{% else %}-{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 <div class="overlay"></div>
@@ -34,7 +59,6 @@
 {% block javascript %}
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script src="{% static 'js/ajaxLoadingSpinner.js' %}"></script>
-{{challenges|json_script:"challenges-data"}}
 <script>
     const gameID = "{{game.id}}";
     var chartOptions = {
@@ -126,13 +150,12 @@
         console.error("Game Socket Close unexpected", e);
     }
 
-    const challenges = JSON.parse(document.getElementById('challenges-data').textContent);
-    function updateClearedFlag() {
-        challenges.forEach(function (c) {
-            $("#challenge_cleared_" + c.id).html(c.cleared_flag);
-        });
-    }
-    updateClearedFlag();
+    // function updateClearedFlag() {
+    //     challenges.forEach(function (c) {
+    //         $("#challenge_cleared_" + c.id).html(c.cleared_flag);
+    //     });
+    // }
+    // updateClearedFlag();
 
 
     $(".form-challenge").submit(function (e) {
@@ -153,9 +176,9 @@
                     gameSocket.send(JSON.stringify({
                         type: "update_score",
                     }));
-                    const idx = challenges.findIndex(obj => obj.id == challenge_id);
-                    challenges[idx].cleared_flag += 1;
-                    updateClearedFlag();
+                    // const idx = challenges.findIndex(obj => obj.id == challenge_id);
+                    // challenges[idx].cleared_flag += 1;
+                    // updateClearedFlag();
                 }
             }
         });
