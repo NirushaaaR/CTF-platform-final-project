@@ -128,13 +128,11 @@ def game_view(request, game_slug):
 @require_POST
 def enter_challenge_flag(request):
     flag = request.POST.get("flag")
-    challenge_id = request.POST.get("challenge_id")
 
     try:
         right_flag = ChallengeFlag.objects.select_related("challenge__game").get(
-            challenge_id=challenge_id, flag__iexact=flag
+            flag__iexact=flag
         )
-
         game = right_flag.challenge.game
         result = update_score_process(
             game, right_flag, request.user.id, request.user.username
