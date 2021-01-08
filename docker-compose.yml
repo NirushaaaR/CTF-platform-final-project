@@ -12,6 +12,6 @@ services:
                         python manage.py runserver 0.0.0.0:8000 --settings=settings.local"
         # env_file: ./src/.env
     
-    redis_db:
-        image: redis:5
+    # redis_db:
+    #     image: redis:5
 
