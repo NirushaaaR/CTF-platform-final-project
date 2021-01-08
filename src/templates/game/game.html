@@ -60,7 +60,7 @@
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script src="{% static 'js/ajaxLoadingSpinner.js' %}"></script>
 <script>
-    const gameID = "{{game.id}}";
+    const date_list = [];
     var chartOptions = {
         chart: {
             height: 350,
@@ -98,72 +98,52 @@
 
     chart.render();
 
-    let date_list = [];
-    const gameSocket = new WebSocket(
-        `ws://${window.location.host}/ws/game/${gameID}/`
-    );
+    async function get_top10_score() {
+        const res = await fetch("{% url 'game_score' game.id %}");
+        const json = await res.json();
+        console.log("get_top10_score", json);
 
-    gameSocket.onopen = function (e) {
-        console.log("open", e)
-    }
+        const score_data = [];
+        // update graph
+        json.data.forEach((d, index) => {
+            const idx = score_data.findIndex(s => s.name === d.username);
+            if (idx >= 0) {
+                // add to existing user data
+                score_data[idx].current_score += d.points_gained
 
-    gameSocket.onmessage = function (e) {
-        const data = JSON.parse(e.data);
-        console.log("onmessage", data)
-
-        if (data.type === "get_score") {
-            const score_data = [];
-            date_list = [];
-            data.data.forEach((d, index) => {
-                const idx = score_data.findIndex(s => s.name === d.username);
-                if (idx >= 0) {
-                    // add to existing user data
-                    score_data[idx].current_score += d.points_gained
-
-                    for (let i = 0; i < score_data.length; i++) {
-                        score_data[i].data.push(score_data[i].current_score);
-                    }
-
-                } else {
-                    // update others user data
-                    for (let i = 0; i < score_data.length; i++) {
-                        score_data[i].data.push(score_data[i].current_score);
-                    }
-                    const newUserSeries = {
-                        name: d.username,
-                        data: [...date_list.map(dl => 0), d.points_gained],
-                        current_score: d.points_gained,
-                    }
-                    // add new user data
-                    score_data.push(newUserSeries);
-                    chart.appendSeries(newUserSeries);
+                for (let i = 0; i < score_data.length; i++) {
+                    score_data[i].data.push(score_data[i].current_score);
                 }
-                date_list.push(d.answered_at);
-            });
 
-            score_data.sort((a, b) => b.current_score - a.current_score);
-            console.log(score_data);
-            chart.updateSeries(score_data);
-        }
+            } else {
+                // update others user data
+                for (let i = 0; i < score_data.length; i++) {
+                    score_data[i].data.push(score_data[i].current_score);
+                }
+                const newUserSeries = {
+                    name: d.username,
+                    data: [...date_list.map(dl => 0), d.points_gained],
+                    current_score: d.points_gained,
+                }
+                // add new user data
+                score_data.push(newUserSeries);
+                chart.appendSeries(newUserSeries);
+            }
+            date_list.push(d.answered_at);
+        });
+
+        score_data.sort((a, b) => b.current_score - a.current_score);
+        chart.updateSeries(score_data);
     }
-    gameSocket.onclose = function (e) {
-        console.error("Game Socket Close unexpected", e);
-    }
 
-    // function updateClearedFlag() {
-    //     challenges.forEach(function (c) {
-    //         $("#challenge_cleared_" + c.id).html(c.cleared_flag);
-    //     });
-    // }
-    // updateClearedFlag();
+    get_top10_score();
 
-
+    // user answer the flag
     $(".form-challenge").submit(function (e) {
         e.preventDefault();
         const form = $(this);
         const url = form.attr('action');
 
-        const challenge_id = $('input[name="challenge_id"]', $(this)).val();
         const flag = $('input[name="flag"]', $(this)).val();
 
         $.ajax({
@@ -171,11 +151,10 @@
             url: url,
             data: form.serialize(),
             success: function (data) {
+                console("answer flag", data);
                 alert(data.message);
                 if (data.correct) {
-                    gameSocket.send(JSON.stringify({
-                        type: "update_score",
-                    }));
+                    get_top10_score();
                     // const idx = challenges.findIndex(obj => obj.id == challenge_id);
                     // challenges[idx].cleared_flag += 1;
                     // updateClearedFlag();

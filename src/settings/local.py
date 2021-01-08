@@ -3,9 +3,9 @@ from .base import *
 DEBUG = True
 
 INSTALLED_APPS = [
-    "channels",
-    "game",
-    "docker_instance",
+    # "channels",
+    # "game",
+    # "docker_instance",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -20,6 +20,8 @@ INSTALLED_APPS = [
     "debug_toolbar",
     # local app
     "core.apps.CoreConfig",
+    "game.apps.GameConfig",
+    "docker_instance.apps.DockerInstanceConfig",
 ]
 
 MIDDLEWARE = [
@@ -63,8 +65,8 @@ DEBUG_TOOLBAR_PANELS = [
 ]
 
 # Channels
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer"
-    }
-}
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels.layers.InMemoryChannelLayer"
+#     }
+# }

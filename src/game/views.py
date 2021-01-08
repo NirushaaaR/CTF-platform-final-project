@@ -96,6 +96,22 @@ def update_score_process(game, flag, user_id, username):
         }
 
 
+def get_top10_score(game_id):
+    top10 = UserParticipateGame.objects.filter(game_id=game_id).order_by("-game_score").values_list("id", flat=True)[:10]
+
+    score = (
+        UserChallengeRecord.objects.filter(participated_user_id__in=top10)
+        .values(
+            "points_gained",
+            "answered_at",
+            username=F("participated_user__user__username"),
+        )
+        .order_by("answered_at")
+    )
+
+    return tuple(score)
+
+
 def index(request):
     now = datetime.now()
     games = Game.objects.select_related("period").filter(is_archive=False)
@@ -140,3 +156,9 @@ def enter_challenge_flag(request):
 
     except ChallengeFlag.DoesNotExist:
         return JsonResponse({"message": "ผิด", "correct": False})
+
+
+@login_required
+def get_current_top10_score(request, game_id):
+    scores = get_top10_score(game_id)
+    return JsonResponse({"data": scores})

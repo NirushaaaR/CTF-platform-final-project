@@ -11,9 +11,7 @@ ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(",")
 
 INSTALLED_APPS = [
     # channels
-    "channels",
-    "game",
-    "docker_instance",
+    # "channels",
     # django contrib
     "django.contrib.admin",
     "django.contrib.auth",
@@ -26,6 +24,8 @@ INSTALLED_APPS = [
     "nested_inline",
     # local app
     "core.apps.CoreConfig",
+    "game.apps.GameConfig",
+    "docker_instance.apps.DockerInstanceConfig",
 ]
 
 MIDDLEWARE = [
@@ -127,7 +127,7 @@ MESSAGE_TAGS = {
 }
 
 WSGI_APPLICATION = "app.wsgi.application"
-ASGI_APPLICATION = 'app.asgi.application'
+# ASGI_APPLICATION = 'app.asgi.application'
 
 # Tiny private key
 TINY_KEY=environ.Env().str("TINY_KEY", multiline=True)
