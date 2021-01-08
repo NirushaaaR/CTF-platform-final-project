@@ -26,9 +26,7 @@
     {% endif %}
   {% endif %} box-shadow">
         <div class="card-header">
-          {% for tag in room.tags.all %}
-            <span class="badge badge-secondary small-text">{{tag}}</span>
-            {% endfor %}
+          {% include "partials/_room_tags.html" %}
         </div>
         <div class="card-body">
           <h5 class="card-title">{{room.title}}</h5>

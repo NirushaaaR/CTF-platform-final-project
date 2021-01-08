@@ -11,30 +11,44 @@ from core.models import Room, Task
 from core.utils import already_participate
 
 
-def index(request):
-    """ The Fist page. Will Get Rooms and shows a paginated result """
+def query_paginated_room(request, rooms):
     search = request.GET.get("search")
-    rooms = (
-        Room.objects.prefetch_related("tags")
-        .filter(is_active=True)
-        .order_by("difficulty", "created_at")
-    )
     if search:
         rooms = rooms.filter(
             Q(title__icontains=search)
             | Q(preview__icontains=search)
             | Q(description__icontains=search)
         )
-    pgination = Paginator(rooms, 6)
+    pagination = Paginator(rooms, 6)
     current_page = request.GET.get("page", 1)
-    context = {"rooms": pgination.get_page(current_page), "search": search}
 
+    context = {"rooms": pagination.get_page(current_page), "search": search}
     if request.user.is_authenticated:
         participated_room = rooms.filter(participants=request.user).values_list(
             "id", "userparcitipation__finished_at"
         )
         context["user_participated"] = {k: v for k, v in participated_room}
+    return context
 
+
+def index(request):
+    """ The Fist page. Will Get Rooms and shows a paginated result """
+    rooms = (
+        Room.objects.prefetch_related("tags")
+        .filter(is_active=True)
+        .order_by("difficulty", "created_at")
+    )
+    context = query_paginated_room(request, rooms)
+    return render(request, "core/index.html", context)
+
+
+def room_by_tag(request, tag):
+    rooms = (
+        Room.objects.prefetch_related("tags")
+        .filter(is_active=True, tags__name=tag)
+        .order_by("difficulty", "created_at")
+    )
+    context = query_paginated_room(request, rooms)
     return render(request, "core/index.html", context)
 
 

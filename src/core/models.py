@@ -111,7 +111,10 @@ class Room(models.Model):
 
 
 class Tag(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
+
+    def get_absolute_url(self):
+        return reverse("room_by_tag", args=[str(self.name)])
 
     def __str__(self):
         return self.name

@@ -1,0 +1,5 @@
+<div class="room-tags">
+    {% for tag in room.tags.all %}
+    <a class="badge badge-secondary small-text" href="{{tag.get_absolute_url}}">{{tag}}</a>
+    {% endfor %}
+</div>

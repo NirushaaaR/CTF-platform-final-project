@@ -1,6 +1,6 @@
 from django.urls import path
 
-from core.views.room import index, room, enter_flag
+from core.views.room import index, room, enter_flag, room_by_tag
 from core.views.auth import login, logout, register, validate_email, validate_username
 from core.views.user import profile, scoreboard
 from core.views.tiny import tiny_jwt
@@ -8,6 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 urlpatterns = [
     path("", index, name="index"),
+    path("tag/<str:tag>", room_by_tag, name="room_by_tag"),
     path("room/<int:pk>/", room, name="room"),
     path("room/<int:room_id>/enter-flag/", enter_flag, name="enter_flag"),
     path("login/", login, name="login"),

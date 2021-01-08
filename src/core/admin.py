@@ -30,8 +30,8 @@ class RoomAdmin(NestedModelAdmin):
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
     ordering = ("id",)
-    list_display = ("email", "username", "score", "is_superuser")
-    list_editable = ("is_superuser",)
+    list_display = ("email", "username", "score", "is_superuser", "is_staff")
+    list_editable = ("is_superuser", "is_staff")
 
     fieldsets = (
         (None, {"fields": ("username", "email", "password")}),

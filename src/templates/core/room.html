@@ -2,32 +2,18 @@
 {% block content %}
 <div class="container">
   <h2 class="mt-4">{{room.title}}</h2>
-  <p>
+  <!-- <p>
     {% for require_room in room.prerequisites.all %}
     {% if forloop.first %}ควรทำ {% endif %}
     <a href="{{require_room.get_absolute_url}}">&lt;{{require_room}}&gt;</a>
     {% if forloop.last %} ก่อน{% endif %}
     {% endfor %}
-  </p>
+  </p> -->
+  {% include "partials/_room_tags.html" %}
   <hr>
-  {{room.description|safe}}
-
-  {% if is_finish %}
-  <div class="card mb-3 border-warning box-shadow">
-    <h3 class="card-header border-warning">บทสรุป</h3>
-    <div class="card-body">
-      <div class="card-text">
-        {{room.conclusion|safe}}
-      </div>
-      <div>
-        {% for next_room in room.next_rooms.all %}
-        {% if forloop.counter == 1 %}ถัดไป: {% endif %}
-        <a href="{{next_room.get_absolute_url}}">&lt;{{next_room}}&gt;</a>
-        {% endfor %}
-      </div>
-    </div>
+  <div id="roomdesc">
+    {{room.description|safe}}
   </div>
-  {% endif %}
   <hr>
 
   {% for task in tasks %}
@@ -105,6 +91,22 @@
     {% endif %}
   </div>
   {% endfor %}
+  {% if is_finish %}
+  <div class="card mb-3 border-warning box-shadow" id="roomconclus">
+    <h3 class="card-header border-warning">บทสรุป</h3>
+    <div class="card-body">
+      <div class="card-text">
+        {{room.conclusion|safe}}
+      </div>
+      <div>
+        {% for next_room in room.next_rooms.all %}
+        {% if forloop.counter == 1 %}ถัดไป: {% endif %}
+        <a href="{{next_room.get_absolute_url}}">&lt;{{next_room}}&gt;</a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
 </div>
 <div class="overlay"></div>
 {% endblock content %}
