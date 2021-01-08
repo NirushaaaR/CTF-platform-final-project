@@ -66,7 +66,7 @@ class Challenge(models.Model):
 
 class ChallengeFlag(models.Model):
     name = models.CharField(max_length=255)
-    flag = models.CharField(max_length=255)
+    flag = models.CharField(max_length=255, unique=True)
     explanation = models.CharField(max_length=255)
     point = models.PositiveIntegerField()
 

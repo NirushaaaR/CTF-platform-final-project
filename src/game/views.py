@@ -128,7 +128,6 @@ def game_view(request, game_slug):
 @require_POST
 def enter_challenge_flag(request):
     flag = request.POST.get("flag")
-
     try:
         right_flag = ChallengeFlag.objects.select_related("challenge__game").get(
             flag__iexact=flag
