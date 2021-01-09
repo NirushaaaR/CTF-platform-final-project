@@ -122,10 +122,7 @@
         alert(data.message);
         console.log(data);
         if (data.correct) {
-          $("#card_" + task_id).addClass("border-success");
-          $("#card_header_" + task_id).addClass("border-success");
-          $("#card_" + task_id).append(`<div class="card-footer border-success text-success text-right">
-            <i class="fas fa-check"></i> cleared </div>`);
+          location.reload();
         }
       }
     });
