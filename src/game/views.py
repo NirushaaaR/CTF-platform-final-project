@@ -92,7 +92,7 @@ def update_score_process(game, flag, user_id, username):
             "correct": True,
             "points_gained": points_gained,
             "answered_at": user_challenges_record.answered_at,
-            "username": username,
+            "flagid": user_challenges_record.challenge_flag_id,
         }
 
 

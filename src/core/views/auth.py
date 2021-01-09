@@ -20,6 +20,7 @@ def login(request):
         user = auth.authenticate(request, email=email, password=password)
         if user is not None:
             auth.login(request, user)
+            messages.success(request, "Login สำเร็จ")
             return redirect_after_login(request)
 
         # wrong credentials

@@ -2,11 +2,13 @@
 {% block content %}
 <div class="container">
     <h1>{{game}}</h1>
-    {% if game.period and not game.period.is_game_end %}
-    <p>Time remain <span id="days"></span> <span id="hours"></span> <span id="minutes"></span> <span
-            id="seconds"></span> </p>
+    {% if game.period %}
+    {% if game.period.is_game_end %}
+    <p>ช่วงเวลาของเกมหมดลงแล้วแต่คุณยังตอบ</p>
     {% else %}
-    <p>Game Already Ends But you can still answer the flag</p>
+    <p>เวลาที่เหลืออยู่ <span id="days"></span> <span id="hours"></span> <span id="minutes"></span> <span
+            id="seconds"></span> </p>
+    {% endif %}
     {% endif %}
     <div class="chart-title">Top 10 Users Score</div>
     <div id='chart-area'></div>
@@ -42,11 +44,12 @@
             </thead>
             <tbody>
                 {% for flag in flags %}
-                <tr>
+                <tr id="flag_{{flag.id}}">
                     <td>{{flag.name}}</td>
                     <td colspan="2">{{flag.explanation}}</td>
-                    <td class="{% if flag.answered %}text-success{% else %}text-danger{% endif %}">{{flag.status}}</td>
-                    <td>{% if flag.answered %}{{flag.points_gained}}{% else %}-{% endif %}</td>
+                    <td class="flag-status {% if flag.answered %}text-success{% else %}text-danger{% endif %}">
+                        {{flag.status}}</td>
+                    <td class="flag-point">{% if flag.answered %}{{flag.points_gained}}{% else %}-{% endif %}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -144,20 +147,25 @@
         const form = $(this);
         const url = form.attr('action');
 
-        const flag = $('input[name="flag"]', $(this)).val();
-
         $.ajax({
             type: "POST",
             url: url,
             data: form.serialize(),
             success: function (data) {
-                console("answer flag", data);
                 alert(data.message);
+                $('.input-challenge-flag').val('');
                 if (data.correct) {
+                    // location.reload();
                     get_top10_score();
-                    // const idx = challenges.findIndex(obj => obj.id == challenge_id);
-                    // challenges[idx].cleared_flag += 1;
-                    // updateClearedFlag();
+                    // find the right flag and update it
+                    const flagInfo = $("#flag_" + data.flagid);
+                    // status to "Solved "+ "\u2713"
+                    const flagStatus = flagInfo.find(".flag-status");
+                    flagStatus.text("Solved " + "\u2713");
+                    flagStatus.removeClass("text-danger");
+                    flagStatus.addClass("text-success");
+                    // point gain update
+                    flagInfo.find(".flag-point").text(data.points_gained);
                 }
             }
         });
