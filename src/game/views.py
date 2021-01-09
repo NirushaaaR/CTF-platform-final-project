@@ -125,12 +125,7 @@ def game_view(request, game_slug):
 
     try:
         remaining_time = game.period.get_remaining_time_percentage()
-        if remaining_time > 0:
-            # game ongoing...
-            game.participants.add(request.user)
-        else:
-            # game already ends hmmm what todo...
-            pass
+        game.participants.add(request.user)
     except Game.period.RelatedObjectDoesNotExist:
         # no periods game always ongoning
         game.period = None

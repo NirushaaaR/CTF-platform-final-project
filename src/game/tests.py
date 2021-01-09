@@ -7,6 +7,7 @@ from django.test import override_settings
 
 from selenium.webdriver.firefox.webdriver import WebDriver
 # from selenium.webdriver.chrome.webdriver import WebDriver
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
@@ -70,6 +71,9 @@ def prepare_db(self):
 
     self.flag3p = ChallengeFlag(name="flag3p", flag="FLAG{3p}", explanation="explanation3p", point=35, challenge=challenge1p)
     self.flag3p.save()
+
+    self.game = game_nonperiod
+    self.gamep = game_with_period
     
 
 
@@ -109,15 +113,15 @@ class GameSeleniumTests(StaticLiveServerTestCase):
     def _answer_flag(self, flag):
         form = self.selenium.find_element_by_css_selector(".flag-enter form")
         input_flag = form.find_element_by_css_selector("input[name='flag']")
-        submit = form.find_element_by_css_selector(".submit-flag")
+        submit = form.find_element_by_css_selector("button")
 
         # enter wrong flag
         input_flag.send_keys(flag)
         submit.click()
 
         # check alert
-        ale = self.selenium.switch_to_alert()
         WebDriverWait(self.selenium, 10).until(EC.alert_is_present())
+        ale = self.selenium.switch_to_alert()
         ale.accept()
         input_flag.clear()
 
@@ -187,6 +191,27 @@ class GameSeleniumTests(StaticLiveServerTestCase):
         # check if half score
         self.user1.refresh_from_db()
         self.assertEqual(self.user1.score, self.flag2p.point // 2)
+    
+
+    def test_play_game_with_period_ends(self):
+        """ A game that already end get 0 point """
+        # make game ends
+        self.gamep.period.end = timezone.now() - timedelta(minutes=1) 
+        self.gamep.period.save()
+
+        
+        self._login_user(self.user1.email, "123456")
+        GAME_URL = self.live_server_url + reverse("game", args=["title2"])
+        self.selenium.get(GAME_URL)
+
+        # see if inform user that game ends
+        self.assertIn("ช่วงเวลาของเกมหมดลงแล้วแต่คุณยังตอบ", self.selenium.page_source)
+
+        # check answer flag and get 0 point
+        self._answer_flag(self.flag2p.flag)
+        # check if get 0 point
+        self.user1.refresh_from_db()
+        self.assertEqual(self.user1.score, 0)
 
 
         
