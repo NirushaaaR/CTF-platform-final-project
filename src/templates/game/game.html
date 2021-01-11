@@ -15,7 +15,7 @@
     <hr>
     <div id="challenges">
         {% for challenge in challenges %}
-        <p>{{challenge.docker_image}} - <a href="{{challenge.url}}">{{challenge.url}}</a></p>
+        <a href="{{challenge.url}}">{{challenge.url}}</a></p>
         <p>{{challenge.description|safe}}</p>
         <hr>
         {% endfor %}
