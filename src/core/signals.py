@@ -22,7 +22,6 @@ def user_clear_tasks(sender, instance, action, model, pk_set, **kwargs):
 
         # check if user clear all room
         if clear_all_tasks(user_id, instance.room_id):
-            print("user cleared room")
             UserParcitipation.objects.filter(
                 user=user_id, room=instance.room_id
             ).update(finished_at=timezone.now())

@@ -1,6 +1,6 @@
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-from selenium.webdriver.firefox.webdriver import WebDriver
-# from selenium.webdriver.chrome.webdriver import WebDriver
+# from selenium.webdriver.firefox.webdriver import WebDriver
+from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from django.urls import reverse
@@ -96,12 +96,14 @@ class CoreSeleniumTests(StaticLiveServerTestCase):
 
 
     def test_login_wrong(self):
+        """ login with wrong password """
         self._login_user("this@mail.com", "password.....")
 
         alert = self.selenium.find_element_by_css_selector(".alert-danger")
         self.assertTrue(alert)
 
     def test_login_right(self):
+        """ login with right password """
         self._login_user("brock@mail.com", "123456")
 
         alert = self.selenium.find_element_by_css_selector(".alert-success")
@@ -109,6 +111,7 @@ class CoreSeleniumTests(StaticLiveServerTestCase):
     
 
     def test_enter_flag(self):
+        """ test mechanic when user enter the flag in room """
         self._login_user("brock@mail.com", "123456")
 
         self._enter_flag(self.room.id, self.task1.id, "FLAG{WRONG}")
