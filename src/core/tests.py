@@ -10,7 +10,7 @@ from django.contrib.auth import get_user_model
 from core.models import Room, Task, TaskHint, ScoreHistory
 
 
-def prepare_db():
+def prepare_db(self):
     get_user_model().objects.create_user(username="brock", email="brock@mail.com", password="123456")
     room = Room(
         title="title",
@@ -44,6 +44,10 @@ def prepare_db():
     task1.hints.add(TaskHint(hint="task1_hint1"), TaskHint(hint="task1_hint2"), bulk=False)
     task2.hints.add(TaskHint(hint="task2_hint1"), TaskHint(hint="task2_hint2"), bulk=False)
 
+    self.room = room
+    self.task1 = task1
+    self.task2 = task2
+
 
 
 @override_settings(DEBUG=True,)
@@ -56,7 +60,7 @@ class CoreSeleniumTests(StaticLiveServerTestCase):
         cls.selenium.implicitly_wait(5)
     
     def setUp(self):
-        prepare_db()
+        prepare_db(self)
 
     @classmethod
     def tearDownClass(cls):
@@ -75,6 +79,22 @@ class CoreSeleniumTests(StaticLiveServerTestCase):
         password.send_keys(p)
         submit.click()
 
+    
+    def _enter_flag(self, roomid, taskid, flag):
+        ROOM_URL = self.live_server_url + reverse("room", args=[roomid])
+        self.selenium.get(ROOM_URL)
+
+        task = self.selenium.find_element_by_css_selector(f"#formtask_{taskid} input[name='flag']")
+        task_submit = self.selenium.find_element_by_css_selector(f"#formtask_{taskid} button[type='submit']")
+        # wrong flag
+        task.send_keys(flag)
+        task_submit.click()
+        # check alert
+        WebDriverWait(self.selenium, 10).until(EC.alert_is_present())
+        ale = self.selenium.switch_to_alert();
+        ale.accept();
+
+
     def test_login_wrong(self):
         self._login_user("this@mail.com", "password.....")
 
@@ -91,40 +111,26 @@ class CoreSeleniumTests(StaticLiveServerTestCase):
     def test_enter_flag(self):
         self._login_user("brock@mail.com", "123456")
 
-        GAME_URL = self.live_server_url + reverse("room", args=[1])
-        self.selenium.get(GAME_URL)
-
-        task1 = self.selenium.find_element_by_css_selector("#formtask_1 input[name='flag']")
-        task1_submit = self.selenium.find_element_by_css_selector("#formtask_1 button[type='submit']")
-
-        # wrong flag
-        task1.send_keys("FLAG{WRONG}")
-        task1_submit.click()
-
-        # check alert
-        WebDriverWait(self.selenium, 10).until(EC.alert_is_present())
-        ale = self.selenium.switch_to_alert();
-        ale.accept();
-        task1.clear()
-
+        self._enter_flag(self.room.id, self.task1.id, "FLAG{WRONG}")
         # score not increase
         user = get_user_model().objects.get(email="brock@mail.com")
         self.assertEqual(user.score, 0)
 
         # right flag
-        task1.send_keys("FLAG{FLAG_1}")
-        task1_submit.click()
-        WebDriverWait(self.selenium, 10).until(EC.alert_is_present())
-        ale.accept();
-
+        self._enter_flag(self.room.id, self.task1.id, self.task1.flag)
         # check points increase
         user.refresh_from_db()
-        self.assertEqual(user.score, 50)
+        self.assertEqual(user.score, self.task1.points)
 
         # check score history
         history = ScoreHistory.objects.get(user=user)
-        self.assertEqual(history.gained, 50)
+        self.assertEqual(history.gained, self.task1.points)
         self.assertEqual(history.type, "task")
+
+        # enter every flag and see if conclusion appear
+        self._enter_flag(self.room.id, self.task2.id, self.task2.flag)
+        conslusion = self.selenium.find_element_by_css_selector("#roomconclus")
+        self.assertTrue(conslusion)
 
 
 
