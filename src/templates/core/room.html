@@ -22,7 +22,7 @@
         {% if task.docker %}
           {% if task.docker.url %}
           ไปที่ url: <a
-            href="{{task.docker.url}}{{task.docker_url_path}}">{{task.docker.url}}{{task.docker_url_path}}</a>
+            href="{{task.docker.url|render_docker_url:task.docker_url_path}}">{{task.docker.url|render_docker_url:task.docker_url_path}}</a>
           <br>
           {% else %}
           <p>สามารถรันเว็บโดยใช้คำสั่ง "docker run --rm -p {{task.docker.port}}:{{task.docker.port}} {{task.docker.docker}}"</p>
