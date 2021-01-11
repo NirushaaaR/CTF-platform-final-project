@@ -201,7 +201,7 @@ class GameSeleniumTests(StaticLiveServerTestCase):
 
         
         self._login_user(self.user1.email, "123456")
-        GAME_URL = self.live_server_url + reverse("game", args=["title2"])
+        GAME_URL = self.live_server_url + reverse("game", args=[self.gamep.title])
         self.selenium.get(GAME_URL)
 
         # see if inform user that game ends
@@ -212,6 +212,40 @@ class GameSeleniumTests(StaticLiveServerTestCase):
         # check if get 0 point
         self.user1.refresh_from_db()
         self.assertEqual(self.user1.score, 0)
+    
+
+    def test_play_game_that_not_started_yet(self):
+         # make not start in the next 1 minute
+        self.gamep.period.start = timezone.now() + timedelta(minutes=10) 
+        self.gamep.period.save()
+
+        self._login_user(self.user1.email, "123456")
+        GAME_URL = self.live_server_url + reverse("game", args=[self.gamep.title])
+        self.selenium.get(GAME_URL)
+
+        # must redirect to game index page
+        GAME_INDEX_URL = self.live_server_url + reverse("game_index")
+        WebDriverWait(self.selenium, 10).until(lambda driver: driver.current_url == GAME_INDEX_URL)
+
+        # find warning alert
+        self.assertIn("alert-warning", self.selenium.page_source)
+
+        # try going in the page and enter the flag too
+        self.gamep.period.start = timezone.now() - timedelta(minutes=1) 
+        self.gamep.period.save()
+
+        GAME_URL = self.live_server_url + reverse("game", args=[self.gamep.title])
+        self.selenium.get(GAME_URL)
+
+        self.gamep.period.start = timezone.now() + timedelta(minutes=1) 
+        self.gamep.period.save()
+
+        # when enter the flag shold alert and no points gain
+        self._answer_flag(self.flag1p.flag)
+        self.assertEqual(self.user1.score, 0)
+
+
+
 
 
         

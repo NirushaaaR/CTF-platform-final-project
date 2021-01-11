@@ -1,9 +1,9 @@
 from datetime import datetime
+from django.contrib import messages
 
 from django.db.models import F, Subquery, Count, Q
 from django.http.response import JsonResponse
-from django.shortcuts import get_object_or_404
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 
@@ -125,6 +125,9 @@ def game_view(request, game_slug):
 
     try:
         remaining_time = game.period.get_remaining_time_percentage()
+        if remaining_time > 1:
+            messages.warning(request, "ยังไม่ถึงเวลาเริ่มเกม")
+            return redirect('game_index')
         game.participants.add(request.user)
     except Game.period.RelatedObjectDoesNotExist:
         # no periods game always ongoning
@@ -137,13 +140,21 @@ def game_view(request, game_slug):
 
 @login_required
 @require_POST
-def enter_challenge_flag(request):
-    flag = request.POST.get("flag")
+def enter_challenge_flag(request, game_id):
+    game = get_object_or_404(Game.objects.select_related("period"), id=game_id)
+
     try:
-        right_flag = ChallengeFlag.objects.select_related("challenge__game").get(
-            flag__iexact=flag
+        # check if game has period and started yet...
+        if not game.period.is_game_start():
+            return JsonResponse({"message": "เกมยังไม่เริ่ม", "correct": False})
+    except Game.period.RelatedObjectDoesNotExist:
+        # no periods game always ongoning
+        game.period = None
+    
+    try:
+        right_flag = ChallengeFlag.objects.select_related("challenge").get(
+            flag__iexact=request.POST.get("flag", "").strip(), challenge__game_id=game_id
         )
-        game = right_flag.challenge.game
         result = update_score_process(
             game, right_flag, request.user.id, request.user.username
         )
@@ -151,6 +162,8 @@ def enter_challenge_flag(request):
 
     except ChallengeFlag.DoesNotExist:
         return JsonResponse({"message": "ผิด", "correct": False})
+    
+    
 
 
 @login_required

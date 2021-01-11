@@ -42,6 +42,9 @@ class GamePeriod(models.Model):
     
     def is_game_end(self):
         return timezone.now() > self.end
+    
+    def is_game_start(self):
+        return timezone.now() > self.start
 
     def clean(self):
         if self.start >= self.end:
