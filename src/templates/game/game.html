@@ -15,14 +15,14 @@
     <hr>
     <div id="challenges">
         {% for challenge in challenges %}
-        <a href="{{challenge.url}}">{{challenge.url}}</a></p>
+        Url: <a href="{{challenge.url}}">{{challenge.url}}</a></p>
         <p>{{challenge.description|safe}}</p>
         <hr>
         {% endfor %}
     </div>
 
     <div class="flag-enter">
-        <form class="form-challenge" id="challenge_{{challenge.id}}" action="{% url 'enter_challenge_flag' %}"
+        <form class="form-challenge" id="challenge_{{challenge.id}}" action="{% url 'enter_challenge_flag' game.id %}"
             method="POST">
             {% csrf_token %}
             <div class="form-group">
