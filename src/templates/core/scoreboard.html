@@ -1,8 +1,27 @@
 {% extends 'base.html' %} {% block content %}
 <div class="container">
-    <p>---Show User Score---</p>
-    {% for user in top_10 %}
-    <p>{{user.username}}: {{user.score}}</p>
-    {% endfor %}
+    <div class="container">
+        <h1 class="text-center">Scoreboard</h1>
+            <br>
+        <table class="table table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in top_10 %}
+                <tr>
+                    <th scope="row" width="10%" class="text-nowrap">{{forloop.counter}}</th>
+                    <td class="text-nowrap">{{user.username}}</td>
+                    <td class="text-nowrap">{{user.score}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
 </div>
 {% endblock content %}
