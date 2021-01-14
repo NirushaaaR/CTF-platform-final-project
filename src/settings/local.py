@@ -2,27 +2,7 @@ from .base import *
 
 DEBUG = True
 
-INSTALLED_APPS = [
-    # "channels",
-    # "game",
-    # "docker_instance",
-    "django.contrib.admin",
-    "django.contrib.auth",
-    "django.contrib.contenttypes",
-    "django.contrib.sessions",
-    "django.contrib.messages",
-    # disable static files handling when debug=True
-    "whitenoise.runserver_nostatic",
-    "django.contrib.staticfiles",
-    "django.contrib.humanize",
-    # 3rd party
-    "nested_inline",
-    "debug_toolbar",
-    # local app
-    "core.apps.CoreConfig",
-    "game.apps.GameConfig",
-    "docker_instance.apps.DockerInstanceConfig",
-]
+INSTALLED_APPS += ["debug_toolbar",]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
