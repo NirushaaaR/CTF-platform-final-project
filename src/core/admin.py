@@ -13,7 +13,7 @@ class TaskHintInline(NestedStackedInline):
 
 class TaskInline(NestedStackedInline):
     model = Task
-    extra = 0
+    extra = 1
     inlines = (TaskHintInline,)
 
 
