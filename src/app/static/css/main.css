@@ -33,3 +33,8 @@ body {
   .small-text {
     font-size: small;
   }
+
+  code {
+    background-color: #212c42;
+    color: white;
+  }
