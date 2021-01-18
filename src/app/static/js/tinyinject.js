@@ -13,6 +13,6 @@ script.onload = function () {
     height: 500,
     plugins: 'code advlist link image lists media tinydrive imagetools',
     toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | outdent indent',
-    tinydrive_token_provider: '/jwt'
+    tinydrive_token_provider: '/jwt/'
   });
 };
