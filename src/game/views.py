@@ -33,6 +33,7 @@ def populate_game_challenges(game, user_id):
         challenge__in=challenges, participated_user__user_id=user_id
     )
     flags = []
+    count_answered= 0
     for c in challenges:
         for flag in c.flags.all():
             # find if user already answer the flag
@@ -43,10 +44,11 @@ def populate_game_challenges(game, user_id):
                     flag.status = "Solved "+ "\u2713"
                     flag.answered = True
                     flag.points_gained = record.points_gained
+                    count_answered += 1
                     break
             flags.append(flag)
 
-    return {"game": game, "challenges": challenges, "flags": flags}
+    return {"game": game, "challenges": challenges, "flags": flags, "count_answered": count_answered}
 
 
 def update_score_process(game, flag, user_id, username):

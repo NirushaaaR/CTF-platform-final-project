@@ -1,4 +1,4 @@
-const BASEURL = "http://139.162.48.22:3000/docker/";
+const BASEURL = "http://139.162.48.22:3000/manage/docker/";
 
 function urlencode(str) {
     return encodeURIComponent(str)
@@ -35,6 +35,7 @@ async function deleteDocker(docker) {
 
 function checkDockerStatus(data, docker, isDelete, isDeleteLink) {
     const url = BASEURL + urlencode(docker);
+
     if (isDelete) {
         changeDeleteStatus(data);
     } else {
@@ -46,32 +47,31 @@ function checkDockerStatus(data, docker, isDelete, isDeleteLink) {
             .then(res => res.json())
             .then(res => {
                 const data = res.data;
-                if (data.status === "deployed" && !isDelete) {
-                    // deploy success!!
-                    document.getElementById("id_url").disabled = false;
-                    document.getElementById("id_url").value = res.url;
-                    // submit form
-                    document.getElementById("dockerweb_form").submit();
-                } else if (data.status === "remove from server" && isDelete) {
-                    // remove success
-                    if (isDeleteLink) {
-                        const deleteLink = document.querySelector(".deletelink").getAttribute("href");
-                        window.location.replace(deleteLink);
-                    } else {
-                        console.table(data);
+
+                if (!data.isOperating) {
+
+                    if (data.status === "deployed") {
+                        // deploy success!!
                         document.getElementById("id_url").disabled = false;
-                        document.getElementById("id_url").value = "";
-                        document.getElementById("dockerweb_form").submit();
+                        document.getElementById("id_url").value = res.url;
+                        // submit form
+                        document.querySelector("input[name='_continue']").click()
+                    } else if (data.port === null) {
+                        // remove success
+                        if (isDeleteLink) {
+                            const deleteLink = document.querySelector(".deletelink").getAttribute("href");
+                            window.location.replace(deleteLink);
+                        } else {
+                            document.getElementById("id_url").disabled = false;
+                            document.getElementById("id_url").value = "";
+                            document.querySelector("input[name='_continue']").click()
+                        }
                     }
-                }
-                else {
+
+                } else {
                     // check every 1.5 secconds
-                    if (!data.isError) {
-                        checkDockerStatus(data.status, docker, isDelete, isDeleteLink);
-                    } else {
-                        console.log("error",data);
-                        throw new Error(data.status);
-                    }
+                    // not finish operating
+                    checkDockerStatus(data.status, docker, isDelete, isDeleteLink);
                 }
             })
             .catch(err => {
@@ -81,7 +81,11 @@ function checkDockerStatus(data, docker, isDelete, isDeleteLink) {
                 }
                 deployButton.disabled = false;
                 deleteButton.disabled = false;
-                changeDeployStatus(err);
+                if (isDelete) {
+                    changeDeleteStatus(err.message);
+                } else {
+                    changeDeployStatus(err.message);
+                }
             });
     }, 1500);
 }
