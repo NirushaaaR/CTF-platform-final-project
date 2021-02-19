@@ -11,3 +11,8 @@ DEBUG = False
 #         },
 #     },
 # }
+
+# django security
+# for https only
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True 

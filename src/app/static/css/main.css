@@ -1,6 +1,10 @@
 body {
     font-size: 1.1rem;
+    background-color: rgba(240,240,245,0.75);
 }
+
+/*#20293C background object
+#2F3B52 background input*/
 
 .box-shadow {
     -webkit-box-shadow: 0px 0px 1.5px 0px rgba(0,0,0,0.75);
@@ -20,21 +24,41 @@ body {
   }
 
   /* Turn off scrollbar when body element has the loading class */
-  body.loading {
-    overflow: hidden;
-  }
+body.loading {
+  overflow: hidden;
+}
 
   /* Make spinner image visible when body element has the loading class */
-  body.loading .overlay {
-    display: block;
-  }
+body.loading .overlay {
+  display: block;
+}
 
 
-  .small-text {
-    font-size: small;
-  }
+.small-text {
+  font-size: small;
+}
 
-  code {
-    background-color: #212c42;
-    color: white;
-  }
+code {
+  background-color: #212c42;
+  color: white;
+}
+
+body {
+  padding-top: 80px; /*70px nabar height*/
+}
+
+.navbar-fixed-top {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1030;
+}
+
+.navbar-bg {
+  font-weight: 600;
+}
+
+h5.card-title {
+  font-weight: 700;
+}
