@@ -25,3 +25,11 @@ def censor_flag(flag: str):
 def render_docker_url(url, path):
     """ render docker url whether / or no / """
     return f"{url}{path}" if path.startswith("/") else f"{url}/{path}"
+
+
+
+@register.filter
+def startswith(text, starts):
+    if isinstance(text, str):
+        return text.startswith(starts)
+    return False

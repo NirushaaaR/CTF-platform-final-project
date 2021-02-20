@@ -1,110 +1,66 @@
 {% extends 'base.html' %} {% load static %} {% load custom_filters %} {% load humanize %}
+{% block stylesheet %}
+<link rel="stylesheet" href="{% static 'css/room.css' %}">
+{% endblock stylesheet %}
 {% block content %}
-<div class="container">
-  <h2 class="mt-4">{{room.title}}</h2>
-  {% include "partials/_room_tags.html" %}
-  <hr>
-  <div id="roomdesc">
-    {% for require_room in room.prerequisites.all %}	
-    {% if forloop.first %}ควรทำ {% endif %}	
-    <a href="{{require_room.get_absolute_url}}">&lt;{{require_room}}&gt;</a>	
-    {% if forloop.last %} ก่อน<br>----------{% endif %}	
-    {% endfor %}
-    <div class="desc">
-      {{room.description|safe}}
-    </div>
-  </div>
-  <hr>
+<div class="page-learn">
 
-  {% for task in tasks %}
-  <div id="card_{{task.id}}"
-    class="card my-3 {% if task.task_number in user_answered_tasks %}border-success{% endif %}">
-    <div id="card_header_{{task.id}}"
-      class="card-header d-flex justify-content-between {% if task.task_number in user_answered_tasks %}border-success{% endif %} box-shadow">
-      <h3>{{task.task_number}} - {{task.title}}</h3>
-      <div class="align-self-end pb-1">{{task.points}} points</div>
-    </div>
-    <div class="card-body">
-      <div class="card-text">
-        {% if task.docker %}
-          {% if task.docker.url %}
-          ไปที่ url: <a
-            href="{{task.docker.url|render_docker_url:task.docker_url_path}}">{{task.docker.url|render_docker_url:task.docker_url_path}}</a>
-          <br>
-          {% else %}
-          <p>สามารถรันเว็บโดยใช้คำสั่ง "docker run --rm -p {{task.docker.port}}:{{task.docker.port}} {{task.docker.docker}}"</p>
-          <p>แล้วไปที่ {{task.docker_url_path}}</p>
-          {% endif %}
-        {% endif %}
-        {{task.description|safe}}
-      </div>
-      <hr>
-      <form id="formtask_{{task.id}}" class="task-form" action="{% url 'enter_flag' room.id %}" method="post">
-        <div class="form-row align-items-center">
-          <div class="col-md-11">
-            {% csrf_token %}
-            <input type="hidden" name="task_id" value="{{task.id}}" />
-            {% if task.flag %}
-            <input class="form-control" type="text" name="flag" placeholder="{{task.flag|censor_flag}}" />
-            {% else %}
-            <input class="form-control" type="text" name="flag" placeholder="ทำความเข้าใจตามข้างบน" disabled />
-            {% endif %}
-          </div>
-          <div class="col-md-1 text-center">
-            <button type="submit" class="btn btn-success">Submit</button>
-          </div>
-        </div>
-      </form>
-      <div class="d-inline-flex mt-2">
-        {% for hint in task.hints.all %}
-        <button type="button" class="btn mr-2" data-toggle="modal" data-target="#task{{task.id}}-hint{{hint.id}}">
-          คำใบ้ {{forloop.counter}}
-        </button>
-        <div class="modal fade" id="task{{task.id}}-hint{{hint.id}}" tabindex="-1" role="dialog"
-          aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLongTitle">คำใบ้ {{forloop.counter}}</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <div class="modal-body">
-                {{hint.hint}}
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-              </div>
-            </div>
-          </div>
-        </div>
-        {% endfor %}
-      </div>
-    </div>
-    {% if task.task_number in user_answered_tasks %}
-    <div class="card-footer border-success text-success text-right">
-      <i class="fas fa-check"></i> cleared {{user_answered_tasks|get_dict_value:task.task_number|naturaltime}}
-    </div>
-    {% endif %}
+  <div class="menu-container" id="learnmenu">
+    <nav class="learn-menu text-center">
+      <div data-slide-to="0" class="menu-page active">1</div>
+      <div data-slide-to="1" class="menu-page">2</div>
+      <div data-slide-to="2" class="menu-page">3</div>
+    </nav>
   </div>
-  {% endfor %}
-  {% if is_finish and room.conclusion %}
-  <div class="card mb-3 border-warning box-shadow" id="roomconclus">
-    <h3 class="card-header border-warning">บทสรุป</h3>
-    <div class="card-body">
-      <div class="card-text">
-        {{room.conclusion|safe}}
+
+
+  <div class="view-container">
+    <div class="slide-progress progress" style="height: 0.25rem;">
+      <div role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="8" class="progress-bar"
+        style="width: 7.69231%;"></div>
+    </div>
+
+    <div class="slide-navbar">
+      <div class="course-navbar">
+        {{room.title}}
       </div>
-      <div>
-        {% for next_room in room.next_rooms.all %}
-        {% if forloop.counter == 1 %}ถัดไป: {% endif %}
-        <a href="{{next_room.get_absolute_url}}">&lt;{{next_room}}&gt;</a>
-        {% endfor %}
+    </div>
+    <div class="slide-content">
+
+      <div role="button" class="slide-control slide-control-left" href="#myCarousel" data-slide="prev">
+        <div class="arrow"><svg aria-hidden="true" focusable="false" data-prefix="dh" data-icon="angle-left" role="img"
+            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="svg-inline--fa fa-angle-left fa-w-16">
+            <path fill="currentColor"
+              d="M16.01 20.885a1.25 1.25 0 01-1.666.09l-.101-.09-8-8a1.25 1.25 0 01-.091-1.667l.09-.101 8-8a1.25 1.25 0 011.859 1.666l-.09.102L8.895 12l7.116 7.117a1.25 1.25 0 01.09 1.666l-.09.102z"
+              class=""></path>
+          </svg></div>
+        </div>
+
+      <div class="slides carousel slide" id="myCarousel" data-interval="false" data-wrap="false">
+        <div class="slides carousel-inner">
+          <div class="slide-inside carousel-item active">
+            {% include "partials/_learning_content.html" with left="1Lorem ipsum dolor sit amet consectetur, adipisicing elit. Perspiciatis quos sapiente eaque necessitatibus nostrum repellendus, tenetur voluptatum omnis optio architecto fuga iusto doloribus quidem, ratione dolorum praesentium. Animi, sit corporis." right="Lorem ipsum dolor sit amet consectetur, adipisicing elit. Perspiciatis quos sapiente eaque necessitatibus nostrum repellendus, tenetur voluptatum omnis optio architecto fuga iusto doloribus quidem, ratione dolorum praesentium. Animi, sit corporis." %}
+          </div>
+          <div class="slide-inside carousel-item">
+            {% include "partials/_learning_content.html" with left="2Lorem ipsum dolor sit amet consectetur, adipisicing elit. Perspiciatis quos sapiente eaque necessitatibus nostrum repellendus, tenetur voluptatum omnis optio architecto fuga iusto doloribus quidem, ratione dolorum praesentium. Animi, sit corporis." right="Lorem ipsum dolor sit amet consectetur, adipisicing elit. Perspiciatis quos sapiente eaque necessitatibus nostrum repellendus, tenetur voluptatum omnis optio architecto fuga iusto doloribus quidem, ratione dolorum praesentium. Animi, sit corporis." %}
+          </div>
+          <div class="slide-inside carousel-item">
+            {% include "partials/_learning_content.html" with left="3Lorem ipsum dolor sit amet consectetur, adipisicing elit. Perspiciatis quos sapiente eaque necessitatibus nostrum repellendus, tenetur voluptatum omnis optio architecto fuga iusto doloribus quidem, ratione dolorum praesentium. Animi, sit corporis." right="Lorem ipsum dolor sit amet consectetur, adipisicing elit. Perspiciatis quos sapiente eaque necessitatibus nostrum repellendus, tenetur voluptatum omnis optio architecto fuga iusto doloribus quidem, ratione dolorum praesentium. Animi, sit corporis." %}
+          </div>
+        </div>
+      </div>
+
+
+      <div role="button" class="slide-control slide-control-right" href="#myCarousel" data-slide="next">
+        <div class="arrow"><svg aria-hidden="true" focusable="false" data-prefix="dh" data-icon="angle-right" role="img"
+            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="svg-inline--fa fa-angle-right fa-w-16">
+            <path fill="currentColor"
+              d="M8 3.1c.4-.4 1.2-.5 1.7-.1l.1.1 8 8c.5.5.5 1.2.1 1.7l-.1.1-8 8c-.5.5-1.3.5-1.8 0s-.5-1.2-.1-1.7l.1-.1 7.1-7.1L8 4.9c-.5-.5-.5-1.2-.1-1.7l.1-.1z"
+              class=""></path>
+          </svg></div>
       </div>
     </div>
   </div>
-  {% endif %}
 </div>
 <div class="overlay"></div>
 {% endblock content %}
@@ -112,6 +68,23 @@
 {% block javascript %}
 <script src="{% static 'js/ajaxLoadingSpinner.js' %}"></script>
 <script>
+
+  function adjustActivePage(from, to) {
+    $(`.menu-page[data-slide-to='${from}']`).removeClass("active");
+    $(`.menu-page[data-slide-to='${to}']`).addClass("active");
+  }
+
+  $(".menu-page").each((index, elem) => {
+    elem.onclick = e => {
+      $('.carousel').carousel(index);
+    };
+  });
+
+  $('#myCarousel').on('slide.bs.carousel', function (e) {
+    adjustActivePage(e.from, e.to);
+  })
+
+
   $(".task-form").submit(function (e) {
     e.preventDefault();
 

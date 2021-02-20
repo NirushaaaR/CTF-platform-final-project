@@ -36,7 +36,7 @@ def index(request):
     rooms = (
         Room.objects.prefetch_related("tags")
         .filter(is_active=True)
-        .order_by("difficulty", "created_at")
+        .order_by("created_at")
     )
     context = query_paginated_room(request, rooms)
     return render(request, "core/index.html", context)
@@ -46,7 +46,7 @@ def room_by_tag(request, tag):
     rooms = (
         Room.objects.prefetch_related("tags")
         .filter(is_active=True, tags__name=tag)
-        .order_by("difficulty", "created_at")
+        .order_by("created_at")
     )
     context = query_paginated_room(request, rooms)
     return render(request, "core/index.html", context)

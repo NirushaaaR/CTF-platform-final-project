@@ -1,6 +1,7 @@
 body {
     font-size: 1.1rem;
     background-color: rgba(240,240,245,0.75);
+    padding-top: 50px;
 }
 
 /*#20293C background object
@@ -41,10 +42,6 @@ body.loading .overlay {
 code {
   background-color: #212c42;
   color: white;
-}
-
-body {
-  padding-top: 80px; /*70px nabar height*/
 }
 
 .navbar-fixed-top {

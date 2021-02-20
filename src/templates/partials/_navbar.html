@@ -1,3 +1,4 @@
+{% load custom_filters %}
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark navbar-bg navbar-fixed-top">
   <a class="navbar-brand" href="{% url 'index' %}">CTF PLATFORM</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
@@ -7,13 +8,13 @@
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
   <div class="container">
       <ul class="navbar-nav mr-auto">
-        <li class="nav-item {% if request.path == '/' %}active{% endif %}">
+        <li class="nav-item {% if request.path == '/' or request.path|startswith:'/room/' %}active{% endif %}">
           <a class="nav-link" href="{% url 'index' %}">Learn</a>
         </li>
-        <li class="nav-item {% if request.path == '/game/' %}active{% endif %}">
+        <li class="nav-item {% if request.path|startswith:'/game/' %}active{% endif %}">
           <a class="nav-link" href="{% url 'game_index' %}">Game</a>
         </li>
-        <li class="nav-item {% if request.path == '/scoreboard/' %}active{% endif %}">
+        <li class="nav-item {% if request.path|startswith:'/scoreboard/' %}active{% endif %}">
           <a href="{% url 'scoreboard' %}" class="nav-link">ScoreBoard</a>
         </li>
       </ul>
