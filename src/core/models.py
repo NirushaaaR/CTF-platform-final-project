@@ -95,19 +95,26 @@ class Room(models.Model):
         blank=True,
         related_name="participated_rooms",
     )
-    docker = models.ForeignKey(
-        DockerWeb,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="rooms",
-    )
 
     def get_absolute_url(self):
         return reverse("room", args=[str(self.pk)])
 
     def __str__(self):
         return self.title
+
+
+class RoomContent(models.Model):
+    content_number = models.PositiveSmallIntegerField(validators=[MinValueValidator(1)])
+    title = models.CharField(max_length=50)
+    left = models.TextField()
+    right = models.TextField()
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="contents")
+
+    class Meta:
+        unique_together = ("content_number", "room")
+
+    def __str__(self):
+        return f"content {self.room} {self.id}"
 
 
 class Tag(models.Model):
@@ -131,7 +138,7 @@ class UserParcitipation(models.Model):
 
 
 class Task(models.Model):
-    task_number = models.PositiveIntegerField(validators=[MinValueValidator(1)])
+    task_number = models.PositiveSmallIntegerField(validators=[MinValueValidator(1)])
     title = models.CharField(max_length=255)
     description = models.TextField()
     flag = models.CharField(max_length=255, null=True, blank=True)

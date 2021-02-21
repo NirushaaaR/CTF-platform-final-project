@@ -1,9 +1,12 @@
 from django.contrib import admin
+from django.db import models
 from nested_inline.admin import NestedStackedInline, NestedModelAdmin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
 
-from core.models import Room, Tag, Task, TaskHint, User
+from markdownx.widgets import AdminMarkdownxWidget
+
+from core.models import Room, Tag, Task, TaskHint, User, RoomContent
 
 
 class TaskHintInline(NestedStackedInline):
@@ -17,14 +20,26 @@ class TaskInline(NestedStackedInline):
     inlines = (TaskHintInline,)
 
 
+class RoomContentInline(NestedStackedInline):
+    model = RoomContent
+    extra = 1
+
+    formfield_overrides = {
+        models.TextField: {'widget': AdminMarkdownxWidget},
+    }
+
+
 @admin.register(Room)
 class RoomAdmin(NestedModelAdmin):
     list_display = ("title", "preview", "is_active", "created_at", "updated_at")
     list_editable = ("is_active",)
-    inlines = (TaskInline,)
+    inlines = (RoomContentInline, TaskInline,)
 
     class Media:
-        js = ("js/tinyinject.js",)
+        js = ("js/jquery.js", "js/popper.min.js", "js/bootstrap.min.js",)
+
+    #class Media:
+    #    js = ("js/tinyinject.js",)
 
 
 @admin.register(User)

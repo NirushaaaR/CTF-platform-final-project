@@ -220,11 +220,15 @@ svg:not(:root).svg-inline--fa {
 .menu-page.active {
     background-color: #F3F3F7;
     color: #31313a;
-    border-left: 0.5rem solid #272C31;
+    border-left: 0.4rem solid #272C31;
 }
 
 .menu-page:hover {
     cursor: pointer;
+}
+
+.menu-page:hover:not(.active) {
+    background: #404047;
 }
 
 .simplebar-content-wrapper {
@@ -279,17 +283,16 @@ svg:not(:root).svg-inline--fa {
 .learn-content {
     width: 100%;
     min-height: 100%;
-    line-height: 1.75;
+    line-height: 2;
     color: #f0f0f5;
     word-break: keep-all;
     background-color: transparent;
     color: #fff;
+    font-size: larger;
 }
 
-@media screen and (min-width: 1300px) {
-    .learn-content {
-        font-size: 18px !important;
-    }
+.learn-content hr {
+    border-top: 1px solid #f0f0f5;
 }
 
 

@@ -15,6 +15,7 @@ urlpatterns = (
             "secret",
             TemplateView.as_view(template_name="secret.html"),
         ),
+        path('markdownx/', include('markdownx.urls')),
         path("game/", include("game.urls")),
         path("", include("core.urls")),
     ]
