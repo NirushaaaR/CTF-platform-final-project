@@ -159,3 +159,7 @@ MARKDOWNX_MARKDOWN_EXTENSION_CONFIGS = {
         }
     }
 }
+
+from datetime import datetime
+
+MARKDOWNX_MEDIA_PATH = datetime.now().strftime('markdownx/%Y/%m/%d')

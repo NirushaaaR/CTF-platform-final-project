@@ -9,8 +9,10 @@ def get_dict_value(dict_instance, key):
         return None
     return dict_instance.get(key)
 
+
 def replace_char(char):
     return char if char == "_" else "*"
+
 
 @register.filter
 def censor_flag(flag: str):
@@ -18,14 +20,14 @@ def censor_flag(flag: str):
     if not flag:
         return ""
     elif flag.startswith("FLAG{") and flag.endswith("}"):
-        return "FLAG{"+''.join([replace_char(char) for char in flag[4:-1]])+"}"
+        return "FLAG{" + "".join([replace_char(char) for char in flag[4:-1]]) + "}"
     return "-" * len(flag)
+
 
 @register.filter
 def render_docker_url(url, path):
     """ render docker url whether / or no / """
     return f"{url}{path}" if path.startswith("/") else f"{url}/{path}"
-
 
 
 @register.filter

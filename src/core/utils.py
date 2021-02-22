@@ -8,14 +8,15 @@ from core.models import Room, Task, UserAnsweredTask, UserParcitipation
 
 def redirect_after_login(request):
     nxt = request.GET.get("next", None)
-    if not(nxt is None or not is_safe_url(
-        nxt, {request.get_host()}, require_https=request.is_secure()
-    )):
+    if not (
+        nxt is None
+        or not is_safe_url(nxt, {request.get_host()}, require_https=request.is_secure())
+    ):
         try:
             return redirect(nxt)
         except Exception as err:
             print(err, type(err))
-    
+
     return redirect(settings.LOGIN_REDIRECT_URL)
 
 

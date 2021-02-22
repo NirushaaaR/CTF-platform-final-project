@@ -1,16 +1,53 @@
 {% load custom_filters %}
+{% load markdown_tags %}
 
 <div class="base-component component-split direction-vertical">
     <div class="split-pane" style="flex: 1 1 0%; width: 50%; min-width: 50%; max-width: 50%; min-height: 100%;">
-      <div class="component-html base-component">
-        <div class="simplebar"  data-simplebar>
-            <div class="simplebar-wrapper" style="margin: 0px;">
-                <div class="simplebar-mask">
-                    <div class="simplebar-offset" style="right: 0px; bottom: 0px;">
-                        <div class="simplebar-content-wrapper">
-                            <div class="simplebar-content" style="margin-right: 10px;">
-                                <div class="learn-content markdown-content">
-                                    {{task.description | safe}}
+        <div class="component-html base-component">
+            <div class="simplebar" data-simplebar>
+                <div class="simplebar-wrapper" style="margin: 0px;">
+                    <div class="simplebar-mask">
+                        <div class="simplebar-offset" style="right: 0px; bottom: 0px;">
+                            <div class="simplebar-content-wrapper">
+                                <div class="simplebar-content" style="margin-right: 10px;">
+                                    <div class="learn-content markdown-content">
+                                        <h1>{{task.title}}</h1>
+                                        <hr>
+                                        {{task.description | markdown | safe}}
+                                        {% if task.docker %}
+                                        {% if task.docker.url %}
+                                        <p>ไปที่ url: <a target="_blank"
+                                                href="{{task.docker.url|render_docker_url:task.docker_url_path}}">{{task.docker.url|render_docker_url:task.docker_url_path}}</a>
+                                        </p>
+                                        {% else %}
+                                        <p>สามารถรันเว็บโดยใช้คำสั่ง "docker run --rm -p
+                                            {{task.docker.port}}:{{task.docker.port}} {{task.docker.docker}}"</p>
+                                        <p>แล้วไปที่ {{task.docker_url_path}}</p>
+                                        {% endif %}
+                                        {% endif %}
+                                        <form id="formtask_{{task.id}}" class="task-form"
+                                            action="{% url 'enter_flag' task.room_id %}" method="post">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="task_id" value="{{task.id}}" />
+                                            <div class="form-group">
+                                                {% if task.flag %}
+                                                <input class="form-control" type="text" name="flag"
+                                                placeholder="{{task.flag|censor_flag}}" />
+                                                {% else %}
+                                                <input class="form-control" type="text" name="flag"
+                                                placeholder="ทำความเข้าใจตามข้างบน" disabled />
+                                                {% endif %}
+                                            </div>
+                                                <button type="submit" class="btn btn-success">Submit</button>
+                                        </form>
+                                        <hr>
+                                        {% for hint in task.hints.all %}
+                                        <details class="warning">
+                                            <summary>คำใบ้ {{forloop.counter}}</summary>
+                                            <p>{{hint}}</p>
+                                        </details>
+                                        {% endfor %}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -18,29 +55,24 @@
                 </div>
             </div>
         </div>
-      </div>
     </div>
     <div class="split-pane" style="flex: 1 1 0%; width: 50%; min-width: 50%; max-width: 50%; min-height: 100%;">
-      <div class="component-html base-component">
-        <div class="simplebar" data-simplebar>
-            <div class="simplebar-wrapper" style="margin: 0px;">
-                <div class="simplebar-mask">
-                    <div class="simplebar-offset" style="right: 0px; bottom: 0px;">
-                        <div class="simplebar-content-wrapper">
-                            <div class="simplebar-content" style="margin-right: 10px;">
-                                <div class="learn-content markdown-content">
-                                    {% if task.docker %}
-                                    URL: <a href="{{task.docker | render_docker_url:task.docker_url_path}}">{{task.docker | render_docker_url:task.docker_url_path}}</a>
-                                    {% else %}
-                                    Just Do It!!
-                                    {% endif %}
+        <div class="component-html base-component">
+            <div class="simplebar" data-simplebar>
+                <div class="simplebar-wrapper" style="margin: 0px;">
+                    <div class="simplebar-mask">
+                        <div class="simplebar-offset" style="right: 0px; bottom: 0px;">
+                            <div class="simplebar-content-wrapper">
+                                <div class="simplebar-content" style="margin-right: 10px;">
+                                    <div class="learn-content markdown-content">
+                                        {{task.conclusion | markdown | safe}}
+                                    </div>
                                 </div>
                             </div>
-                        </div>              
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-      </div>
     </div>
-  </div>
+</div>

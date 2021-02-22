@@ -136,7 +136,6 @@ class UserParcitipation(models.Model):
     def __str__(self):
         return f"{self.user} - {self.room}"
 
-
 class Task(models.Model):
     task_number = models.PositiveSmallIntegerField(validators=[MinValueValidator(1)])
     title = models.CharField(max_length=255)

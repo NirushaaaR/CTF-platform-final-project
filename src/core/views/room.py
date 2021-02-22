@@ -56,7 +56,10 @@ def room_by_tag(request, tag):
 def room(request, pk):
     room = get_object_or_404(Room, pk=pk)
     tasks = (
-        Task.objects.filter(room=room).prefetch_related("hints").order_by("task_number")
+        Task.objects.filter(room=room)
+        .select_related("docker")
+        .prefetch_related("hints")
+        .order_by("task_number")
     )
     contents = RoomContent.objects.filter(room=room).order_by("content_number")
 
@@ -67,7 +70,7 @@ def room(request, pk):
         "contents_count": contents.count(),
         "tasks_count": tasks.count(),
     }
-    
+
     if request.user.is_authenticated:
         user_answered_tasks = tasks.filter(answered_users=request.user).values_list(
             "task_number", "useransweredtask__answered_at"
@@ -92,8 +95,8 @@ def enter_flag(request, room_id):
     task_id = request.POST.get("task_id")
     flag = request.POST.get("flag")
     task = Task.objects.get(id=task_id)
-
-    if task.flag == flag:
+    print(task.flag, flag)
+    if task.flag == flag or task.flag is None:
         task.answered_users.add(request.user.id)
         return JsonResponse({"message": "ถูกต้อง!!", "correct": True})
     else:
