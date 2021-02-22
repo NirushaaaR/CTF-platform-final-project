@@ -67,9 +67,7 @@ def room(request, pk):
         "contents_count": contents.count(),
         "tasks_count": tasks.count(),
     }
-
-    print(context)
-
+    
     if request.user.is_authenticated:
         user_answered_tasks = tasks.filter(answered_users=request.user).values_list(
             "task_number", "useransweredtask__answered_at"
