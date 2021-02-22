@@ -13,7 +13,7 @@
         data-toggle="tooltip" data-placement="right" title="{{content.title}}">{{forloop.counter}}</div>
       {% endfor %}
       {% for task in tasks %}
-        <div data-slide-to="{{forloop.counter0|add:contents_count}}" class="menu-page"
+        <div data-slide-to="{{forloop.counter0|add:contents_count}}" class="menu-page{% if forloop.counter0|add:contents_count == 0 %} active{% endif %}"
         data-toggle="tooltip" data-placement="right" title="{{task.title}}">{{forloop.counter|add:contents_count}}</div>
       {% endfor %}
     </nav>

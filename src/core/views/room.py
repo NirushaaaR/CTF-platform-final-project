@@ -55,7 +55,9 @@ def room_by_tag(request, tag):
 @login_required
 def room(request, pk):
     room = get_object_or_404(Room, pk=pk)
-    tasks = Task.objects.filter(room=room).prefetch_related("hints").order_by("task_number")
+    tasks = (
+        Task.objects.filter(room=room).prefetch_related("hints").order_by("task_number")
+    )
     contents = RoomContent.objects.filter(room=room).order_by("content_number")
 
     context = {
@@ -63,6 +65,7 @@ def room(request, pk):
         "tasks": tasks,
         "contents": contents,
         "contents_count": contents.count(),
+        "tasks_count": tasks.count(),
     }
 
     print(context)
@@ -72,7 +75,7 @@ def room(request, pk):
             "task_number", "useransweredtask__answered_at"
         )
         context["user_answered_tasks"] = {k: v for k, v in user_answered_tasks}
-        context["is_finish"] = len(tasks) == len(user_answered_tasks)
+        context["is_finish"] = context["tasks_count"] == len(user_answered_tasks)
 
     return render(request, "core/room.html", context)
 
