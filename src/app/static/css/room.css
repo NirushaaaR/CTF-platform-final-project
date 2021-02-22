@@ -283,16 +283,6 @@ svg:not(:root).svg-inline--fa {
 .learn-content {
     width: 100%;
     min-height: 100%;
-    line-height: 2;
-    color: #f0f0f5;
-    word-break: keep-all;
-    background-color: transparent;
-    color: #fff;
-    font-size: larger;
-}
-
-.learn-content hr {
-    border-top: 1px solid #f0f0f5;
 }
 
 

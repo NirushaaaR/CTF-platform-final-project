@@ -36,6 +36,9 @@ class RoomAdmin(NestedModelAdmin):
     inlines = (RoomContentInline, TaskInline,)
 
     class Media:
+        css = {
+            'all': ('css/markdown.css', ),
+        }
         js = ("js/jquery.js", "js/popper.min.js", "js/bootstrap.min.js",)
 
     #class Media:

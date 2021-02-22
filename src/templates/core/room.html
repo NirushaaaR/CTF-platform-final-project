@@ -1,15 +1,21 @@
 {% extends 'base.html' %} {% load static %} {% load custom_filters %} {% load humanize %}
 {% block stylesheet %}
 <link rel="stylesheet" href="{% static 'css/room.css' %}">
+<link rel="stylesheet" href="{% static 'css/markdown.css' %}">
 {% endblock stylesheet %}
 {% block content %}
 <div class="page-learn">
 
   <div class="menu-container" id="learnmenu">
     <nav class="learn-menu text-center">
-      <div data-slide-to="0" class="menu-page active">1</div>
-      <div data-slide-to="1" class="menu-page">2</div>
-      <div data-slide-to="2" class="menu-page">3</div>
+      {% for content in contents %}
+        <div data-slide-to="{{forloop.counter0}}" class="menu-page{% if forloop.first %} active{% endif %}"
+        data-toggle="tooltip" data-placement="right" title="{{content.title}}">{{forloop.counter}}</div>
+      {% endfor %}
+      {% for task in tasks %}
+        <div data-slide-to="{{forloop.counter0|add:contents_count}}" class="menu-page"
+        data-toggle="tooltip" data-placement="right" title="{{task.title}}">{{forloop.counter|add:contents_count}}</div>
+      {% endfor %}
     </nav>
   </div>
 
@@ -38,15 +44,16 @@
 
       <div class="slides carousel slide" id="myCarousel" data-interval="false" data-wrap="false">
         <div class="slides carousel-inner">
-          <div class="slide-inside carousel-item active">
-            {% include "partials/_learning_content.html" with left="1Lorem ipsum dolor sit amet consectetur, adipisicing elit. Perspiciatis quos sapiente eaque necessitatibus nostrum repellendus, tenetur voluptatum omnis optio architecto fuga iusto doloribus quidem, ratione dolorum praesentium. Animi, sit corporis." right="Lorem ipsum dolor sit amet consectetur, adipisicing elit. Perspiciatis quos sapiente eaque necessitatibus nostrum repellendus, tenetur voluptatum omnis optio architecto fuga iusto doloribus quidem, ratione dolorum praesentium. Animi, sit corporis." %}
+          {% for content in contents %}
+          <div class="slide-inside carousel-item {% if forloop.first %}active{% endif %}">
+            {% include "partials/_learning_content.html" with left=content.left right=content.right %}
           </div>
-          <div class="slide-inside carousel-item">
-            {% include "partials/_learning_content.html" with left="2Lorem ipsum dolor sit amet consectetur, adipisicing elit. Perspiciatis quos sapiente eaque necessitatibus nostrum repellendus, tenetur voluptatum omnis optio architecto fuga iusto doloribus quidem, ratione dolorum praesentium. Animi, sit corporis." right="Lorem ipsum dolor sit amet consectetur, adipisicing elit. Perspiciatis quos sapiente eaque necessitatibus nostrum repellendus, tenetur voluptatum omnis optio architecto fuga iusto doloribus quidem, ratione dolorum praesentium. Animi, sit corporis." %}
+          {% endfor %}
+          {% for t in tasks %}
+          <div class="slide-inside carousel-item {% if forloop.counter0|add:contents_count == 0 %}active{% endif %}">
+            {% include "partials/_task_content.html" with task=t %}
           </div>
-          <div class="slide-inside carousel-item">
-            {% include "partials/_learning_content.html" with left="3Lorem ipsum dolor sit amet consectetur, adipisicing elit. Perspiciatis quos sapiente eaque necessitatibus nostrum repellendus, tenetur voluptatum omnis optio architecto fuga iusto doloribus quidem, ratione dolorum praesentium. Animi, sit corporis." right="Lorem ipsum dolor sit amet consectetur, adipisicing elit. Perspiciatis quos sapiente eaque necessitatibus nostrum repellendus, tenetur voluptatum omnis optio architecto fuga iusto doloribus quidem, ratione dolorum praesentium. Animi, sit corporis." %}
-          </div>
+          {% endfor %}
         </div>
       </div>
 

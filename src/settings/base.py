@@ -130,15 +130,27 @@ MESSAGE_TAGS = {
 WSGI_APPLICATION = "app.wsgi.application"
 # ASGI_APPLICATION = 'app.asgi.application'
 
-# Tiny private key
-TINY_KEY = environ.Env().str("TINY_KEY", multiline=True)
-
 CSRF_COOKIE_HTTPONLY = False
 
 # MARKDOWN X
-MARKDOWNX_MARKDOWN_EXTENSIONS = [
-    'markdown.extensions.extra',
-    'markdown.extensions.nl2br',
-    'markdown.extensions.smarty',
-    'markdown.extensions.fenced_code',
-]
+MARKDOWNX_MARKDOWN_EXTENSIONS = (
+    "pymdownx.extra",
+    "pymdownx.highlight",
+    "pymdownx.inlinehilite",
+    "pymdownx.keys",
+    "markdown.extensions.nl2br",
+    "markdown.extensions.smarty",
+    "markdown.extensions.sane_lists",
+)
+
+#MARKDOWNX_MARKDOWN_EXTENSION_CONFIGS = {
+#    "pymdownx.superfences": {
+#        "custom_fences": [
+#            {
+#                'name': 'mermaid',
+#                'class': 'mermaid',
+#                'format': superfences.fence_div_format,
+#            }
+#        ]
+#    }
+#}

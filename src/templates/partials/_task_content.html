@@ -1,4 +1,4 @@
-{% load markdown_tags %}
+{% load custom_filters %}
 
 <div class="base-component component-split direction-vertical">
     <div class="split-pane" style="flex: 1 1 0%; width: 50%; min-width: 50%; max-width: 50%; min-height: 100%;">
@@ -10,7 +10,7 @@
                         <div class="simplebar-content-wrapper">
                             <div class="simplebar-content" style="margin-right: 10px;">
                                 <div class="learn-content markdown-content">
-                                    {{left | markdown | safe}}
+                                    {{task.description | safe}}
                                 </div>
                             </div>
                         </div>
@@ -29,7 +29,11 @@
                         <div class="simplebar-content-wrapper">
                             <div class="simplebar-content" style="margin-right: 10px;">
                                 <div class="learn-content markdown-content">
-                                    {{right | markdown | safe}}
+                                    {% if task.docker %}
+                                    URL: <a href="{{task.docker | render_docker_url:task.docker_url_path}}">{{task.docker | render_docker_url:task.docker_url_path}}</a>
+                                    {% else %}
+                                    Just Do It!!
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>              

@@ -39,11 +39,6 @@ body.loading .overlay {
   font-size: small;
 }
 
-code {
-  background-color: #212c42;
-  color: white;
-}
-
 .navbar-fixed-top {
   position: fixed;
   top: 0;

@@ -7,7 +7,7 @@ from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q, F
 
-from core.models import Room, Task
+from core.models import Room, Task, RoomContent
 from core.utils import already_participate
 
 
@@ -54,15 +54,18 @@ def room_by_tag(request, tag):
 
 @login_required
 def room(request, pk):
-    room = get_object_or_404(
-        Room.objects.select_related("docker").prefetch_related("tasks__hints"), pk=pk
-    )
-    tasks = room.tasks.all().order_by("task_number")
+    room = get_object_or_404(Room, pk=pk)
+    tasks = Task.objects.filter(room=room).prefetch_related("hints").order_by("task_number")
+    contents = RoomContent.objects.filter(room=room).order_by("content_number")
 
     context = {
         "room": room,
         "tasks": tasks,
+        "contents": contents,
+        "contents_count": contents.count(),
     }
+
+    print(context)
 
     if request.user.is_authenticated:
         user_answered_tasks = tasks.filter(answered_users=request.user).values_list(
