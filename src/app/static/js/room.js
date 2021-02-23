@@ -27,9 +27,18 @@ $(".task-form").submit(function (e) {
     data: form.serialize(),
     success: function (data) {
       alert(data.message);
-      console.log(data);
       if (data.correct) {
-        location.reload();
+        // find element id task{id}
+        const taskElement = document.getElementById(`task${task_id}`);
+        // take blur out
+        const blur = taskElement.querySelector(".blur");
+        if (blur) blur.classList.remove("blur");
+        // remove hidden wrap
+        const hiddenWrap = taskElement.querySelector(".hidden-wrap");
+        if (hiddenWrap) hiddenWrap.remove();
+        // add conclusion to text
+        const taskConclusion = taskElement.querySelector(`#taskConclusion${task_id}`);
+        if (taskConclusion) taskConclusion.innerHTML = data.conclusion;
       }
     }
   });

@@ -1,7 +1,7 @@
 {% load custom_filters %}
 {% load markdown_tags %}
 
-<div class="base-component component-split direction-vertical">
+<div class="base-component component-split direction-vertical" id="task{{task.id}}">
     <div class="split-pane" style="flex: 1 1 0%; width: 50%; min-width: 50%; max-width: 50%; min-height: 100%;">
         <div class="component-html base-component">
             <div class="simplebar" data-simplebar>
@@ -32,13 +32,13 @@
                                             <div class="form-group">
                                                 {% if task.flag %}
                                                 <input class="form-control" type="text" name="flag"
-                                                placeholder="{{task.flag|censor_flag}}" />
+                                                    placeholder="{{task.flag|censor_flag}}" />
                                                 {% else %}
                                                 <input class="form-control" type="text" name="flag"
-                                                placeholder="ทำความเข้าใจตามข้างบน" disabled />
+                                                    placeholder="ทำความเข้าใจตามข้างบน" disabled />
                                                 {% endif %}
                                             </div>
-                                                <button type="submit" class="btn btn-success">Submit</button>
+                                            <button type="submit" class="btn btn-success">Submit</button>
                                         </form>
                                         <hr>
                                         {% for hint in task.hints.all %}
@@ -58,14 +58,29 @@
     </div>
     <div class="split-pane" style="flex: 1 1 0%; width: 50%; min-width: 50%; max-width: 50%; min-height: 100%;">
         <div class="component-html base-component">
-            <div class="simplebar" data-simplebar>
+            <div class="simplebar {% if not answered %}blur{% endif %}" data-simplebar>
                 <div class="simplebar-wrapper" style="margin: 0px;">
                     <div class="simplebar-mask">
                         <div class="simplebar-offset" style="right: 0px; bottom: 0px;">
                             <div class="simplebar-content-wrapper">
                                 <div class="simplebar-content" style="margin-right: 10px;">
                                     <div class="learn-content markdown-content">
-                                        {{task.conclusion | markdown | safe}}
+                                        <div id="taskConclusion{{task.id}}">
+                                            {% if answered %}
+                                            {{task.conclusion | markdown | safe}}
+                                            {% else %}
+                                            <p>
+                                                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quidem asperiores,
+                                                dolore in exercitationem laborum quis fugiat non corrupti veritatis, eum
+                                                aperiam! Debitis eius quisquam enim tenetur voluptate nesciunt ducimus iste.
+                                            </p>
+                                            <p>
+                                                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quidem asperiores,
+                                                dolore in exercitationem laborum quis fugiat non corrupti veritatis, eum
+                                                aperiam! Debitis eius quisquam enim tenetur voluptate nesciunt ducimus iste.
+                                            </p>
+                                            {% endif %}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -73,6 +88,16 @@
                     </div>
                 </div>
             </div>
+            {% if not answered %}
+            <!--hidden wrap-->
+            <div class="hidden-wrap">
+                <div class="hidden-inner">
+                    <font style="vertical-align: inherit;">
+                        ตอบ Flag เพื่อปลดล็อค
+                    </font>
+                </div>
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>

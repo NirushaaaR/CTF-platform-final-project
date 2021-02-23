@@ -51,7 +51,11 @@
           {% endfor %}
           {% for t in tasks %}
           <div class="slide-inside carousel-item {% if forloop.counter0|add:contents_count == 0 %}active{% endif %}">
-            {% include "partials/_task_content.html" with task=t %}
+            {% if t.task_number in user_answered_tasks %}
+              {% include "partials/_task_content.html" with task=t answered=True %}
+            {% else %}
+              {% include "partials/_task_content.html" with task=t answered=False %}
+            {% endif %}
           </div>
           {% endfor %}
         </div>

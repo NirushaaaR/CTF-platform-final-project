@@ -6,9 +6,12 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q, F
+from django.utils import timezone
 
-from core.models import Room, Task, RoomContent
-from core.utils import already_participate
+from markdownx.utils import markdownify
+
+from core.models import Room, Task, RoomContent, UserAnsweredTask, ScoreHistory, UserParcitipation
+from core.utils import already_participate, clear_all_tasks
 
 
 def query_paginated_room(request, rooms):
@@ -94,14 +97,46 @@ def enter_flag(request, room_id):
 
     task_id = request.POST.get("task_id")
     flag = request.POST.get("flag")
-    task = Task.objects.get(id=task_id)
-    print(task.flag, flag)
+    task = get_object_or_404(Task, id=task_id)
+
     if task.flag == flag or task.flag is None:
         task.answered_users.add(request.user.id)
-        return JsonResponse({"message": "ถูกต้อง!!", "correct": True})
+        return JsonResponse({"message": "ถูกต้อง!!", "conclusion": markdownify(task.conclusion), "correct": True})
     else:
         return JsonResponse({"message": "ผิด!!", "correct": False})
 
+
+@login_required
+@require_POST
+def unlock_conclusion(request, room_id):
+    """ user unlock conclusion but won't be able to gain point """
+    if not already_participate(request.user, room_id):
+        request.user.participated_rooms.add(room_id)
+    
+    task_id = request.POST.get("task_id")
+    task = get_object_or_404(Task, id=task_id)
+    # check if already answered
+    if UserAnsweredTask.objects.filter(user=request.user, task_id=task_id).exists():
+        return JsonResponse({"message": "ตอบคำถามนี้ไปแล้ว", "unlocked": False})
+
+    UserAnsweredTask.objects.create(user=request.user, task_id=task_id)
+    ScoreHistory.objects.create(
+        gained=0,
+        type="task",
+        object_id=task_id,
+        group_id=room_id,
+        user_id=request.user.id,
+    )
+
+    # check if user clear all room
+    if clear_all_tasks(request.user.id, room_id):
+        UserParcitipation.objects.filter(
+            user_id=request.user.id, room_id=room_id
+        ).update(finished_at=timezone.now())
+
+    return JsonResponse({"message": "ปลดล็อคเฉลย", "unlocked": True, "conclusion": markdownify(task.conclusion)})
+
+    
 
 def admin_create_room(request):
     if not request.user.is_superuser:

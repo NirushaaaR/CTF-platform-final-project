@@ -296,3 +296,28 @@ svg:not(:root).svg-inline--fa {
         overflow-y: scroll;
     }
 }
+
+.hidden-wrap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    filter: blur(0);
+}
+
+.hidden-inner {
+    font-size: 2.3rem;
+    font-weight: 700;
+    color: #fff;
+    text-align: center;
+    cursor: pointer;
+}
+
+.blur {
+    filter: blur(.5rem);
+}

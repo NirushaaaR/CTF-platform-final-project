@@ -11,6 +11,7 @@ from core.utils import clear_all_tasks
 def user_clear_tasks(sender, instance, action, model, pk_set, **kwargs):
     if action == "post_add" and len(pk_set) == 1:
         # update user score by task point
+        print("signal running")
         user_id = pk_set.pop()
         ScoreHistory.objects.create(
             gained=instance.points,
