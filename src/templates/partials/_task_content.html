@@ -27,7 +27,6 @@
                                         {% endif %}
                                         <form id="formtask_{{task.id}}" class="task-form"
                                             action="{% url 'enter_flag' task.room_id %}" method="post">
-                                            {% csrf_token %}
                                             <input type="hidden" name="task_id" value="{{task.id}}" />
                                             <div class="form-group">
                                                 {% if task.flag %}
@@ -38,7 +37,7 @@
                                                     placeholder="ทำความเข้าใจตามข้างบน" disabled />
                                                 {% endif %}
                                             </div>
-                                            <button type="submit" class="btn btn-success">Submit</button>
+                                            <button type="submit" class="btn btn-primary">Submit</button>
                                         </form>
                                         <hr>
                                         {% for hint in task.hints.all %}
@@ -70,14 +69,18 @@
                                             {{task.conclusion | markdown | safe}}
                                             {% else %}
                                             <p>
-                                                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quidem asperiores,
+                                                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quidem
+                                                asperiores,
                                                 dolore in exercitationem laborum quis fugiat non corrupti veritatis, eum
-                                                aperiam! Debitis eius quisquam enim tenetur voluptate nesciunt ducimus iste.
+                                                aperiam! Debitis eius quisquam enim tenetur voluptate nesciunt ducimus
+                                                iste.
                                             </p>
                                             <p>
-                                                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quidem asperiores,
+                                                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quidem
+                                                asperiores,
                                                 dolore in exercitationem laborum quis fugiat non corrupti veritatis, eum
-                                                aperiam! Debitis eius quisquam enim tenetur voluptate nesciunt ducimus iste.
+                                                aperiam! Debitis eius quisquam enim tenetur voluptate nesciunt ducimus
+                                                iste.
                                             </p>
                                             {% endif %}
                                         </div>
@@ -90,11 +93,36 @@
             </div>
             {% if not answered %}
             <!--hidden wrap-->
-            <div class="hidden-wrap">
+            <div class="hidden-wrap" data-toggle="modal" data-target="#unlockTaskModal{{task.id}}">
                 <div class="hidden-inner">
                     <font style="vertical-align: inherit;">
                         ตอบ Flag เพื่อปลดล็อค
                     </font>
+                </div>
+            </div>
+
+            <!-- Modal -->
+            <div class="modal fade" id="unlockTaskModal{{task.id}}" tabindex="1" data-backdrop="false" role="dialog" aria-labelledby="unlockTaskModal{{task.id}}Label"
+                aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="unlockTaskModal{{task.id}}Label">ปลดล็อคเฉลย</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            คุณสามารถปลดล็อคเฉลยได้ แต่คุณจะไม่ได้แต้มในข้อนี้ {{task.points}}pts
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">ปิด</button>
+                            <form action="{% url 'unlock_conclusion' task.room_id %}" class="unlock-form" id="taskUnlock{{task.id}}">
+                                <input type="hidden" name="task_id" value="{{task.id}}" id="taskModalClose{{task.id}}">
+                                <button type="submit" class="btn btn-danger">ปลดล็อค</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
             {% endif %}

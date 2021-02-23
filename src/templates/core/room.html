@@ -77,6 +77,7 @@
 {% endblock content %}
 
 {% block javascript %}
+{% csrf_token %}
 <script src="https://unpkg.com/mermaid@8.6.4/dist/mermaid.min.js"></script>
 <script>
   // Optional config

@@ -308,6 +308,7 @@ svg:not(:root).svg-inline--fa {
     width: 100%;
     height: 100%;
     filter: blur(0);
+    cursor: pointer;
 }
 
 .hidden-inner {
@@ -315,7 +316,6 @@ svg:not(:root).svg-inline--fa {
     font-weight: 700;
     color: #fff;
     text-align: center;
-    cursor: pointer;
 }
 
 .blur {

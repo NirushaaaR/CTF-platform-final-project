@@ -117,7 +117,7 @@ def unlock_conclusion(request, room_id):
     task = get_object_or_404(Task, id=task_id)
     # check if already answered
     if UserAnsweredTask.objects.filter(user=request.user, task_id=task_id).exists():
-        return JsonResponse({"message": "ตอบคำถามนี้ไปแล้ว", "unlocked": False})
+        return JsonResponse({"message": "ตอบคำถามนี้ไปแล้ว", "correct": False})
 
     UserAnsweredTask.objects.create(user=request.user, task_id=task_id)
     ScoreHistory.objects.create(
@@ -134,7 +134,7 @@ def unlock_conclusion(request, room_id):
             user_id=request.user.id, room_id=room_id
         ).update(finished_at=timezone.now())
 
-    return JsonResponse({"message": "ปลดล็อคเฉลย", "unlocked": True, "conclusion": markdownify(task.conclusion)})
+    return JsonResponse({"message": "ปลดล็อคเฉลย", "correct": True, "conclusion": markdownify(task.conclusion)})
 
     
 

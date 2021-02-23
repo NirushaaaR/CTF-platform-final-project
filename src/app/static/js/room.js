@@ -9,37 +9,52 @@ $(".menu-page").each((index, elem) => {
   };
 });
 
-$('#myCarousel').on('slide.bs.carousel', function (e) {
+$('#myCarousel').on('slide.bs.carousel', e => {
   adjustActivePage(e.from, e.to);
 })
 
+function showConslusion(task_id, conclusion) {
+  // find element id task{id}
+  const taskElement = document.getElementById(`task${task_id}`);
+  // take blur out
+  const blur = taskElement.querySelector(".blur");
+  if (blur) blur.classList.remove("blur");
+  // remove hidden wrap
+  const hiddenWrap = taskElement.querySelector(".hidden-wrap");
+  if (hiddenWrap) hiddenWrap.remove();
+  // add conclusion to text
+  const taskConclusion = taskElement.querySelector(`#taskConclusion${task_id}`);
+  if (taskConclusion) taskConclusion.innerHTML = conclusion;
+}
 
-$(".task-form").submit(function (e) {
-  e.preventDefault();
-
-  const form = $(this);
+function sendFormRequest(form) {
   const url = form.attr('action');
   const task_id = $('input[name="task_id"]', form).val();
-
   $.ajax({
     type: "POST",
     url: url,
+    headers: {
+      'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+    },
     data: form.serialize(),
-    success: function (data) {
+    success: data => {
       alert(data.message);
       if (data.correct) {
-        // find element id task{id}
-        const taskElement = document.getElementById(`task${task_id}`);
-        // take blur out
-        const blur = taskElement.querySelector(".blur");
-        if (blur) blur.classList.remove("blur");
-        // remove hidden wrap
-        const hiddenWrap = taskElement.querySelector(".hidden-wrap");
-        if (hiddenWrap) hiddenWrap.remove();
-        // add conclusion to text
-        const taskConclusion = taskElement.querySelector(`#taskConclusion${task_id}`);
-        if (taskConclusion) taskConclusion.innerHTML = data.conclusion;
+        showConslusion(task_id, data.conclusion);
       }
     }
   });
+}
+
+$(".task-form").submit(e => {
+  e.preventDefault();
+  const form = $(`#${e.target.id}`);
+  sendFormRequest(form);
+});
+
+$(".unlock-form").submit(e => {
+  e.preventDefault();
+  const form = $(`#${e.target.id}`);
+  sendFormRequest(form);
+  document.getElementById(e.target.id).parentNode.querySelector("[data-dismiss='modal']").click()
 });
