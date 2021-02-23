@@ -10,7 +10,14 @@ from django.utils import timezone
 
 from markdownx.utils import markdownify
 
-from core.models import Room, Task, RoomContent, UserAnsweredTask, ScoreHistory, UserParcitipation
+from core.models import (
+    Room,
+    Task,
+    RoomContent,
+    UserAnsweredTask,
+    ScoreHistory,
+    UserParcitipation,
+)
 from core.utils import already_participate, clear_all_tasks
 
 
@@ -72,6 +79,7 @@ def room(request, pk):
         "contents": contents,
         "contents_count": contents.count(),
         "tasks_count": tasks.count(),
+        "page_index": request.session.get(f"room{room.id}", 0),
     }
 
     if request.user.is_authenticated:
@@ -101,7 +109,13 @@ def enter_flag(request, room_id):
 
     if task.flag == flag or task.flag is None:
         task.answered_users.add(request.user.id)
-        return JsonResponse({"message": "ถูกต้อง!!", "conclusion": markdownify(task.conclusion), "correct": True})
+        return JsonResponse(
+            {
+                "message": "ถูกต้อง!!",
+                "conclusion": markdownify(task.conclusion),
+                "correct": True,
+            }
+        )
     else:
         return JsonResponse({"message": "ผิด!!", "correct": False})
 
@@ -112,7 +126,7 @@ def unlock_conclusion(request, room_id):
     """ user unlock conclusion but won't be able to gain point """
     if not already_participate(request.user, room_id):
         request.user.participated_rooms.add(room_id)
-    
+
     task_id = request.POST.get("task_id")
     task = get_object_or_404(Task, id=task_id)
     # check if already answered
@@ -134,9 +148,24 @@ def unlock_conclusion(request, room_id):
             user_id=request.user.id, room_id=room_id
         ).update(finished_at=timezone.now())
 
-    return JsonResponse({"message": "ปลดล็อคเฉลย", "correct": True, "conclusion": markdownify(task.conclusion)})
+    return JsonResponse(
+        {
+            "message": "ปลดล็อคเฉลย",
+            "correct": True,
+            "conclusion": markdownify(task.conclusion),
+        }
+    )
 
-    
+
+@login_required
+@require_POST
+def user_content_tracker(request, room_id):
+    """ track which learning content user are currently looking """
+    page_index = request.POST.get("page_index", 0)
+    request.session.setdefault('room', {})
+    request.session[f"room{room_id}"] = int(page_index)
+    return JsonResponse({"success": True})
+
 
 def admin_create_room(request):
     if not request.user.is_superuser:

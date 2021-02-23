@@ -4,16 +4,17 @@
 <link rel="stylesheet" href="{% static 'css/markdown.css' %}">
 {% endblock stylesheet %}
 {% block content %}
+{% csrf_token %}
 <div class="page-learn">
 
   <div class="menu-container" id="learnmenu">
     <nav class="learn-menu text-center">
       {% for content in contents %}
-        <div data-slide-to="{{forloop.counter0}}" class="menu-page{% if forloop.first %} active{% endif %}"
+        <div data-slide-to="{{forloop.counter0}}" class="menu-page{% if forloop.counter0 == page_index %} active{% endif %}"
         data-toggle="tooltip" data-placement="right" title="{{content.title}}">{{forloop.counter}}</div>
       {% endfor %}
       {% for task in tasks %}
-        <div data-slide-to="{{forloop.counter0|add:contents_count}}" class="menu-page{% if forloop.counter0|add:contents_count == 0 %} active{% endif %}"
+        <div data-slide-to="{{forloop.counter0|add:contents_count}}" class="menu-page{% if forloop.counter0|add:contents_count == page_index %} active{% endif %}"
         data-toggle="tooltip" data-placement="right" title="{{task.title}}">{{forloop.counter|add:contents_count}}</div>
       {% endfor %}
     </nav>
@@ -45,12 +46,12 @@
       <div class="slides carousel slide" id="myCarousel" data-interval="false" data-wrap="false">
         <div class="slides carousel-inner">
           {% for content in contents %}
-          <div class="slide-inside carousel-item {% if forloop.first %}active{% endif %}">
+          <div class="slide-inside carousel-item {% if forloop.counter0 == page_index %}active{% endif %}">
             {% include "partials/_learning_content.html" with left=content.left right=content.right %}
           </div>
           {% endfor %}
           {% for t in tasks %}
-          <div class="slide-inside carousel-item {% if forloop.counter0|add:contents_count == 0 %}active{% endif %}">
+          <div class="slide-inside carousel-item {% if forloop.counter0|add:contents_count == page_index %}active{% endif %}">
             {% if t.task_number in user_answered_tasks %}
               {% include "partials/_task_content.html" with task=t answered=True %}
             {% else %}
@@ -77,7 +78,9 @@
 {% endblock content %}
 
 {% block javascript %}
-{% csrf_token %}
+<!--tracking url-->
+{{ room.get_tracker_url|json_script:"tracker-url" }}
+
 <script src="https://unpkg.com/mermaid@8.6.4/dist/mermaid.min.js"></script>
 <script>
   // Optional config

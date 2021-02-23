@@ -98,6 +98,9 @@ class Room(models.Model):
 
     def get_absolute_url(self):
         return reverse("room", args=[str(self.pk)])
+    
+    def get_tracker_url(self):
+        return reverse("user_content_tracker", args=[str(self.pk)])
 
     def __str__(self):
         return self.title
