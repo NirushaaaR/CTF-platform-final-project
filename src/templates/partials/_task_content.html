@@ -13,9 +13,7 @@
                                     <div class="learn-content markdown-content">
                                         <h1>{{task.title}}</h1>
                                         <hr>
-                                        {{task.description | markdown | safe}}
-                                        {% if task.docker %}
-                                        {% if task.docker.url %}
+                                        {% if task.docker %}{% if task.docker.url %}
                                         <p>ไปที่ url: <a target="_blank"
                                                 href="{{task.docker.url|render_docker_url:task.docker_url_path}}">{{task.docker.url|render_docker_url:task.docker_url_path}}</a>
                                         </p>
@@ -23,8 +21,8 @@
                                         <p>สามารถรันเว็บโดยใช้คำสั่ง "docker run --rm -p
                                             {{task.docker.port}}:{{task.docker.port}} {{task.docker.docker}}"</p>
                                         <p>แล้วไปที่ {{task.docker_url_path}}</p>
-                                        {% endif %}
-                                        {% endif %}
+                                        {% endif %}{% endif %}
+                                        {{task.description | markdown | safe}}
                                         <form id="formtask_{{task.id}}" class="task-form"
                                             action="{% url 'enter_flag' task.room_id %}" method="post">
                                             <input type="hidden" name="task_id" value="{{task.id}}" />

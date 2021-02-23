@@ -18,6 +18,10 @@ class TaskInline(NestedStackedInline):
     model = Task
     extra = 1
     inlines = (TaskHintInline,)
+    
+    formfield_overrides = {
+        models.TextField: {'widget': AdminMarkdownxWidget},
+    }
 
 
 class RoomContentInline(NestedStackedInline):

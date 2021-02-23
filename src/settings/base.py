@@ -139,6 +139,8 @@ MARKDOWNX_MARKDOWN_EXTENSIONS = (
     "pymdownx.highlight",
     "pymdownx.inlinehilite",
     "pymdownx.details",
+    "pymdownx.saneheaders",
+    "pymdownx.magiclink",
     "markdown.extensions.nl2br",
     "markdown.extensions.smarty",
     "markdown.extensions.sane_lists",
