@@ -7,6 +7,7 @@ from django.contrib.auth.models import (
 )
 from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.utils.translation import gettext_lazy as _
 
 from docker_instance.models import DockerWeb
 
@@ -68,11 +69,11 @@ class ScoreHistory(models.Model):
 
 class Room(models.Model):
     class DifficultyChoices(models.IntegerChoices):
-        VERY_HARD = 5
-        HARD = 4
-        MEDIUM = 3
-        EASY = 2
-        VERY_EASY = 1
+        VERY_HARD = 5, _('Very Hard')
+        HARD = 4, _('Hard')
+        MEDIUM = 3, _('Medium')
+        EASY = 2, _('Easy')
+        VERY_EASY = 1, _('Very Easy')
 
     title = models.CharField(max_length=255)
     preview = models.CharField(max_length=255)
@@ -101,6 +102,11 @@ class Room(models.Model):
     
     def get_tracker_url(self):
         return reverse("user_content_tracker", args=[str(self.pk)])
+    
+    def get_difficulty_label(self):
+        for num, text in Room.DifficultyChoices.choices:
+            if num == self.difficulty:
+                return text
 
     def __str__(self):
         return self.title
@@ -122,9 +128,6 @@ class RoomContent(models.Model):
 
 class Tag(models.Model):
     name = models.CharField(max_length=255, unique=True)
-
-    def get_absolute_url(self):
-        return reverse("room_by_tag", args=[str(self.name)])
 
     def __str__(self):
         return self.name

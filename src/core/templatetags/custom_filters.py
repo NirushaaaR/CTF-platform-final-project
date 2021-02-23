@@ -35,3 +35,12 @@ def startswith(text, starts):
     if isinstance(text, str):
         return text.startswith(starts)
     return False
+
+@register.simple_tag
+def render_url_with_param(path, param, value):
+    """ generate a GET PARAM url by looking to at & ot ? """
+    print(path)
+    if "?" in path:
+        return f"{path}&{param}={value}"
+    else:
+        return f"{path}?{param}={value}"

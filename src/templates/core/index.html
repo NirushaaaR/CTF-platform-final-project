@@ -29,10 +29,13 @@
         <div class="card-body">
           <div class="d-flex justify-content-between">
             <h5 class="card-title">{{room.title}}</h5>
-              <div class="progress" style="width: 12%; height: 10px;" data-toggle="tooltip" data-placement="bottom" title="ระดับความยาก {{room.difficulty}}">
-                <div class="progress-bar {% if room.difficulty <= 2 %}bg-success{% elif room.difficulty == 3 %}bg-warning{% else %}bg-danger{% endif %}" role="progressbar" style="width: {% widthratio room.difficulty 5 100 %}%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-              </div>
+            {% if room.id in user_participated %}{% if user_participated|get_dict_value:room.id %}
+            <span class='text-success'>Complete <i class="fas fa-check"></i></span>
+            {% else %}
+            <span class='text-warning'>In-Complete</span>
+            {% endif %}{% endif %}
           </div>
+          <h6 class="card-subtitle mb-2 text-muted">{{room.get_difficulty_label}}</h6>
           <p class="card-text">{{room.preview|truncatechars:50}}</p>
           <div class="d-flex align-items-center">
             

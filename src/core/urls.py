@@ -1,20 +1,17 @@
 from django.urls import path
 
-from core.views.room import index, room, enter_flag, room_by_tag, unlock_conclusion, user_content_tracker
-from core.views.auth import login, logout, register, validate_email, validate_username
+from core.views.room import index, room, enter_flag, unlock_conclusion, user_content_tracker
+from core.views.auth import login, logout, register
 from core.views.user import profile, scoreboard
 
 urlpatterns = [
     path("", index, name="index"),
-    path("tag/<str:tag>", room_by_tag, name="room_by_tag"),
     path("room/<int:pk>/", room, name="room"),
     path("room/<int:room_id>/enter-flag/", enter_flag, name="enter_flag"),
     path("room/<int:room_id>/unlock/", unlock_conclusion, name="unlock_conclusion"),
     path("room/<int:room_id>/track", user_content_tracker, name="user_content_tracker"),
     path("login/", login, name="login"),
     path("register/", register, name="register"),
-    path("validate_username/", validate_username, name="validate_username"),
-    path("validate_email/", validate_email, name="validate_email"),
     path("logout/", logout, name="logout"),
     path("profile/", profile, name="profile"),
     path("scoreboard/", scoreboard, name="scoreboard"),

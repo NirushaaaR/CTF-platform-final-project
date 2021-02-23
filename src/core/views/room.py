@@ -48,18 +48,15 @@ def index(request):
         .filter(is_active=True)
         .order_by("created_at")
     )
+
+    tag = request.GET.get('tag')
+    print(tag)
+    if tag:
+        rooms = rooms.filter(tags__name=tag)
+
     context = query_paginated_room(request, rooms)
     return render(request, "core/index.html", context)
 
-
-def room_by_tag(request, tag):
-    rooms = (
-        Room.objects.prefetch_related("tags")
-        .filter(is_active=True, tags__name=tag)
-        .order_by("created_at")
-    )
-    context = query_paginated_room(request, rooms)
-    return render(request, "core/index.html", context)
 
 
 @login_required
@@ -166,8 +163,3 @@ def user_content_tracker(request, room_id):
     request.session[f"room{room_id}"] = int(page_index)
     return JsonResponse({"success": True})
 
-
-def admin_create_room(request):
-    if not request.user.is_superuser:
-        raise PermissionDenied()
-    return render(request, "core/create_room.html")
