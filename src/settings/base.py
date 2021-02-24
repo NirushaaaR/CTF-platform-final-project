@@ -133,7 +133,7 @@ WSGI_APPLICATION = "app.wsgi.application"
 CSRF_COOKIE_HTTPONLY = False
 
 # MARKDOWN X
-MARKDOWNX_MARKDOWNIFY_FUNCTION = 'markdownx.utils.markdownify'
+MARKDOWNX_MARKDOWNIFY_FUNCTION = "markdownx.utils.markdownify"
 MARKDOWNX_MARKDOWN_EXTENSIONS = (
     "pymdownx.extra",
     "pymdownx.highlight",
@@ -144,6 +144,7 @@ MARKDOWNX_MARKDOWN_EXTENSIONS = (
     "markdown.extensions.nl2br",
     "markdown.extensions.smarty",
     "markdown.extensions.sane_lists",
+    "markdown_captions",
 )
 
 from pymdownx.superfences import fence_div_format
@@ -164,4 +165,4 @@ MARKDOWNX_MARKDOWN_EXTENSION_CONFIGS = {
 
 from datetime import datetime
 
-MARKDOWNX_MEDIA_PATH = datetime.now().strftime('markdownx/%Y/%m/%d')
+MARKDOWNX_MEDIA_PATH = datetime.now().strftime("markdownx/%Y/%m/%d")

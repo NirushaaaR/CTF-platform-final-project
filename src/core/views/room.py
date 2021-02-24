@@ -48,9 +48,7 @@ def index(request):
         .filter(is_active=True)
         .order_by("created_at")
     )
-
     tag = request.GET.get('tag')
-    print(tag)
     if tag:
         rooms = rooms.filter(tags__name=tag)
 

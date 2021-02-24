@@ -11,7 +11,10 @@
                             <div class="simplebar-content-wrapper">
                                 <div class="simplebar-content" style="margin-right: 10px;">
                                     <div class="learn-content markdown-content">
-                                        <h1>{{task.title}}</h1>
+                                        <div class="d-flex">
+                                            <h1>{{task.title}}</h1>
+                                            <h3 class='ml-auto align-self-center'>{{task.points}}pts</h3>
+                                        </div>
                                         <hr>
                                         {% if task.docker %}{% if task.docker.url %}
                                         <p>ไปที่ url: <a target="_blank"

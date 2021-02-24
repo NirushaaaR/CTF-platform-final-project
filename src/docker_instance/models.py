@@ -15,4 +15,4 @@ class DockerWeb(models.Model):
         return reverse("docker-info", args=[str(self.id)])
 
     def __str__(self) -> str:
-        return self.url
+        return self.docker
