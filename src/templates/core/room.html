@@ -45,20 +45,8 @@
 
       <div class="slides carousel slide" id="myCarousel" data-interval="false" data-wrap="false">
         <div class="slides carousel-inner">
-          {% for content in contents %}
-          <div class="slide-inside carousel-item {% if forloop.counter0 == page_index %}active{% endif %}">
-            {% include "partials/_learning_content.html" with left=content.left right=content.right %}
-          </div>
-          {% endfor %}
-          {% for t in tasks %}
-          <div class="slide-inside carousel-item {% if forloop.counter0|add:contents_count == page_index %}active{% endif %}">
-            {% if t.task_number in user_answered_tasks %}
-              {% include "partials/_task_content.html" with task=t answered=True %}
-            {% else %}
-              {% include "partials/_task_content.html" with task=t answered=False %}
-            {% endif %}
-          </div>
-          {% endfor %}
+          {% include "partials/_learning_content.html" with contents=contents %}
+          {% include "partials/_task_content.html" with tasks=tasks user_answered_tasks=user_answered_tasks %}
         </div>
       </div>
 

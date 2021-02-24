@@ -1,52 +1,55 @@
 {% load custom_filters %}
 {% load markdown_tags %}
 
-<div class="base-component component-split direction-vertical" id="task{{task.id}}">
-    <div class="split-pane" style="flex: 1 1 0%; width: 50%; min-width: 50%; max-width: 50%; min-height: 100%;">
-        <div class="component-html base-component">
-            <div class="simplebar" data-simplebar>
-                <div class="simplebar-wrapper" style="margin: 0px;">
-                    <div class="simplebar-mask">
-                        <div class="simplebar-offset" style="right: 0px; bottom: 0px;">
-                            <div class="simplebar-content-wrapper">
-                                <div class="simplebar-content" style="margin-right: 10px;">
-                                    <div class="learn-content markdown-content">
-                                        <div class="d-flex">
-                                            <h1>{{task.title}}</h1>
-                                            <h3 class='ml-auto align-self-center'>{{task.points}}pts</h3>
-                                        </div>
-                                        <hr>
-                                        {% if task.docker %}{% if task.docker.url %}
-                                        <p>ไปที่ url: <a target="_blank"
-                                                href="{{task.docker.url|render_docker_url:task.docker_url_path}}">{{task.docker.url|render_docker_url:task.docker_url_path}}</a>
-                                        </p>
-                                        {% else %}
-                                        <p>สามารถรันเว็บโดยใช้คำสั่ง "docker run --rm -p
-                                            {{task.docker.port}}:{{task.docker.port}} {{task.docker.docker}}"</p>
-                                        <p>แล้วไปที่ {{task.docker_url_path}}</p>
-                                        {% endif %}{% endif %}
-                                        {{task.description | markdown | safe}}
-                                        <form id="formtask_{{task.id}}" class="task-form"
-                                            action="{% url 'enter_flag' task.room_id %}" method="post">
-                                            <input type="hidden" name="task_id" value="{{task.id}}" />
-                                            <div class="form-group">
-                                                {% if task.flag %}
-                                                <input class="form-control" type="text" name="flag"
-                                                    placeholder="{{task.flag|censor_flag}}" />
-                                                {% else %}
-                                                <input class="form-control" type="text" name="flag"
-                                                    placeholder="ทำความเข้าใจตามข้างบน" disabled />
-                                                {% endif %}
+{% for task in tasks %}
+<div class="slide-inside carousel-item {% if forloop.counter0|add:contents_count == page_index %}active{% endif %}">
+    <div class="base-component component-split direction-vertical" id="task{{task.id}}">
+        <div class="split-pane" style="flex: 1 1 0%; width: 50%; min-width: 50%; max-width: 50%; min-height: 100%;">
+            <div class="component-html base-component">
+                <div class="simplebar" data-simplebar>
+                    <div class="simplebar-wrapper" style="margin: 0px;">
+                        <div class="simplebar-mask">
+                            <div class="simplebar-offset" style="right: 0px; bottom: 0px;">
+                                <div class="simplebar-content-wrapper">
+                                    <div class="simplebar-content" style="margin-right: 10px;">
+                                        <div class="learn-content markdown-content">
+                                            <div class="d-flex">
+                                                <h1>{{task.title}}</h1>
+                                                <h3 class='ml-auto align-self-center'>{{task.points}}pts</h3>
                                             </div>
-                                            <button type="submit" class="btn btn-primary">Submit</button>
-                                        </form>
-                                        <hr>
-                                        {% for hint in task.hints.all %}
-                                        <details class="warning">
-                                            <summary>คำใบ้ {{forloop.counter}}</summary>
-                                            <p>{{hint}}</p>
-                                        </details>
-                                        {% endfor %}
+                                            <hr>
+                                            {% if task.docker %}{% if task.docker.url %}
+                                            <p>ไปที่ url: <a target="_blank"
+                                                    href="{{task.docker.url|render_docker_url:task.docker_url_path}}">{{task.docker.url|render_docker_url:task.docker_url_path}}</a>
+                                            </p>
+                                            {% else %}
+                                            <p>สามารถรันเว็บโดยใช้คำสั่ง "docker run --rm -p
+                                                {{task.docker.port}}:{{task.docker.port}} {{task.docker.docker}}"</p>
+                                            <p>แล้วไปที่ {{task.docker_url_path}}</p>
+                                            {% endif %}{% endif %}
+                                            {{task.description | markdown | safe}}
+                                            <form id="formtask_{{task.id}}" class="task-form"
+                                                action="{% url 'enter_flag' task.room_id %}" method="post">
+                                                <input type="hidden" name="task_id" value="{{task.id}}" />
+                                                <div class="form-group">
+                                                    {% if task.flag %}
+                                                    <input class="form-control" type="text" name="flag"
+                                                        placeholder="{{task.flag|censor_flag}}" />
+                                                    {% else %}
+                                                    <input class="form-control" type="text" name="flag"
+                                                        placeholder="ทำความเข้าใจตามข้างบน" disabled />
+                                                    {% endif %}
+                                                </div>
+                                                <button type="submit" class="btn btn-primary">{% if task.points == 0 %}เข้าใจแล้ว{% else %}Submit{% endif %}</button>
+                                            </form>
+                                            <hr>
+                                            {% for hint in task.hints.all %}
+                                            <details class="warning">
+                                                <summary>คำใบ้ {{forloop.counter}}</summary>
+                                                <p>{{hint}}</p>
+                                            </details>
+                                            {% endfor %}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -55,35 +58,35 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="split-pane" style="flex: 1 1 0%; width: 50%; min-width: 50%; max-width: 50%; min-height: 100%;">
-        <div class="component-html base-component">
-            <div class="simplebar {% if not answered %}blur{% endif %}" data-simplebar>
-                <div class="simplebar-wrapper" style="margin: 0px;">
-                    <div class="simplebar-mask">
-                        <div class="simplebar-offset" style="right: 0px; bottom: 0px;">
-                            <div class="simplebar-content-wrapper">
-                                <div class="simplebar-content" style="margin-right: 10px;">
-                                    <div class="learn-content markdown-content">
-                                        <div id="taskConclusion{{task.id}}">
-                                            {% if answered %}
-                                            {{task.conclusion | markdown | safe}}
-                                            {% else %}
-                                            <p>
-                                                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quidem
-                                                asperiores,
-                                                dolore in exercitationem laborum quis fugiat non corrupti veritatis, eum
-                                                aperiam! Debitis eius quisquam enim tenetur voluptate nesciunt ducimus
-                                                iste.
-                                            </p>
-                                            <p>
-                                                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quidem
-                                                asperiores,
-                                                dolore in exercitationem laborum quis fugiat non corrupti veritatis, eum
-                                                aperiam! Debitis eius quisquam enim tenetur voluptate nesciunt ducimus
-                                                iste.
-                                            </p>
-                                            {% endif %}
+        <div class="split-pane" style="flex: 1 1 0%; width: 50%; min-width: 50%; max-width: 50%; min-height: 100%;">
+            <div class="component-html base-component">
+                <div class="simplebar {% if not task.task_number in user_answered_tasks and task.points != 0 %}blur{% endif %}" data-simplebar>
+                    <div class="simplebar-wrapper" style="margin: 0px;">
+                        <div class="simplebar-mask">
+                            <div class="simplebar-offset" style="right: 0px; bottom: 0px;">
+                                <div class="simplebar-content-wrapper">
+                                    <div class="simplebar-content" style="margin-right: 10px;">
+                                        <div class="learn-content markdown-content">
+                                            <div id="taskConclusion{{task.id}}">
+                                                {% if task.task_number in user_answered_tasks or task.points == 0 %}
+                                                {{task.conclusion | markdown | safe}}
+                                                {% else %}
+                                                <p>
+                                                    Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quidem
+                                                    asperiores,
+                                                    dolore in exercitationem laborum quis fugiat non corrupti veritatis, eum
+                                                    aperiam! Debitis eius quisquam enim tenetur voluptate nesciunt ducimus
+                                                    iste.
+                                                </p>
+                                                <p>
+                                                    Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quidem
+                                                    asperiores,
+                                                    dolore in exercitationem laborum quis fugiat non corrupti veritatis, eum
+                                                    aperiam! Debitis eius quisquam enim tenetur voluptate nesciunt ducimus
+                                                    iste.
+                                                </p>
+                                                {% endif %}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -91,42 +94,43 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            {% if not answered %}
-            <!--hidden wrap-->
-            <div class="hidden-wrap" data-toggle="modal" data-target="#unlockTaskModal{{task.id}}">
-                <div class="hidden-inner">
-                    <font style="vertical-align: inherit;">
-                        ตอบ Flag เพื่อปลดล็อค
-                    </font>
+                {% if not task.task_number in user_answered_tasks and task.points != 0 %}
+                <!--hidden wrap-->
+                <div class="hidden-wrap" data-toggle="modal" data-target="#unlockTaskModal{{task.id}}">
+                    <div class="hidden-inner">
+                        <font style="vertical-align: inherit;">
+                            ตอบ Flag เพื่อปลดล็อค
+                        </font>
+                    </div>
                 </div>
-            </div>
-
-            <!-- Modal -->
-            <div class="modal fade" id="unlockTaskModal{{task.id}}" tabindex="1" data-backdrop="false" role="dialog" aria-labelledby="unlockTaskModal{{task.id}}Label"
-                aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="unlockTaskModal{{task.id}}Label">ปลดล็อคเฉลย</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            คุณสามารถปลดล็อคเฉลยได้ แต่คุณจะไม่ได้แต้มในข้อนี้ {{task.points}}pts
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">ปิด</button>
-                            <form action="{% url 'unlock_conclusion' task.room_id %}" class="unlock-form" id="taskUnlock{{task.id}}">
-                                <input type="hidden" name="task_id" value="{{task.id}}" id="taskModalClose{{task.id}}">
-                                <button type="submit" class="btn btn-danger">ปลดล็อค</button>
-                            </form>
+    
+                <!-- Modal -->
+                <div class="modal fade" id="unlockTaskModal{{task.id}}" tabindex="1" data-backdrop="false" role="dialog" aria-labelledby="unlockTaskModal{{task.id}}Label"
+                    aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="unlockTaskModal{{task.id}}Label">ปลดล็อคเฉลย</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                คุณสามารถปลดล็อคเฉลยได้ แต่คุณจะไม่ได้แต้มในข้อนี้ {{task.points}}pts
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">ปิด</button>
+                                <form action="{% url 'unlock_conclusion' task.room_id %}" class="unlock-form" id="taskUnlock{{task.id}}">
+                                    <input type="hidden" name="task_id" value="{{task.id}}" id="taskModalClose{{task.id}}">
+                                    <button type="submit" class="btn btn-danger">ปลดล็อค</button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
+                {% endif %}
             </div>
-            {% endif %}
         </div>
     </div>
 </div>
+{% endfor %}

@@ -1,16 +1,19 @@
 {% load markdown_tags %}
-
-<div class="base-component component-split direction-vertical">
-    <div class="split-pane" style="flex: 1 1 0%; width: 50%; min-width: 50%; max-width: 50%; min-height: 100%;">
-      <div class="component-html base-component">
-        <div class="simplebar"  data-simplebar>
-            <div class="simplebar-wrapper" style="margin: 0px;">
-                <div class="simplebar-mask">
-                    <div class="simplebar-offset" style="right: 0px; bottom: 0px;">
-                        <div class="simplebar-content-wrapper">
-                            <div class="simplebar-content" style="margin-right: 10px;">
-                                <div class="learn-content markdown-content">
-                                    {{left | markdown | safe}}
+{% for content in contents %}
+<div class="slide-inside carousel-item {% if forloop.counter0 == page_index %}active{% endif %}">
+    <div class="base-component component-split direction-vertical">
+        <div class="split-pane" style="flex: 1 1 0%; width: 50%; min-width: 50%; max-width: 50%; min-height: 100%;">
+            <div class="component-html base-component">
+                <div class="simplebar" data-simplebar>
+                    <div class="simplebar-wrapper" style="margin: 0px;">
+                        <div class="simplebar-mask">
+                            <div class="simplebar-offset" style="right: 0px; bottom: 0px;">
+                                <div class="simplebar-content-wrapper">
+                                    <div class="simplebar-content" style="margin-right: 10px;">
+                                        <div class="learn-content markdown-content">
+                                            {{content.left | markdown | safe}}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -18,25 +21,25 @@
                 </div>
             </div>
         </div>
-      </div>
-    </div>
-    <div class="split-pane" style="flex: 1 1 0%; width: 50%; min-width: 50%; max-width: 50%; min-height: 100%;">
-      <div class="component-html base-component">
-        <div class="simplebar" data-simplebar>
-            <div class="simplebar-wrapper" style="margin: 0px;">
-                <div class="simplebar-mask">
-                    <div class="simplebar-offset" style="right: 0px; bottom: 0px;">
-                        <div class="simplebar-content-wrapper">
-                            <div class="simplebar-content" style="margin-right: 10px;">
-                                <div class="learn-content markdown-content">
-                                    {{right | markdown | safe}}
+        <div class="split-pane" style="flex: 1 1 0%; width: 50%; min-width: 50%; max-width: 50%; min-height: 100%;">
+            <div class="component-html base-component">
+                <div class="simplebar" data-simplebar>
+                    <div class="simplebar-wrapper" style="margin: 0px;">
+                        <div class="simplebar-mask">
+                            <div class="simplebar-offset" style="right: 0px; bottom: 0px;">
+                                <div class="simplebar-content-wrapper">
+                                    <div class="simplebar-content" style="margin-right: 10px;">
+                                        <div class="learn-content markdown-content">
+                                            {{content.right | markdown | safe}}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>              
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-      </div>
     </div>
-  </div>
+</div>
+{% endfor %}
