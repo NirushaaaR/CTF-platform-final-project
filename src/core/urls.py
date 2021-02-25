@@ -3,6 +3,7 @@ from django.urls import path
 from core.views.room import index, room, enter_flag, unlock_conclusion, user_content_tracker
 from core.views.auth import login, logout, register
 from core.views.user import profile, scoreboard
+from core.views.sqli_test import get_sql_response
 
 urlpatterns = [
     path("", index, name="index"),
@@ -15,4 +16,5 @@ urlpatterns = [
     path("logout/", logout, name="logout"),
     path("profile/", profile, name="profile"),
     path("scoreboard/", scoreboard, name="scoreboard"),
+    path("sqli-execute/", get_sql_response, name="sqli-execute"),
 ]
