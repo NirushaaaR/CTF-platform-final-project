@@ -19,7 +19,7 @@
                                             </div>
                                             <hr>
                                             {% if task.docker %}{% if task.docker.url %}
-                                            <p>ไปที่ url: <a target="_blank"
+                                            <p>url: <a target="_blank"
                                                     href="{{task.docker.url|render_docker_url:task.docker_url_path}}">{{task.docker.url|render_docker_url:task.docker_url_path}}</a>
                                             </p>
                                             {% else %}
