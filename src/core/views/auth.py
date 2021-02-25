@@ -65,12 +65,7 @@ def register(request):
 
 @require_POST
 def logout(request):
-    # if Bob logout don't remove his session but remove sessionid cookies!!
-    if request.user.username == "Bob":
-        response = HttpResponseRedirect(reverse("index"))
-        response.delete_cookie("sessionid")
-    else:
-        auth.logout(request)
-        response = redirect("index")
+    auth.logout(request)
+    response = redirect("index")
     messages.success(request, "Logout สำเร็จ")
     return response
