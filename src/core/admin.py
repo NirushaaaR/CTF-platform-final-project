@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.forms.models import BaseInlineFormSet
 from django.db import models
 from nested_inline.admin import NestedStackedInline, NestedModelAdmin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
@@ -8,6 +9,15 @@ from markdownx.widgets import AdminMarkdownxWidget
 
 from core.models import Room, Tag, Task, TaskHint, User, RoomContent
 
+class TaskInlineFormSet(BaseInlineFormSet):
+
+    def get_queryset(self):
+        return super().get_queryset().order_by("task_number")
+
+class ContentInlineFormSet(BaseInlineFormSet):
+
+    def get_queryset(self):
+        return super().get_queryset().order_by("content_number")
 
 class TaskHintInline(NestedStackedInline):
     model = TaskHint
@@ -16,6 +26,7 @@ class TaskHintInline(NestedStackedInline):
 
 class TaskInline(NestedStackedInline):
     model = Task
+    formset = TaskInlineFormSet
     extra = 1
     inlines = (TaskHintInline,)
     
@@ -24,13 +35,17 @@ class TaskInline(NestedStackedInline):
     }
 
 
+
+
 class RoomContentInline(NestedStackedInline):
     model = RoomContent
+    formset = ContentInlineFormSet
     extra = 1
 
     formfield_overrides = {
         models.TextField: {'widget': AdminMarkdownxWidget},
     }
+
 
 
 @admin.register(Room)
