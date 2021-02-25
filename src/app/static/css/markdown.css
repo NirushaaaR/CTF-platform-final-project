@@ -34,6 +34,18 @@
     border-radius: 5px;
 }
 
+.markdown-content table, .markdown-content th, .markdown-content td {
+    border: 1px solid black;
+    background-color: white;
+    color: #000;
+    font-size: medium-large;
+    text-align: center;
+}
+
+.markdown-content th {
+    background-color: #DFDFEC;
+}
+
 
 code.highlight,
 .markdown-content a {
@@ -500,3 +512,4 @@ details.no-details:not([open])>* {
 details.no-details:not([open]) summary {
     display: block;
 }
+
