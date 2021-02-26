@@ -2,6 +2,7 @@
     background-color: #272C31;
     color: #f0f0f5;
     word-break: keep-all;
+    word-wrap: break-word;
     font-size: larger;
 }
 
