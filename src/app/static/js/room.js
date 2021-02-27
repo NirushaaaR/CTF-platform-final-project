@@ -1,5 +1,9 @@
 const tracker_url = JSON.parse(document.getElementById('tracker-url').textContent);
 
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+
 function adjustActivePage(from, to) {
   $(`.menu-page[data-slide-to='${from}']`).removeClass("active");
   $(`.menu-page[data-slide-to='${to}']`).addClass("active");
@@ -10,15 +14,7 @@ function adjustActivePage(from, to) {
       'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
     },
     body: new URLSearchParams(`page_index=${to}`),
-  })
-  //$.ajax({
-  //  type: 'POST',
-  //  url: tracker_url,
-  //  headers: {
-  //    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-  //  },
-  //  data: {page_index: to},
-  //})
+  });
 }
 
 $(".menu-page").each((index, elem) => {
