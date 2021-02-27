@@ -1,9 +1,5 @@
 const tracker_url = JSON.parse(document.getElementById('tracker-url').textContent);
 
-$(function () {
-  $('[data-toggle="tooltip"]').tooltip()
-})
-
 function adjustActivePage(from, to) {
   $(`.menu-page[data-slide-to='${from}']`).removeClass("active");
   $(`.menu-page[data-slide-to='${to}']`).addClass("active");
