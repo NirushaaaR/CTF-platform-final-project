@@ -10,6 +10,14 @@
     border-top: 1px solid #f0f0f5;
 }
 
+.markdown-content blockquote {
+    color: #ddd;
+    margin: 0;
+    padding-left: 1.5em;
+    border-left: .5em #666 solid;
+    background-color: #23272b;
+}
+
 .markdown-content figure, .markdown-content img {
     padding: 6px 0 6px 0;
 }

@@ -168,5 +168,6 @@ from datetime import datetime
 MARKDOWNX_MEDIA_PATH = datetime.now().strftime("markdownx/%Y/%m/%d")
 
 MARKDOWNX_IMAGE_MAX_SIZE = {
+    'size': (500, 0),
     'quality': 100
 }
