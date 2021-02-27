@@ -80,8 +80,6 @@ class Room(models.Model):
     difficulty = models.IntegerField(
         choices=DifficultyChoices.choices,
     )
-    description = models.TextField()
-    conclusion = models.TextField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
