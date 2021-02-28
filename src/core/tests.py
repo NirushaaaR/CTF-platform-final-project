@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.test import override_settings
 
 from django.contrib.auth import get_user_model
-from core.models import Room, Task, TaskHint, ScoreHistory
+from core.models import Room, Task, TaskHint, ScoreHistory, RoomContent
 
 
 def prepare_db(self):
@@ -16,11 +16,25 @@ def prepare_db(self):
         title="title",
         preview="preview",
         difficulty=3,
-        description="description",
-        conclusion="conclusion",
     )
     room.save()
-
+    content1 = RoomContent(
+        content_number=1,
+        left="left1",
+        right="right1",
+        title="title1",
+        room=room
+    )
+    content2 = RoomContent(
+        content_number=2,
+        left="left2",
+        right="right2",
+        title="title2",
+        room=room
+    )
+    content1.save()
+    content2.save()
+    
     task1 = Task(
         task_number=1,
         title="task_title1",
@@ -81,11 +95,8 @@ class CoreSeleniumTests(StaticLiveServerTestCase):
 
     
     def _enter_flag(self, roomid, taskid, flag):
-        ROOM_URL = self.live_server_url + reverse("room", args=[roomid])
-        self.selenium.get(ROOM_URL)
-
-        task = self.selenium.find_element_by_css_selector(f"#formtask_{taskid} input[name='flag']")
-        task_submit = self.selenium.find_element_by_css_selector(f"#formtask_{taskid} button[type='submit']")
+        task = self.selenium.find_element_by_css_selector("#formtask_{taskid} input[name='flag']")
+        task_submit = self.selenium.find_element_by_css_selector("#formtask_{taskid} button[type='submit']")
         # wrong flag
         task.send_keys(flag)
         task_submit.click()
@@ -108,11 +119,37 @@ class CoreSeleniumTests(StaticLiveServerTestCase):
 
         alert = self.selenium.find_element_by_css_selector(".alert-success")
         self.assertTrue(alert)
+
+    
+    def test_move_room_content(self):
+        self._login_user("brock@mail.com", "123456")
+
+        ROOM_URL = self.live_server_url + reverse("room", args=[self.room.id])
+        self.selenium.get(ROOM_URL)
+
+        # moving by clicking left
+        self.selenium.find_element_by_css_selector(".slide-control-left").click()
+        self.assertIn("title1", self.selenium.page_source)
+
+        # moving by clicking right
+        self.selenium.find_element_by_css_selector(".slide-control-left").click()
+        self.assertIn("title2", self.selenium.page_source)
+
+        # moving by clicking left
+        self.selenium.find_element_by_css_selector(".slide-control-left").click()
+        self.assertIn("title1", self.selenium.page_source)
     
 
     def test_enter_flag(self):
         """ test mechanic when user enter the flag in room """
         self._login_user("brock@mail.com", "123456")
+
+        ROOM_URL = self.live_server_url + reverse("room", args=[self.room.id])
+        self.selenium.get(ROOM_URL)
+
+        # moving by clicking left
+        self.selenium.find_element_by_css_selector("[data-slide-to='2']").click()
+        self.assertIn("task_title1", self.selenium.page_source)
 
         self._enter_flag(self.room.id, self.task1.id, "FLAG{WRONG}")
         # score not increase
@@ -130,9 +167,8 @@ class CoreSeleniumTests(StaticLiveServerTestCase):
         self.assertEqual(history.gained, self.task1.points)
         self.assertEqual(history.type, "task")
 
-        # enter every flag and see if conclusion appear
-        self._enter_flag(self.room.id, self.task2.id, self.task2.flag)
-        conslusion = self.selenium.find_element_by_css_selector("#roomconclus")
+        # see if conclusion appear
+        conslusion = self.selenium.find_element_by_css_selector("#taskConclusion"+self.task1.id)
         self.assertTrue(conslusion)
 
 
