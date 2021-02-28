@@ -12,8 +12,8 @@
                 </tr>
             </thead>
             <tbody>
-                {% for user in top_10 %}
-                <tr>
+                {% for user in users %}
+                <tr {% if user.username == request.user.username %}class="bg-primary text-white"{% endif %}>
                     <th scope="row" width="10%" class="text-nowrap">{{forloop.counter}}</th>
                     <td class="text-nowrap">{{user.username}}</td>
                     <td class="text-nowrap">{{user.score}}</td>

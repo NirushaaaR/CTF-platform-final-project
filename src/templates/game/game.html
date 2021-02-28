@@ -1,10 +1,10 @@
 {% extends 'base.html' %} {% load static %}
 {% block content %}
-<div class="container">
-    <h1>{{game}}</h1>
+<div class="container mt-3 p-2 bg-white rounded">
+    <h1 class="mb-3">{{game}}</h1>
     {% if game.period %}
     {% if game.period.is_game_end %}
-    <p>ช่วงเวลาของเกมหมดลงแล้วแต่คุณยังตอบ</p>
+    <p>ช่วงเวลาของเกมหมดลงแล้วแต่คุณยังตอบคำถามได้ แต่จะไม่ได้แต้ม</p>
     {% else %}
     <p>เวลาที่เหลืออยู่ <span id="days"></span> <span id="hours"></span> <span id="minutes"></span> <span
             id="seconds"></span> </p>
@@ -32,29 +32,29 @@
             </div>
             <button class="submit-flag btn btn-primary">Submit</button>
         </form>
-
-        <table id="allflags" class="table table-bordered my-4">
-            <thead>
-                <tr>
-                    <th scope="col">ชื่อ</th>
-                    <th scope="col" colspan="2">คำอธิบาย</th>
-                    <th scope="col">สถานะ</th>
-                    <th scope="col">แต้มที่ได้</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for flag in flags %}
-                <tr id="flag_{{flag.id}}">
-                    <td>{{flag.name}}</td>
-                    <td colspan="2">{{flag.explanation}}</td>
-                    <td class="flag-status {% if flag.answered %}text-success{% else %}text-danger{% endif %}">
-                        {{flag.status}}</td>
-                    <td class="flag-point">{% if flag.answered %}{{flag.points_gained}}{% else %}-{% endif %}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
     </div>
+    <table id="allflags" class="table table-bordered my-4">
+        <thead>
+            <tr>
+                <th scope="col">ชื่อ</th>
+                <th scope="col" colspan="2">คำอธิบาย</th>
+                <th scope="col">สถานะ</th>
+                <th scope="col">แต้มที่ได้</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for flag in flags %}
+            <tr id="flag_{{flag.id}}">
+                <td>{{flag.name}}</td>
+                <td colspan="2">{{flag.explanation}}</td>
+                <td class="flag-status {% if flag.answered %}text-success{% else %}text-danger{% endif %}">
+                    {{flag.status}}</td>
+                <td class="flag-point">{% if flag.answered %}{{flag.points_gained}}{% else %}-{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 </div>
 <div class="overlay"></div>
 {% endblock %}

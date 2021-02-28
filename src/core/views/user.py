@@ -14,10 +14,10 @@ def profile(request):
 
 
 def scoreboard(request):
-    top10 = (
+    users = (
         ScoreHistory.objects.values(username=F("user__username"))
         .annotate(score=Sum("gained"))
         .order_by("-score")
     )
-    context = {"top_10": top10}
+    context = {"users": users}
     return render(request, "core/scoreboard.html", context)
