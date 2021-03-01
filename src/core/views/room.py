@@ -27,7 +27,8 @@ def query_paginated_room(request, rooms):
         rooms = rooms.filter(
             Q(title__icontains=search)
             | Q(preview__icontains=search)
-            | Q(description__icontains=search)
+            | Q(contents__left__icontains=search)
+            | Q(contents__right__icontains=search)
         )
     pagination = Paginator(rooms, 6)
     current_page = request.GET.get("page", 1)
