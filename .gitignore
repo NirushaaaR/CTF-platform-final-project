@@ -54,6 +54,9 @@ db.sqlite3
 tiny_privatekey.pem
 
 .env
+.env.local
+.env.production
+credentials.json
 .vscode/
 
 Pipfile.lock

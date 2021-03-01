@@ -21,7 +21,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.humanize",
     # 3rd party
-    "nested_inline",
+    "nested_admin",
     "markdownx",
     # local app
     "core.apps.CoreConfig",
@@ -68,6 +68,7 @@ DATABASES = {
         "NAME": os.environ.get("POSTGRES_DB"),
         "USER": os.environ.get("POSTGRES_USER"),
         "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
+        "PORT": os.environ.get("DB_PORT"),
     }
 }
 
@@ -104,8 +105,8 @@ USE_TZ = True
 STATIC_URL = "/static/"
 MEDIA_URL = "/media/"
 # where to store
-MEDIA_ROOT = BASE_DIR / "media"
-STATIC_ROOT = BASE_DIR / "static"
+MEDIA_ROOT =  "media"
+STATIC_ROOT = "static"
 
 STATICFILES_DIRS = [BASE_DIR / "app" / "static"]
 

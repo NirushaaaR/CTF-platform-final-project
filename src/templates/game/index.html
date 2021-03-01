@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load humanize %}
+{% load humanize %} {% load markdown_tags %}
 {% block content %}
 <div class="container">
     <div class="game-list">
@@ -12,7 +12,7 @@
             {% endif %}
             <div class="card-body">
               <h5 class="card-title">{{game.title}}</h5>
-              <p class="card-text">{{game.description|safe}}</p>
+              <p class="card-text">{{game.description|markdown|safe}}</p>
               <hr>
               <a href="{{game.get_absolute_url}}" class="btn btn-dark">Enter</a>
             </div>

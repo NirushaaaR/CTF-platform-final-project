@@ -1,4 +1,4 @@
-{% extends 'base.html' %} {% load static %}
+{% extends 'base.html' %} {% load static %} {% load markdown_tags %}
 {% block content %}
 <div class="container mt-3 p-2 bg-white rounded">
     <h1 class="mb-3">{{game}}</h1>
@@ -16,7 +16,7 @@
     <div id="challenges">
         {% for challenge in challenges %}
         Url: <a href="{{challenge.url}}">{{challenge.url}}</a></p>
-        <p>{{challenge.description|safe}}</p>
+        <p>{{challenge.description|markdown|safe}}</p>
         <hr>
         {% endfor %}
     </div>
