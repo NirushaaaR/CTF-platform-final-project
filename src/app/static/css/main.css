@@ -47,6 +47,14 @@ body.loading .overlay {
   z-index: 1030;
 }
 
+.alert-fixed-top {
+  position: fixed;
+  top: 10%;
+  left: 0;
+  right: 0;
+  z-index: 1031;
+}
+
 .navbar-bg {
   font-weight: 600;
 }
