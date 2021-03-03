@@ -76,7 +76,7 @@
                                                     <ul>
                                                     {% for next in room.next_rooms.all %}
                                                         <li>
-                                                            <a href="{{next.get_absolute_url}}">{{next}}</a>: {{next.preview | truncatechars:55}}
+                                                            <a href="{{next.get_absolute_url}}">{{next}}</a>: {{next.preview}}
                                                         </li>
                                                     {% endfor %}
                                                     </ul>
