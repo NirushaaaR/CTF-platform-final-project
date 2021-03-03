@@ -70,6 +70,17 @@
                                             <div id="taskConclusion{{task.id}}">
                                                 {% if task.task_number in user_answered_tasks or task.points == 0 %}
                                                 {{task.conclusion | markdown | safe}}
+                                                {% if forloop.last %}
+                                                    <hr>
+                                                    <h1>Next: </h1>
+                                                    <ul>
+                                                    {% for next in room.next_rooms.all %}
+                                                        <li>
+                                                            <a href="{{next.get_absolute_url}}">{{next}}</a>: {{next.preview | truncatechars:55}}
+                                                        </li>
+                                                    {% endfor %}
+                                                    </ul>
+                                                {% endif %}
                                                 {% else %}
                                                 <p>
                                                     Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quidem

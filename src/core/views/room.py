@@ -42,6 +42,27 @@ def query_paginated_room(request, rooms):
     return context
 
 
+def generate_room_conclusion_response(task, room_id):
+    response = {
+        "message": "ถูกต้อง!!",
+        "conclusion": markdownify(task.conclusion),
+        "correct": True,
+    }
+    # check if lastest task
+    # check if the room has any task that has tasknumber higher than this
+    if not Task.objects.filter(
+        room_id=room_id, task_number__gt=task.task_number
+    ).exists():
+        next_room = Room.objects.filter(id=room_id).first().next_rooms.all()
+        next_room_info = [
+            {"url": r.get_absolute_url(), "title": r.title, "preview": r.preview}
+            for r in next_room
+        ]
+        response["next_room_info"] = next_room_info
+
+    return response
+
+
 def index(request):
     """ The Fist page. Will Get Rooms and shows a paginated result """
     rooms = (
@@ -49,13 +70,12 @@ def index(request):
         .filter(is_active=True)
         .order_by("created_at")
     )
-    tag = request.GET.get('tag')
+    tag = request.GET.get("tag")
     if tag:
         rooms = rooms.filter(tags__name=tag)
 
     context = query_paginated_room(request, rooms)
     return render(request, "core/index.html", context)
-
 
 
 @login_required
@@ -100,13 +120,8 @@ def enter_flag(request, room_id):
 
     if task.flag == flag or task.flag is None:
         task.answered_users.add(request.user.id)
-        return JsonResponse(
-            {
-                "message": "ถูกต้อง!!",
-                "conclusion": markdownify(task.conclusion),
-                "correct": True,
-            }
-        )
+        response = generate_room_conclusion_response(task, room_id)
+        return JsonResponse(response)
     else:
         return JsonResponse({"message": "ผิด!!", "correct": False})
 
@@ -139,13 +154,8 @@ def unlock_conclusion(request, room_id):
             user_id=request.user.id, room_id=room_id
         ).update(finished_at=timezone.now())
 
-    return JsonResponse(
-        {
-            "message": "ปลดล็อคเฉลย",
-            "correct": True,
-            "conclusion": markdownify(task.conclusion),
-        }
-    )
+    response = generate_room_conclusion_response(task, room_id)
+    return JsonResponse(response)
 
 
 @login_required
@@ -153,7 +163,6 @@ def unlock_conclusion(request, room_id):
 def user_content_tracker(request, room_id):
     """ track which learning content user are currently looking """
     page_index = request.POST.get("page_index", 0)
-    request.session.setdefault('room', {})
+    request.session.setdefault("room", {})
     request.session[f"room{room_id}"] = int(page_index)
     return JsonResponse({"success": True})
-

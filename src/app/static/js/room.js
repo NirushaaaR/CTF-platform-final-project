@@ -23,7 +23,7 @@ $('#myCarousel').on('slide.bs.carousel', e => {
   adjustActivePage(e.from, e.to);
 })
 
-function showConslusion(task_id, conclusion) {
+function showConslusion(task_id, conclusion, next_room_info = null) {
   // find element id task{id}
   const taskElement = document.getElementById(`task${task_id}`);
   // take blur out
@@ -35,6 +35,14 @@ function showConslusion(task_id, conclusion) {
   // add conclusion to text
   const taskConclusion = taskElement.querySelector(`#taskConclusion${task_id}`);
   if (taskConclusion) taskConclusion.innerHTML = conclusion;
+  // add next room
+  if (next_room_info) {
+    taskConclusion.innerHTML += `<hr>
+    <h1>Next: </h1>
+    <ul>
+    ${next_room_info.map(next => `<li><a href='${next.url}'>${next.title}</a>: ${next.preview}</li>`).join('')}
+    </ul>`
+  }
 }
 
 function sendFormRequest(form) {
@@ -50,7 +58,7 @@ function sendFormRequest(form) {
     success: data => {
       alert(data.message);
       if (data.correct) {
-        showConslusion(task_id, data.conclusion);
+        showConslusion(task_id, data.conclusion, data.next_room_info);
       }
     }
   });

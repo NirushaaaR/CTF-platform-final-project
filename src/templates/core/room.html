@@ -46,7 +46,7 @@
       <div class="slides carousel slide" id="myCarousel" data-interval="false" data-wrap="false">
         <div class="slides carousel-inner">
           {% include "partials/_learning_content.html" with contents=contents %}
-          {% include "partials/_task_content.html" with tasks=tasks user_answered_tasks=user_answered_tasks %}
+          {% include "partials/_task_content.html" with tasks=tasks user_answered_tasks=user_answered_tasks room=room %}
         </div>
       </div>
 
