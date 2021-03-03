@@ -42,9 +42,9 @@ def query_paginated_room(request, rooms):
     return context
 
 
-def generate_room_conclusion_response(task, room_id):
+def generate_room_conclusion_response(task, room_id, cheated=False):
     response = {
-        "message": "ถูกต้อง!!",
+        "message": "ปลดล็อคเฉลยแล้ว!!" if cheated else f"ตอบถูกต้อง {task.points}pts" if task.points > 0  else "ยอดเยี่ยมมาก!!",
         "conclusion": markdownify(task.conclusion),
         "correct": True,
     }
@@ -123,7 +123,7 @@ def enter_flag(request, room_id):
         response = generate_room_conclusion_response(task, room_id)
         return JsonResponse(response)
     else:
-        return JsonResponse({"message": "ผิด!!", "correct": False})
+        return JsonResponse({"message": "ตอบไม่ถูกต้อง!!", "correct": False})
 
 
 @login_required
@@ -154,7 +154,7 @@ def unlock_conclusion(request, room_id):
             user_id=request.user.id, room_id=room_id
         ).update(finished_at=timezone.now())
 
-    response = generate_room_conclusion_response(task, room_id)
+    response = generate_room_conclusion_response(task, room_id, True)
     return JsonResponse(response)
 
 

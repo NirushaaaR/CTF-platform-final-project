@@ -38,6 +38,20 @@ var chart = new ApexCharts(
 
 chart.render();
 
+function toggleAlert(message, success) {
+    const alertElem = `<div class="message container">
+    <div class="alert alert-${success ? "success" : "danger"} alert-dismissible text-center" role="alert">
+        <button class="close" type="button" data-dismiss="alert"><span aria-hidden="true">&times;</span></button>
+        <strong>${message}</strong>
+    </div>
+  </div>`;
+  
+    $(".alert-fixed-top").append(alertElem);
+    setTimeout(() => {
+      $(".message").fadeOut('slow');
+    }, 3000);
+  }
+
 async function get_top10_score() {
     const res = await fetch(SCORE_URL);
     const json = await res.json();
@@ -89,7 +103,7 @@ $(".form-challenge").submit(function (e) {
         url: url,
         data: form.serialize(),
         success: function (data) {
-            alert(data.message);
+            toggleAlert(data.message, data.correct);
             $('.input-challenge-flag').val('');
             if (data.correct) {
                 // location.reload();

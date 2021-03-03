@@ -45,6 +45,20 @@ function showConslusion(task_id, conclusion, next_room_info = null) {
   }
 }
 
+function toggleAlert(message, success) {
+  const alertElem = `<div class="message container">
+  <div class="alert alert-${success ? "success" : "danger"} alert-dismissible text-center" role="alert">
+      <button class="close" type="button" data-dismiss="alert"><span aria-hidden="true">&times;</span></button>
+      <strong>${message}</strong>
+  </div>
+</div>`;
+
+  $(".alert-fixed-top").append(alertElem);
+  setTimeout(() => {
+    $(".message").fadeOut('slow');
+  }, 3000);
+}
+
 function sendFormRequest(form) {
   const url = form.attr('action');
   const task_id = $('input[name="task_id"]', form).val();
@@ -56,7 +70,7 @@ function sendFormRequest(form) {
     },
     data: form.serialize(),
     success: data => {
-      alert(data.message);
+      toggleAlert(data.message, data.correct);
       if (data.correct) {
         showConslusion(task_id, data.conclusion, data.next_room_info);
       }
