@@ -119,10 +119,6 @@ class GameSeleniumTests(StaticLiveServerTestCase):
         input_flag.send_keys(flag)
         submit.click()
 
-        # check alert
-        WebDriverWait(self.selenium, 10).until(EC.alert_is_present())
-        ale = self.selenium.switch_to_alert()
-        ale.accept()
         input_flag.clear()
 
     
