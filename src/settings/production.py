@@ -10,7 +10,7 @@ from google.oauth2 import service_account
 GS_CREDENTIALS = None
 if not os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
     GS_CREDENTIALS = service_account.Credentials.from_service_account_file(
-        str(BASE_DIR / "credentials.json")
+        "credentials.json"
     )
 
 DEFAULT_FILE_STORAGE = os.environ.get("DEFAULT_FILE_STORAGE")
