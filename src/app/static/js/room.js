@@ -24,6 +24,8 @@ $('#myCarousel').on('slide.bs.carousel', e => {
 })
 
 function showConslusion(task_id, conclusion, next_room_info = null) {
+  // .task-cleared
+  $(`#taskMenu${task_id}`).addClass("task-cleared");
   // find element id task{id}
   const taskElement = document.getElementById(`task${task_id}`);
   // take blur out

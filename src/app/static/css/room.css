@@ -321,3 +321,15 @@ svg:not(:root).svg-inline--fa {
 .blur {
     filter: blur(.5rem);
 }
+
+
+.task-menu, .task-menu.active {
+    border-left: 0.4rem solid #ffc107;
+    border-top: 0.2rem solid #fff;
+}
+
+
+.task-menu.task-cleared, .task-menu.task-cleared.active {
+    border-left: 0.4rem solid #28a745;
+}
+

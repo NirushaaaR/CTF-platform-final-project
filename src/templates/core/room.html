@@ -14,8 +14,8 @@
         data-toggle="tooltip" data-placement="right" title="{{content.title}}">{{forloop.counter}}</div>
       {% endfor %}
       {% for task in tasks %}
-        <div data-slide-to="{{forloop.counter0|add:contents_count}}" class="menu-page{% if forloop.counter0|add:contents_count == page_index %} active{% endif %}"
-        data-toggle="tooltip" data-placement="right" title="{{task.title}}">{{forloop.counter|add:contents_count}}</div>
+        <div data-slide-to="{{forloop.counter0|add:contents_count}}" class="menu-page task-menu{% if forloop.counter0|add:contents_count == page_index %} active{% endif %}{% if task.task_number in user_answered_tasks %} task-cleared{% endif %}"
+        data-toggle="tooltip" data-placement="right" title="{{task.title}}" id="taskMenu{{task.id}}">{{forloop.counter|add:contents_count}}</div>
       {% endfor %}
     </nav>
   </div>
