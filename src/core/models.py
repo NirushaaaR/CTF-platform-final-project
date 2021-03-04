@@ -85,8 +85,8 @@ class Room(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     tags = models.ManyToManyField("Tag", blank=True, related_name="rooms")
-    prerequisites = models.ManyToManyField(
-        "self", symmetrical=False, blank=True, related_name="next_rooms"
+    next_rooms = models.ManyToManyField(
+        "self", symmetrical=False, blank=True, related_name="prerequisites"
     )
     participants = models.ManyToManyField(
         get_user_model(),
