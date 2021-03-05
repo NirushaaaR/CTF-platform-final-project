@@ -98,3 +98,4 @@ class UserChallengeRecord(models.Model):
     answered_at = models.DateTimeField(auto_now_add=True)
 
     points_gained = models.PositiveIntegerField()
+    

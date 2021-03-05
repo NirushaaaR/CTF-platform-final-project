@@ -62,6 +62,10 @@ def generate_room_conclusion_response(task, room_id, cheated=False):
 
     return response
 
+def check_alerady_enter_flag(user_id, task_id):
+    """ check if already answered """
+    return UserAnsweredTask.objects.filter(user_id=user_id, task_id=task_id).exists()
+
 
 def index(request):
     """ The Fist page. Will Get Rooms and shows a paginated result """
@@ -115,7 +119,12 @@ def enter_flag(request, room_id):
         request.user.participated_rooms.add(room_id)
 
     task_id = request.POST.get("task_id")
-    flag = request.POST.get("flag")
+
+    # check if already answered
+    if check_alerady_enter_flag(request.user.id, task_id):
+        return JsonResponse({"message": "คุณตอบคำถามนี้ไปแล้ว", "correct": False})
+
+    flag = request.POST.get("flag", "").strip()
     task = get_object_or_404(Task, id=task_id)
 
     if task.flag == flag or task.flag is None:
@@ -136,8 +145,8 @@ def unlock_conclusion(request, room_id):
     task_id = request.POST.get("task_id")
     task = get_object_or_404(Task, id=task_id)
     # check if already answered
-    if UserAnsweredTask.objects.filter(user=request.user, task_id=task_id).exists():
-        return JsonResponse({"message": "ตอบคำถามนี้ไปแล้ว", "correct": False})
+    if check_alerady_enter_flag(request.user.id, task_id):
+        return JsonResponse({"message": "คุณตอบคำถามนี้ไปแล้ว", "correct": False})
 
     UserAnsweredTask.objects.create(user=request.user, task_id=task_id)
     ScoreHistory.objects.create(

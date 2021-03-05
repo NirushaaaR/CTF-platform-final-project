@@ -31,6 +31,7 @@ class GamePeriodInline(NestedStackedInline):
 @admin.register(Game)
 class GameAdmin(NestedModelAdmin):
     list_display = ("title", "is_archive")
+    list_editable = ("is_archive",)
     inlines = (ChallengeInline, GamePeriodInline)
 
     formfield_overrides = {
