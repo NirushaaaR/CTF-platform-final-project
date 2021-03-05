@@ -4,6 +4,7 @@ from core.views.room import index, room, enter_flag, unlock_conclusion, user_con
 from core.views.auth import login, logout, register
 from core.views.user import profile, scoreboard
 from core.views.sqli_test import get_sql_response
+from core.views.feedback import feedback_view
 
 urlpatterns = [
     path("", index, name="index"),
@@ -16,5 +17,6 @@ urlpatterns = [
     path("logout/", logout, name="logout"),
     path("profile/", profile, name="profile"),
     path("scoreboard/", scoreboard, name="scoreboard"),
+    path("feedback/", feedback_view, name="feedback"),
     path("sqli-execute/", get_sql_response, name="sqli-execute"),
 ]
