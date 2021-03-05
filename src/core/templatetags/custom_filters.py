@@ -9,6 +9,11 @@ def get_dict_value(dict_instance, key):
         return None
     return dict_instance.get(key)
 
+@register.filter
+def task_score_points(task_score, task_id):
+    if task_id in task_score:
+        return f'{task_score[task_id]} pts'
+    return "ยังไม่ได้ตอบ"
 
 def replace_char(char):
     return char if char == "_" else "*"
@@ -35,6 +40,7 @@ def startswith(text, starts):
     if isinstance(text, str):
         return text.startswith(starts)
     return False
+
 
 @register.simple_tag
 def render_url_with_param(path, param, value):

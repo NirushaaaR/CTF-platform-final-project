@@ -1,19 +1,25 @@
-{% extends 'base.html' %} {% block content %}
+{% extends 'base.html' %} {% load custom_filters %} {% block content %}
 <div class="container mt-3">
     <div class="jumbotron">
         <h1>User: {{ request.user.username }}</h1>
         <p>email: {{ request.user.email }}</p>
         <p>score: {{request.user.score}}</p>
         <hr class="my-4">
-        <h3>การเข้าร่วม</h3>
+        <h3>การตอบคำถาม</h3>
         <ul>
             {% for parcitipation in parcitipations %}
             <li>
-                room - <a href="{{parcitipation.room.get_absolute_url}}">{{parcitipation.room}}</a>
+                room - <a href="{{parcitipation.room.get_absolute_url}}">{{parcitipation.room}}</a>&nbsp;
                 {% if parcitipation.finished_at %}
-                finish - {{parcitipation.finished_at}}
+                <span class="text-success">Complete <i class="fas fa-check"></i> - {{parcitipation.finished_at}}</span>
                 {% endif %}
+                <ol>
+                    {% for task in parcitipation.room.room_tasks %}
+                    <li>{{task}}: &nbsp; {{ task_score|task_score_points:task.id }}</li>
+                    {% endfor %}
+                </ol>
             </li>
+            <hr>
             {% endfor %}
         </ul>
     </div>
