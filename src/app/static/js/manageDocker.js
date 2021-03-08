@@ -1,4 +1,4 @@
-const BASEURL = "http://139.162.48.22:3000/manage/docker/";
+const BASEURL = "https://li1461-22.members.linode.com:3000/manage/docker/";
 
 function urlencode(str) {
     return encodeURIComponent(str)

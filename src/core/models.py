@@ -60,7 +60,7 @@ class ScoreHistory(models.Model):
     time = models.DateTimeField(auto_now_add=True)
 
     user = models.ForeignKey(
-        get_user_model(), on_delete=models.DO_NOTHING, related_name="score_history"
+        get_user_model(), on_delete=models.CASCADE, related_name="score_history"
     )
 
     def __str__(self) -> str:
