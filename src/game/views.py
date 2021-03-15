@@ -1,6 +1,6 @@
 from datetime import datetime
 from django.contrib import messages
-
+from django.contrib.auth import get_user_model
 from django.db.models import F, Subquery, Count, Q
 from django.http.response import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
@@ -33,7 +33,7 @@ def populate_game_challenges(game, user_id):
         challenge__in=challenges, participated_user__user_id=user_id
     )
     flags = []
-    count_answered= 0
+    count_answered = 0
     for c in challenges:
         for flag in c.flags.all():
             # find if user already answer the flag
@@ -41,14 +41,19 @@ def populate_game_challenges(game, user_id):
             flag.answered = False
             for record in user_records:
                 if record.challenge_flag_id == flag.id:
-                    flag.status = "Solved "+ "\u2713"
+                    flag.status = "Solved " + "\u2713"
                     flag.answered = True
                     flag.points_gained = record.points_gained
                     count_answered += 1
                     break
             flags.append(flag)
 
-    return {"game": game, "challenges": challenges, "flags": flags, "count_answered": count_answered}
+    return {
+        "game": game,
+        "challenges": challenges,
+        "flags": flags,
+        "count_answered": count_answered,
+    }
 
 
 def update_score_process(game, flag, user_id, username):
@@ -99,7 +104,12 @@ def update_score_process(game, flag, user_id, username):
 
 
 def get_top10_score(game_id):
-    top10 = UserParticipateGame.objects.filter(game_id=game_id).order_by("-game_score").values_list("id", flat=True)[:10]
+    top10 = UserParticipateGame.objects.filter(game_id=game_id).values_list("id")[:10]
+    unique_user = (
+        UserParticipateGame.objects.filter(game_id=game_id)
+        .extra(select={"points_gained": 0})
+        .annotate(answered_at=F("participate_at"), username=F("user__username"))
+    )
 
     score = (
         UserChallengeRecord.objects.filter(participated_user_id__in=top10)
@@ -108,6 +118,7 @@ def get_top10_score(game_id):
             "answered_at",
             username=F("participated_user__user__username"),
         )
+        .union(unique_user)
         .order_by("answered_at")
     )
 
@@ -129,7 +140,7 @@ def game_view(request, game_slug):
         remaining_time = game.period.get_remaining_time_percentage()
         if remaining_time > 1:
             messages.warning(request, "ยังไม่ถึงเวลาเริ่มเกม")
-            return redirect('game_index')
+            return redirect("game_index")
         game.participants.add(request.user)
     except Game.period.RelatedObjectDoesNotExist:
         # no periods game always ongoning
@@ -152,10 +163,11 @@ def enter_challenge_flag(request, game_id):
     except Game.period.RelatedObjectDoesNotExist:
         # no periods game always ongoning
         game.period = None
-    
+
     try:
         right_flag = ChallengeFlag.objects.select_related("challenge").get(
-            flag__iexact=request.POST.get("flag", "").strip(), challenge__game_id=game_id
+            flag__iexact=request.POST.get("flag", "").strip(),
+            challenge__game_id=game_id,
         )
         result = update_score_process(
             game, right_flag, request.user.id, request.user.username
@@ -164,8 +176,6 @@ def enter_challenge_flag(request, game_id):
 
     except ChallengeFlag.DoesNotExist:
         return JsonResponse({"message": "ผิด", "correct": False})
-    
-    
 
 
 @login_required
