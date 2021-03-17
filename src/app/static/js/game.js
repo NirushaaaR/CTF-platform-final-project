@@ -60,6 +60,11 @@ async function get_top10_score() {
     const score_data = [];
     // update graph
     json.data.forEach((d, index) => {
+
+        if (index > 0 && d.points_gained === 0) {
+            return;
+        }
+
         const idx = score_data.findIndex(s => s.name === d.username);
         if (idx >= 0) {
             // add to existing user data
