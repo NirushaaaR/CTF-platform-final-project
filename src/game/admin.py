@@ -44,8 +44,3 @@ class GameAdmin(NestedModelAdmin):
         css = {
             "all": ("css/markdown.css",),
         }
-
-
-@admin.register(UserChallengeRecord)
-class UserChallengeRecordAdmin(admin.ModelAdmin):
-    list_display = ("answered_at", "challenge", "challenge_flag")
