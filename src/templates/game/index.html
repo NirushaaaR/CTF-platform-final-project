@@ -1,5 +1,8 @@
 {% extends 'base.html' %}
 {% load humanize %} {% load markdown_tags %}
+{% block stylesheet %}
+<link rel="stylesheet" href="{% static 'css/markdown.css' %}">
+{% endblock stylesheet %}
 {% block content %}
 <div class="container">
     <div class="game-list">
