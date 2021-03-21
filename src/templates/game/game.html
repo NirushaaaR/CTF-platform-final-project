@@ -1,4 +1,7 @@
 {% extends 'base.html' %} {% load static %} {% load markdown_tags %}
+{% block stylesheet %}
+<link rel="stylesheet" href="{% static 'css/markdown.css' %}">
+{% endblock stylesheet %}
 {% block content %}
 <div class="container mt-3 p-2 bg-white rounded">
     <h1 class="mb-3">{{game}}</h1>
@@ -13,13 +16,15 @@
     <div class="chart-title">Top 10 Users Score</div>
     <div id='chart-area'></div>
     <hr>
-    <div id="challenges">
-        {% for challenge in challenges %}
-        Url: <a href="{{challenge.url}}">{{challenge.url}}</a></p>
-        <p>{{challenge.description|markdown|safe}}</p>
+    {% for challenge in challenges %}
+    <div class="challenges">
+        <p>Url: <a href="{{challenge.url}}">{{challenge.url}}</a></p>
+        <div class="challenges-description">
+            {{challenge.description|markdown|safe}}
+        </div>
         <hr>
-        {% endfor %}
     </div>
+    {% endfor %}
 
     <div class="flag-enter">
         <form class="form-challenge" id="challenge_{{challenge.id}}" action="{% url 'enter_challenge_flag' game.id %}"
