@@ -108,6 +108,9 @@ class Room(models.Model):
 
     def __str__(self):
         return self.title
+    
+    class Meta:
+        verbose_name = "Tutorial"
 
 
 class RoomContent(models.Model):
@@ -119,9 +122,11 @@ class RoomContent(models.Model):
 
     class Meta:
         unique_together = ("content_number", "room")
+        verbose_name = "Tutorial Content"
 
     def __str__(self):
         return f"content {self.room} {self.id}"
+
 
 
 class Tag(models.Model):
@@ -169,6 +174,8 @@ class Task(models.Model):
 
     class Meta:
         unique_together = (("room", "task_number"),)
+        verbose_name = "Tutorial Quiz"
+        verbose_name_plural = "Tutorial Quizzes"
 
 
 class UserAnsweredTask(models.Model):

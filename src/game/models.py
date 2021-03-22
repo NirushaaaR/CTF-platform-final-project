@@ -52,6 +52,9 @@ class GamePeriod(models.Model):
 
     def __str__(self):
         return f"{self.start} - {self.end}"
+    
+    class Meta:
+        verbose_name = "Game TimeLimit"
 
 
 class Challenge(models.Model):
