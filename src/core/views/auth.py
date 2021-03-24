@@ -55,7 +55,7 @@ def register(request):
             username=username, email=email, password=password
         )
         auth.login(request, user)
-        return redirect("feedback")
+        return redirect("index")
 
     else:
         if request.user.is_authenticated:
