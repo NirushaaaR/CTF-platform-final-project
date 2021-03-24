@@ -107,6 +107,9 @@ $(".form-challenge").submit(function (e) {
         type: "POST",
         url: url,
         data: form.serialize(),
+        error: function(xhr, ajaxOptions, err) {
+            toggleAlert(`Error: ${xhr.status} ${err.message}`, false);
+        },
         success: function (data) {
             toggleAlert(data.message, data.correct);
             $('.input-challenge-flag').val('');
