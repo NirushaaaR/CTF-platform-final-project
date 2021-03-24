@@ -68,10 +68,31 @@
 <script>
     var SCORE_URL = "{% url 'game_score' game.id %}";
 </script>
+{% if game.period %}
+<script>
+let endTime = new Date("{{game.period.end|date:'U'}}" * 1000);
+endTime = (Date.parse(endTime) / 1000);
+function makeTimer() {
+    const now = (Date.parse(new Date()) / 1000);
+
+    let timeLeft = endTime - now;
+
+    let days = Math.floor(timeLeft / 86400);
+    let hours = Math.floor((timeLeft - (days * 86400)) / 3600);
+    let minutes = Math.floor((timeLeft - (days * 86400) - (hours * 3600)) / 60);
+    let seconds = Math.floor((timeLeft - (days * 86400) - (hours * 3600) - (minutes * 60)));
+
+    if (days > 0) $("#days").html(days + " วัน");
+    if (hours > 0) $("#hours").html(hours + " ชั่วโมง");
+    if (minutes > 0) $("#minutes").html(minutes + " นาที");
+    if (seconds > 0) $("#seconds").html(seconds + " วินาที");
+
+}
+makeTimer();
+setInterval(makeTimer, 1000);
+</script>
+{% endif %}
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script src="{% static 'js/ajaxLoadingSpinner.js' %}"></script>
 <script src="{% static 'js/game.js' %}"></script>
-{% if game.period %}
-<script src="{% static 'js/gameTimer.js' %}"></script>
-{% endif %}
 {% endblock %}
