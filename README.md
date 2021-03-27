@@ -31,16 +31,22 @@ next migrate the database with command
 python manage.py migrate
 ```
 
-
+***
 ## START RUNNING SERVER
 ``` bash
 python manage.py runserver --settings=settings.local
 ```
 server now should run on http://localhost:8000
 
-***
 ## RUN WITH DOCKER
 ```
 docker-compose up
 ```
+
+***
+## Deployment
+currently the project is set to deploy to google cloud App Engine standard environment https://cloud.google.com/python/django/appengine
+you will also need to set **google cloud bucket** and put credentials.json inside the src/ to handle media file upload
+https://ctf-platform-cloud-bucket.et.r.appspot.com/
+
 
