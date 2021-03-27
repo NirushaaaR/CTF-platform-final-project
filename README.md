@@ -47,6 +47,7 @@ docker-compose up
 ## Deployment
 currently the project is set to deploy to google cloud App Engine standard environment https://cloud.google.com/python/django/appengine
 you will also need to set **google cloud bucket** and put credentials.json inside the src/ to handle media file upload
-https://ctf-platform-cloud-bucket.et.r.appspot.com/
+
+website >> https://ctf-platform-cloud-bucket.et.r.appspot.com/
 
 
