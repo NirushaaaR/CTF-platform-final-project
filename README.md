@@ -1,12 +1,15 @@
 # CTF PLATFORM DJANGO
 
-## FIRST
-cd src/ and
-start copy file .env.example to .env and change it to proper environment variable
+## Requirements
+1) [python](https://www.python.org/downloads/) 3.8
+
+## Installation
+1) cd src/
+2) start copy file .env.example to .env and change it to proper environment variable
 ```
 DEBUG=on
 SECRET_KEY=some-key-here
-ALLOWED_HOSTS=
+ALLOWED_HOSTS=*
 
 # DATABASE CONFIG
 DB_HOST=<WHERE IS THE DATABASE>
@@ -21,12 +24,12 @@ GS_PROJECT_ID=<GOOGLE_CLOUD_BUCKET_PROJECT_ID>
 GS_BUCKET_NAME=<NAME_OF_BUCKET>
 ```
 
-install all dependencies in requirements.txt
+3) install all dependencies in requirements.txt
 ``` bash
 pip install -r requirements.txt
 ```
 
-next migrate the database with command
+4) next migrate the database with command
 ``` bash
 python manage.py migrate
 ```

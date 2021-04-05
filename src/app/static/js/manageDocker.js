@@ -1,4 +1,4 @@
-const BASEURL = "https://li1461-22.members.linode.com:3000/manage/docker/";
+const BASEURL = "https://vulnplatform.pw:3000/manage/docker/";
 
 function urlencode(str) {
     return encodeURIComponent(str)

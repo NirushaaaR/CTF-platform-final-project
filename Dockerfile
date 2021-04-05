@@ -6,7 +6,7 @@ ENV PYTHONUNBUFFERED 1
 RUN apt-get update
 RUN apt-get install gcc -y
 
-COPY ./requirements.txt ./requirements.txt
+COPY ./src/requirements.txt ./requirements.txt
 RUN pip install -r requirements.txt
 
 RUN mkdir /src
